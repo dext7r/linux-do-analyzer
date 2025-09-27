@@ -133,7 +133,7 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 
-<body class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+<body class="min-h-screen bg-white">
 
   <!-- 导航栏 -->
   <nav class="sticky top-0 z-50 backdrop-blur-md border-b"
@@ -1363,7 +1363,7 @@
   <div id="helpModal"
     class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div
-      class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+      class="bg-white backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
       <div class="flex items-center justify-between mb-6">
         <h3 class="text-2xl font-bold text-white flex items-center">
           <i class="fas fa-question-circle text-blue-400 mr-3"></i>
@@ -1624,6 +1624,41 @@
     <i class="fas fa-chevron-up"></i>
   </button>
 
+  <!-- 页面导航浮动菜单 -->
+  <div id="pageNavigation" class="fixed bottom-8 left-8 opacity-0 invisible transition-all duration-300 z-40">
+    <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden" style="background: var(--card-bg); border-color: var(--border-color);">
+      <div class="p-1">
+        <a href="#hero" class="nav-item flex items-center px-4 py-3 text-sm font-medium transition-colors hover:bg-indigo-50" style="color: var(--text-color);">
+          <i class="fas fa-home mr-3 w-4 text-indigo-500"></i>
+          <span>首页介绍</span>
+        </a>
+        <a href="#features" class="nav-item flex items-center px-4 py-3 text-sm font-medium transition-colors hover:bg-indigo-50" style="color: var(--text-color);">
+          <i class="fas fa-chart-bar mr-3 w-4 text-green-500"></i>
+          <span>功能特色</span>
+        </a>
+        <a href="#guide" class="nav-item flex items-center px-4 py-3 text-sm font-medium transition-colors hover:bg-indigo-50" style="color: var(--text-color);">
+          <i class="fas fa-route mr-3 w-4 text-purple-500"></i>
+          <span>使用流程</span>
+        </a>
+        <a href="#upload" class="nav-item flex items-center px-4 py-3 text-sm font-medium transition-colors hover:bg-indigo-50" style="color: var(--text-color);">
+          <i class="fas fa-upload mr-3 w-4 text-orange-500"></i>
+          <span>开始分析</span>
+        </a>
+        <a href="#actions" class="nav-item flex items-center px-4 py-3 text-sm font-medium transition-colors hover:bg-indigo-50" style="color: var(--text-color);">
+          <i class="fas fa-tools mr-3 w-4 text-red-500"></i>
+          <span>操作面板</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- 导航按钮 -->
+    <button id="pageNavBtn"
+      class="mt-3 w-12 h-12 bg-purple-600 hover:bg-purple-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 opacity-0 invisible"
+      title="页面导航">
+      <i class="fas fa-map-marked-alt"></i>
+    </button>
+  </div>
+
   <!-- Scripts -->
   <script src="js/data-manager.js"></script>
   <script src="js/zip-parser.js"></script>
@@ -1671,14 +1706,61 @@
       // 返回顶部按钮功能
       const backToTopButton = document.getElementById('backToTop');
 
-      // 监听滚动事件 - 控制返回顶部按钮显示
+      // 页面导航浮动菜单功能
+      const pageNavigation = document.getElementById('pageNavigation');
+      const pageNavBtn = document.getElementById('pageNavBtn');
+      const pageNavIcon = pageNavBtn.querySelector('i');
+      let isPageNavOpen = false;
+
+      // 页面导航按钮点击事件
+      pageNavBtn.addEventListener('click', function() {
+        isPageNavOpen = !isPageNavOpen;
+        if (isPageNavOpen) {
+          pageNavigation.classList.remove('opacity-0', 'invisible');
+          pageNavigation.classList.add('opacity-100', 'visible');
+          pageNavIcon.classList.remove('fa-map-marked-alt');
+          pageNavIcon.classList.add('fa-times');
+        } else {
+          pageNavigation.classList.add('opacity-0', 'invisible');
+          pageNavigation.classList.remove('opacity-100', 'visible');
+          pageNavIcon.classList.add('fa-map-marked-alt');
+          pageNavIcon.classList.remove('fa-times');
+        }
+      });
+
+      // 点击导航项后关闭菜单
+      document.querySelectorAll('#pageNavigation .nav-item').forEach(item => {
+        item.addEventListener('click', function() {
+          setTimeout(() => {
+            isPageNavOpen = false;
+            pageNavigation.classList.add('opacity-0', 'invisible');
+            pageNavigation.classList.remove('opacity-100', 'visible');
+            pageNavIcon.classList.add('fa-map-marked-alt');
+            pageNavIcon.classList.remove('fa-times');
+          }, 300);
+        });
+      });
+
+      // 监听滚动事件 - 控制返回顶部按钮和页面导航显示
       window.addEventListener('scroll', function () {
         if (window.pageYOffset > 300) {
           backToTopButton.classList.remove('opacity-0', 'invisible');
           backToTopButton.classList.add('opacity-100', 'visible');
+          pageNavBtn.classList.remove('opacity-0', 'invisible');
+          pageNavBtn.classList.add('opacity-100', 'visible');
         } else {
           backToTopButton.classList.add('opacity-0', 'invisible');
           backToTopButton.classList.remove('opacity-100', 'visible');
+          pageNavBtn.classList.add('opacity-0', 'invisible');
+          pageNavBtn.classList.remove('opacity-100', 'visible');
+          // 同时关闭导航菜单
+          if (isPageNavOpen) {
+            isPageNavOpen = false;
+            pageNavigation.classList.add('opacity-0', 'invisible');
+            pageNavigation.classList.remove('opacity-100', 'visible');
+            pageNavIcon.classList.add('fa-map-marked-alt');
+            pageNavIcon.classList.remove('fa-times');
+          }
         }
       });
 
