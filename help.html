@@ -26,8 +26,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- FontAwesome -->
-    <script src="https://kit.fontawesome.com/2c3e4a5a0e.js" crossorigin="anonymous"></script>
-
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+    integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/js/fontawesome.min.js"
+    integrity="sha512-obFNtQ1JKCrxPBPLmYDUevlriATl5EhvwU3CFtdW/HKOkeAe0bbsyZfHO44/f1QyndrZJ464TQvrRP9ZjyXSSA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css">
 
@@ -124,7 +129,8 @@
                     </a>
                 </div>
 
-                <div class="flex items-center space-x-6">
+                <!-- 桌面端导航 -->
+                <div class="hidden md:flex items-center space-x-6">
                     <a href="index.html" class="nav-link transition-colors hover:opacity-75" style="color: var(--text-color);">
                         数据分析
                     </a>
@@ -141,6 +147,16 @@
                         隐私政策
                     </a>
 
+                    <!-- GitHub 链接 -->
+                    <a href="https://github.com/dext7r/linux-do-analyzer"
+                       target="_blank"
+                       class="hidden lg:flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all hover:scale-105"
+                       style="background: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-color);">
+                        <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+                             alt="GitHub" class="w-4 h-4 mr-2 opacity-70">
+                        GitHub
+                    </a>
+
                     <!-- 主题切换器 -->
                     <div class="relative">
                         <select id="themeSelector" class="appearance-none rounded-lg px-3 py-2 text-sm border focus:outline-none focus:ring-2 transition-all"
@@ -149,6 +165,54 @@
                             <option value="xiaomi">现代</option>
                             <option value="huawei">商务</option>
                         </select>
+                    </div>
+                </div>
+
+                <!-- 移动端菜单按钮 -->
+                <div class="md:hidden">
+                    <button id="mobileMenuBtn" class="flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200"
+                            style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                        <i class="fas fa-bars" style="color: var(--text-color);"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 移动端菜单 -->
+            <div id="mobileMenu" class="md:hidden hidden">
+                <div class="px-2 pt-2 pb-3 space-y-1 border-t" style="border-color: var(--border-color);">
+                    <a href="index.html" class="block px-3 py-2 rounded-md text-base font-medium transition-colors hover:bg-gray-100" style="color: var(--text-color);">
+                        数据分析
+                    </a>
+                    <a href="help.html" class="block px-3 py-2 rounded-md text-base font-medium transition-colors" style="color: var(--primary-color); background: var(--primary-color); background-opacity: 0.1;">
+                        使用帮助
+                    </a>
+                    <a href="about.html" class="block px-3 py-2 rounded-md text-base font-medium transition-colors hover:bg-gray-100" style="color: var(--text-color);">
+                        关于我们
+                    </a>
+                    <a href="faq.html" class="block px-3 py-2 rounded-md text-base font-medium transition-colors hover:bg-gray-100" style="color: var(--text-color);">
+                        常见问题
+                    </a>
+                    <a href="privacy.html" class="block px-3 py-2 rounded-md text-base font-medium transition-colors hover:bg-gray-100" style="color: var(--text-color);">
+                        隐私政策
+                    </a>
+
+                    <!-- 移动端工具 -->
+                    <div class="pt-3 border-t" style="border-color: var(--border-color);">
+                        <div class="flex items-center justify-between px-3 py-2">
+                            <span class="text-sm font-medium" style="color: var(--text-color);">主题</span>
+                            <select id="mobileThemeSelector" class="appearance-none rounded px-2 py-1 text-sm border focus:outline-none"
+                                    style="background: var(--card-bg); color: var(--text-color); border-color: var(--border-color);">
+                                <option value="apple">简洁</option>
+                                <option value="xiaomi">现代</option>
+                                <option value="huawei">商务</option>
+                            </select>
+                        </div>
+                        <a href="https://github.com/dext7r/linux-do-analyzer" target="_blank"
+                           class="flex items-center px-3 py-2 rounded-md text-base font-medium transition-colors hover:bg-gray-100" style="color: var(--text-color);">
+                            <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+                                 alt="GitHub" class="w-5 h-5 mr-2 opacity-70">
+                            GitHub 源码
+                        </a>
                     </div>
                 </div>
             </div>
@@ -719,26 +783,161 @@
     </div>
 
     <!-- Footer -->
-    <footer class="text-center py-8" style="color: var(--text-muted);">
-        <div class="container mx-auto px-4">
-            <div class="flex items-center justify-center gap-4 flex-wrap text-sm">
-                <a href="privacy.html" class="hover:opacity-70 transition-opacity" style="color: var(--text-muted);">
-                    <i class="fas fa-shield-alt mr-1"></i>
-                    隐私政策
-                </a>
-                <span>|</span>
-                <a href="about.html" class="hover:opacity-70 transition-opacity" style="color: var(--text-muted);">
-                    <i class="fas fa-info-circle mr-1"></i>
-                    关于我们
-                </a>
-                <span>|</span>
-                <span class="flex items-center gap-2">
-                    <i class="fas fa-heart text-red-500"></i>
-                    为 Linux.do 社区服务
-                </span>
+    <footer class="relative z-10 bg-white border-t border-gray-200 overflow-hidden">
+        <!-- 背景装饰 -->
+        <div class="absolute inset-0 opacity-30">
+            <!-- 光晕效果 -->
+            <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-100 rounded-full filter blur-3xl"></div>
+            <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-100 rounded-full filter blur-3xl"></div>
+        </div>
+
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- 主要内容区域 -->
+            <div class="py-16">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    <!-- 品牌介绍 -->
+                    <div class="md:col-span-2">
+                        <div class="flex items-center space-x-3 mb-6">
+                            <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
+                                <span class="text-white text-2xl">📊</span>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-800">
+                                    Linux.do Analyzer
+                                </h3>
+                                <p class="text-sm text-gray-600">专业的论坛数据分析工具</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 leading-relaxed mb-6 max-w-md">
+                            为 Linux.do 社区用户提供专业的个人数据分析服务，
+                            100% 本地处理，保护隐私安全，助您深入了解自己的论坛活动模式。
+                        </p>
+
+                        <!-- 特性标签 -->
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1 bg-indigo-500/20 text-indigo-300 rounded-full text-xs font-medium border border-indigo-500/30">
+                                🔒 隐私保护
+                            </span>
+                            <span class="px-3 py-1 bg-green-500/20 text-green-300 rounded-full text-xs font-medium border border-green-500/30">
+                                📊 数据可视化
+                            </span>
+                            <span class="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-xs font-medium border border-purple-500/30">
+                                ⚡ 实时分析
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- 快速链接 -->
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4 text-gray-800">快速导航</h4>
+                        <ul class="space-y-3">
+                            <li>
+                                <a href="index.html" class="text-gray-600 hover:text-indigo-600 transition-colors duration-200 flex items-center group">
+                                    <i class="fas fa-chart-bar mr-2 group-hover:text-indigo-400"></i>
+                                    数据分析
+                                </a>
+                            </li>
+                            <li>
+                                <a href="help.html" class="text-gray-600 hover:text-indigo-600 transition-colors duration-200 flex items-center group">
+                                    <i class="fas fa-question-circle mr-2 group-hover:text-blue-400"></i>
+                                    使用帮助
+                                </a>
+                            </li>
+                            <li>
+                                <a href="faq.html" class="text-gray-600 hover:text-indigo-600 transition-colors duration-200 flex items-center group">
+                                    <i class="fas fa-comments mr-2 group-hover:text-green-400"></i>
+                                    常见问题
+                                </a>
+                            </li>
+                            <li>
+                                <a href="privacy.html" class="text-gray-600 hover:text-indigo-600 transition-colors duration-200 flex items-center group">
+                                    <i class="fas fa-shield-alt mr-2 group-hover:text-purple-400"></i>
+                                    隐私政策
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- 社区连接 -->
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4 text-gray-800">社区连接</h4>
+                        <ul class="space-y-3">
+                            <li>
+                                <a href="https://linux.do" target="_blank" class="text-gray-600 hover:text-indigo-600 transition-colors duration-200 flex items-center group">
+                                    <i class="fas fa-external-link-alt mr-2 group-hover:text-orange-400"></i>
+                                    Linux.do 论坛
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://github.com/dext7r/linux-do-analyzer" target="_blank" class="text-gray-600 hover:text-indigo-600 transition-colors duration-200 flex items-center group">
+                                    <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub" class="w-4 h-4 mr-2 opacity-70 group-hover:opacity-100 transition-opacity">
+                                    GitHub 源码
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="text-gray-600 hover:text-indigo-600 transition-colors duration-200 flex items-center group">
+                                    <i class="fas fa-bug mr-2 group-hover:text-red-400"></i>
+                                    反馈问题
+                                </a>
+                            </li>
+                            <li>
+                                <a href="about.html" class="text-gray-600 hover:text-indigo-600 transition-colors duration-200 flex items-center group">
+                                    <i class="fas fa-info-circle mr-2 group-hover:text-blue-400"></i>
+                                    关于项目
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 分隔线 -->
+            <div class="border-t border-gray-700/50"></div>
+
+            <!-- 底部信息 -->
+            <div class="py-8">
+                <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                    <!-- 版权信息 -->
+                    <div class="text-center md:text-left">
+                        <p class="text-gray-600 text-sm">
+                            © 2025 Linux.do Analyzer. Made with
+                            <i class="fas fa-heart text-red-500 mx-1"></i>
+                            for Linux.do Community
+                        </p>
+                        <p class="text-gray-500 text-xs mt-1">
+                            Powered by Deno + TailwindCSS + Chart.js
+                        </p>
+                    </div>
+
+                    <!-- 技术标识 -->
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center space-x-2 text-gray-600 text-sm">
+                            <i class="fas fa-shield-alt text-green-500"></i>
+                            <span>100% 本地处理</span>
+                        </div>
+                        <div class="flex items-center space-x-2 text-gray-600 text-sm">
+                            <i class="fas fa-lock text-blue-500"></i>
+                            <span>数据安全</span>
+                        </div>
+                        <div class="flex items-center space-x-2 text-gray-600 text-sm">
+                            <i class="fas fa-code text-purple-500"></i>
+                            <span>开源项目</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+
+        <!-- 底部装饰 -->
+        <div class="h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
     </footer>
+
+    <!-- 返回顶部按钮 -->
+    <button id="backToTop"
+            class="fixed bottom-8 right-8 w-12 h-12 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 opacity-0 invisible z-50"
+            title="返回顶部">
+        <i class="fas fa-chevron-up"></i>
+    </button>
 
     <script>
         // 主题管理
@@ -928,6 +1127,54 @@
             new NavigationManager();
             new PageLoadAnimator();
             new KeyboardShortcuts();
+
+            // 移动端菜单功能
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileMenuIcon = mobileMenuBtn.querySelector('i');
+
+            mobileMenuBtn.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+                mobileMenuIcon.classList.toggle('fa-bars');
+                mobileMenuIcon.classList.toggle('fa-times');
+            });
+
+            // 同步主题选择器
+            const themeSelector = document.getElementById('themeSelector');
+            const mobileThemeSelector = document.getElementById('mobileThemeSelector');
+
+            themeSelector.addEventListener('change', function() {
+                mobileThemeSelector.value = this.value;
+            });
+
+            mobileThemeSelector.addEventListener('change', function() {
+                themeSelector.value = this.value;
+                // 触发主题切换事件
+                const event = new Event('change');
+                themeSelector.dispatchEvent(event);
+            });
+
+            // 返回顶部按钮功能
+            const backToTopButton = document.getElementById('backToTop');
+
+            // 监听滚动事件 - 控制返回顶部按钮显示
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 300) {
+                    backToTopButton.classList.remove('opacity-0', 'invisible');
+                    backToTopButton.classList.add('opacity-100', 'visible');
+                } else {
+                    backToTopButton.classList.add('opacity-0', 'invisible');
+                    backToTopButton.classList.remove('opacity-100', 'visible');
+                }
+            });
+
+            // 点击返回顶部
+            backToTopButton.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
 
             // 平滑滚动支持
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {

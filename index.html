@@ -1,1330 +1,1729 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- SEO Meta Tags -->
-    <title>Linux.do 论坛数据分析工具 - 专业的论坛数据可视化分析平台</title>
-    <meta name="description" content="Linux.do 论坛专业数据分析工具，提供个人活动数据可视化分析、帖子统计、点赞趋势、徽章成就等多维度数据洞察。100%本地处理，保护隐私安全。">
-    <meta name="keywords" content="Linux.do,论坛数据分析,数据可视化,个人数据导出,论坛统计,活动分析,数据洞察,隐私保护,前端分析工具">
-    <meta name="author" content="Linux.do Community">
-    <meta name="robots" content="index, follow">
-    <meta name="language" content="zh-CN">
+  <!-- SEO Meta Tags -->
+  <title>Linux.do 论坛数据分析工具 - 专业的论坛数据可视化分析平台</title>
+  <meta name="description" content="Linux.do 论坛专业数据分析工具，提供个人活动数据可视化分析、帖子统计、点赞趋势、徽章成就等多维度数据洞察。100%本地处理，保护隐私安全。">
+  <meta name="keywords" content="Linux.do,论坛数据分析,数据可视化,个人数据导出,论坛统计,活动分析,数据洞察,隐私保护,前端分析工具">
+  <meta name="author" content="Linux.do Community">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="zh-CN">
 
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="Linux.do 论坛数据分析工具">
-    <meta property="og:description" content="专业的 Linux.do 论坛数据可视化分析平台，支持个人数据导出分析，100%本地处理保护隐私">
-    <meta property="og:url" content="">
-    <meta property="og:site_name" content="Linux.do Analyzer">
-    <meta property="og:locale" content="zh_CN">
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Linux.do 论坛数据分析工具">
+  <meta property="og:description" content="专业的 Linux.do 论坛数据可视化分析平台，支持个人数据导出分析，100%本地处理保护隐私">
+  <meta property="og:url" content="">
+  <meta property="og:site_name" content="Linux.do Analyzer">
+  <meta property="og:locale" content="zh_CN">
 
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Linux.do 论坛数据分析工具">
-    <meta name="twitter:description" content="专业的论坛数据可视化分析平台，支持多维度数据洞察">
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Linux.do 论坛数据分析工具">
+  <meta name="twitter:description" content="专业的论坛数据可视化分析平台，支持多维度数据洞察">
 
-    <!-- Additional SEO -->
-    <meta name="theme-color" content="#6366f1">
-    <meta name="format-detection" content="telephone=no">
-    <link rel="canonical" href="">
+  <!-- Additional SEO -->
+  <meta name="theme-color" content="#6366f1">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="canonical" href="">
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
 
-    <!-- TailwindCSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+  <!-- TailwindCSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- JSZip -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <!-- JSZip -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
-    <!-- FontAwesome -->
-    <script src="https://kit.fontawesome.com/2c3e4a5a0e.js" crossorigin="anonymous"></script>
-
-    <!-- Custom Tailwind Config -->
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {
-                            50: '#eff6ff',
-                            100: '#dbeafe',
-                            200: '#bfdbfe',
-                            300: '#93c5fd',
-                            400: '#60a5fa',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                            800: '#1e40af',
-                            900: '#1e3a8a'
-                        },
-                        accent: {
-                            50: '#fdf4ff',
-                            100: '#fae8ff',
-                            200: '#f5d0fe',
-                            300: '#f0abfc',
-                            400: '#e879f9',
-                            500: '#d946ef',
-                            600: '#c026d3',
-                            700: '#a21caf',
-                            800: '#86198f',
-                            900: '#701a75'
-                        }
-                    },
-                    animation: {
-                        'fade-in': 'fadeIn 0.5s ease-out',
-                        'slide-up': 'slideUp 0.3s ease-out',
-                        'bounce-in': 'bounceIn 0.5s ease-out',
-                        'pulse-glow': 'pulseGlow 2s ease-in-out infinite'
-                    },
-                    keyframes: {
-                        fadeIn: {
-                            '0%': { opacity: '0', transform: 'translateY(10px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' }
-                        },
-                        slideUp: {
-                            '0%': { opacity: '0', transform: 'translateY(20px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' }
-                        },
-                        bounceIn: {
-                            '0%': { opacity: '0', transform: 'scale(0.3)' },
-                            '50%': { opacity: '1', transform: 'scale(1.05)' },
-                            '70%': { transform: 'scale(0.9)' },
-                            '100%': { opacity: '1', transform: 'scale(1)' }
-                        },
-                        pulseGlow: {
-                            '0%, 100%': { boxShadow: '0 0 5px rgba(59, 130, 246, 0.5)' },
-                            '50%': { boxShadow: '0 0 20px rgba(59, 130, 246, 0.8)' }
-                        }
-                    }
-                }
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+    integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/js/fontawesome.min.js"
+    integrity="sha512-obFNtQ1JKCrxPBPLmYDUevlriATl5EhvwU3CFtdW/HKOkeAe0bbsyZfHO44/f1QyndrZJ464TQvrRP9ZjyXSSA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <!-- Custom Tailwind Config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              200: '#bfdbfe',
+              300: '#93c5fd',
+              400: '#60a5fa',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a'
+            },
+            accent: {
+              50: '#fdf4ff',
+              100: '#fae8ff',
+              200: '#f5d0fe',
+              300: '#f0abfc',
+              400: '#e879f9',
+              500: '#d946ef',
+              600: '#c026d3',
+              700: '#a21caf',
+              800: '#86198f',
+              900: '#701a75'
             }
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.5s ease-out',
+            'slide-up': 'slideUp 0.3s ease-out',
+            'bounce-in': 'bounceIn 0.5s ease-out',
+            'pulse-glow': 'pulseGlow 2s ease-in-out infinite'
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0', transform: 'translateY(10px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' }
+            },
+            slideUp: {
+              '0%': { opacity: '0', transform: 'translateY(20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' }
+            },
+            bounceIn: {
+              '0%': { opacity: '0', transform: 'scale(0.3)' },
+              '50%': { opacity: '1', transform: 'scale(1.05)' },
+              '70%': { transform: 'scale(0.9)' },
+              '100%': { opacity: '1', transform: 'scale(1)' }
+            },
+            pulseGlow: {
+              '0%, 100%': { boxShadow: '0 0 5px rgba(59, 130, 246, 0.5)' },
+              '50%': { boxShadow: '0 0 20px rgba(59, 130, 246, 0.8)' }
+            }
+          }
         }
-    </script>
+      }
+    }
+  </script>
 
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css">
+  <!-- 自定义样式 -->
+  <style>
+    /* 平滑滚动 */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* 锚点偏移，避免被固定导航栏遮挡 */
+    section[id] {
+      scroll-margin-top: 80px;
+    }
+  </style>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
 
-    <!-- 导航栏 -->
-    <nav class="sticky top-0 z-50 backdrop-blur-md border-b" style="background: var(--card-bg); border-color: var(--border-color);">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center space-x-4">
-                    <a href="index.html" class="flex items-center space-x-2 text-xl font-bold" style="color: var(--primary-color);">
-                        <span>📊</span>
-                        <span>Linux.do 数据分析</span>
-                    </a>
-                </div>
-
-                <div class="flex items-center space-x-6">
-                    <a href="index.html" class="nav-link current transition-colors" style="color: var(--primary-color); font-weight: 600;">
-                        数据分析
-                    </a>
-                    <a href="help.html" class="nav-link transition-colors hover:opacity-75" style="color: var(--text-color);">
-                        使用帮助
-                    </a>
-                    <a href="about.html" class="nav-link transition-colors hover:opacity-75" style="color: var(--text-color);">
-                        关于我们
-                    </a>
-                    <a href="faq.html" class="nav-link transition-colors hover:opacity-75" style="color: var(--text-color);">
-                        常见问题
-                    </a>
-                    <a href="privacy.html" class="nav-link transition-colors hover:opacity-75" style="color: var(--text-color);">
-                        隐私政策
-                    </a>
-
-                    <!-- 主题切换器 -->
-                    <div class="relative">
-                        <select id="themeSelector" class="appearance-none rounded-lg px-3 py-2 text-sm border focus:outline-none focus:ring-2 transition-all"
-                                style="background: var(--card-bg); color: var(--text-color); border-color: var(--border-color); --tw-ring-color: var(--primary-color);">
-                            <option value="apple">简洁</option>
-                            <option value="xiaomi">现代</option>
-                            <option value="huawei">商务</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
+  <!-- 导航栏 -->
+  <nav class="sticky top-0 z-50 backdrop-blur-md border-b"
+    style="background: var(--card-bg); border-color: var(--border-color);">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center space-x-4">
+          <a href="index.html" class="flex items-center space-x-2 text-xl font-bold"
+            style="color: var(--primary-color);">
+            <span>📊</span>
+            <span>Linux.do 数据分析</span>
+          </a>
         </div>
-    </nav>
 
-    <!-- 现代化几何背景 -->
-    <div class="fixed inset-0 overflow-hidden pointer-events-none">
-        <!-- 主要渐变背景 -->
-        <div class="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-indigo-50/30 to-purple-50/40"></div>
+        <!-- 桌面端导航 -->
+        <div class="hidden md:flex items-center space-x-6">
+          <a href="index.html" class="nav-link current transition-colors"
+            style="color: var(--primary-color); font-weight: 600;">
+            数据分析
+          </a>
+          <a href="help.html" class="nav-link transition-colors hover:opacity-75" style="color: var(--text-color);">
+            使用帮助
+          </a>
+          <a href="about.html" class="nav-link transition-colors hover:opacity-75" style="color: var(--text-color);">
+            关于我们
+          </a>
+          <a href="faq.html" class="nav-link transition-colors hover:opacity-75" style="color: var(--text-color);">
+            常见问题
+          </a>
+          <a href="privacy.html" class="nav-link transition-colors hover:opacity-75" style="color: var(--text-color);">
+            隐私政策
+          </a>
 
-        <!-- 现代几何图形 -->
-        <div class="absolute top-20 right-20 w-96 h-96 bg-gradient-to-br from-blue-400/10 to-indigo-500/10 rounded-full blur-3xl animate-float"></div>
-        <div class="absolute bottom-20 left-20 w-80 h-80 bg-gradient-to-br from-indigo-400/10 to-purple-500/10 rounded-full blur-3xl animate-float-delay"></div>
+          <!-- GitHub 链接 -->
+          <a href="https://github.com/dext7r/linux-do-analyzer" target="_blank" rel="noopener noreferrer"
+            class="flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 hover:scale-105"
+            style="background: var(--card-bg); border: 1px solid var(--border-color);" title="GitHub 仓库">
+            <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub"
+              class="w-5 h-5 opacity-70 hover:opacity-100 transition-opacity">
+          </a>
 
-        <!-- 网格纹理 -->
-        <div class="absolute inset-0 opacity-[0.02]" style="background-image: radial-gradient(circle at 1px 1px, rgba(0,0,0,0.15) 1px, transparent 0); background-size: 20px 20px;"></div>
+          <!-- 主题切换器 -->
+          <div class="relative">
+            <select id="themeSelector"
+              class="appearance-none rounded-lg px-3 py-2 text-sm border focus:outline-none focus:ring-2 transition-all"
+              style="background: var(--card-bg); color: var(--text-color); border-color: var(--border-color); --tw-ring-color: var(--primary-color);">
+              <option value="apple">简洁</option>
+              <option value="xiaomi">现代</option>
+              <option value="huawei">商务</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 移动端菜单按钮 -->
+        <div class="md:hidden">
+          <button id="mobileMenuBtn"
+            class="flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200"
+            style="background: var(--card-bg); border: 1px solid var(--border-color);">
+            <i class="fas fa-bars" style="color: var(--text-color);"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- 移动端菜单 -->
+      <div id="mobileMenu" class="md:hidden hidden">
+        <div class="px-2 pt-2 pb-3 space-y-1 border-t" style="border-color: var(--border-color);">
+          <a href="index.html" class="block px-3 py-2 rounded-md text-base font-medium transition-colors"
+            style="color: var(--primary-color); background: var(--primary-color); background-opacity: 0.1;">
+            数据分析
+          </a>
+          <a href="help.html"
+            class="block px-3 py-2 rounded-md text-base font-medium transition-colors hover:bg-gray-100"
+            style="color: var(--text-color);">
+            使用帮助
+          </a>
+          <a href="about.html"
+            class="block px-3 py-2 rounded-md text-base font-medium transition-colors hover:bg-gray-100"
+            style="color: var(--text-color);">
+            关于我们
+          </a>
+          <a href="faq.html"
+            class="block px-3 py-2 rounded-md text-base font-medium transition-colors hover:bg-gray-100"
+            style="color: var(--text-color);">
+            常见问题
+          </a>
+          <a href="privacy.html"
+            class="block px-3 py-2 rounded-md text-base font-medium transition-colors hover:bg-gray-100"
+            style="color: var(--text-color);">
+            隐私政策
+          </a>
+
+          <!-- 移动端工具 -->
+          <div class="pt-3 border-t" style="border-color: var(--border-color);">
+            <div class="flex items-center justify-between px-3 py-2">
+              <span class="text-sm font-medium" style="color: var(--text-color);">主题</span>
+              <select id="mobileThemeSelector"
+                class="appearance-none rounded px-2 py-1 text-sm border focus:outline-none"
+                style="background: var(--card-bg); color: var(--text-color); border-color: var(--border-color);">
+                <option value="apple">简洁</option>
+                <option value="xiaomi">现代</option>
+                <option value="huawei">商务</option>
+              </select>
+            </div>
+            <a href="https://github.com/dext7r/linux-do-analyzer" target="_blank"
+              class="flex items-center px-3 py-2 rounded-md text-base font-medium transition-colors hover:bg-gray-100"
+              style="color: var(--text-color);">
+              <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub"
+                class="w-5 h-5 mr-2 opacity-70">
+              GitHub 源码
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 现代化几何背景 -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none">
+    <!-- 主要渐变背景 -->
+    <div class="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-indigo-50/30 to-purple-50/40"></div>
+
+    <!-- 现代几何图形 -->
+    <div
+      class="absolute top-20 right-20 w-96 h-96 bg-gradient-to-br from-blue-400/10 to-indigo-500/10 rounded-full blur-3xl animate-float">
+    </div>
+    <div
+      class="absolute bottom-20 left-20 w-80 h-80 bg-gradient-to-br from-indigo-400/10 to-purple-500/10 rounded-full blur-3xl animate-float-delay">
     </div>
 
-    <!-- Main Container -->
-    <div class="relative z-10 max-w-7xl mx-auto px-4 py-8">
+    <!-- 网格纹理 -->
+    <div class="absolute inset-0 opacity-[0.02]"
+      style="background-image: radial-gradient(circle at 1px 1px, rgba(0,0,0,0.15) 1px, transparent 0); background-size: 20px 20px;">
+    </div>
+  </div>
 
-        <!-- Hero Section - 重点突出价值主张 -->
-        <section class="text-center mb-20">
-            <div class="max-w-6xl mx-auto">
-                <!-- 品牌标识区 -->
-                <div class="flex items-center justify-center mb-12">
-                    <div class="relative">
-                        <!-- 现代化Logo设计 -->
-                        <div class="w-28 h-28 bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-600 rounded-3xl flex items-center justify-center mr-6 shadow-2xl transform hover:rotate-3 transition-all duration-500">
-                            <i class="fas fa-chart-line text-white text-4xl"></i>
-                        </div>
-                        <!-- 活跃状态指示器 -->
-                        <div class="absolute -top-1 -right-1 w-10 h-10 bg-green-400 rounded-full flex items-center justify-center shadow-lg">
-                            <i class="fas fa-check text-white text-lg"></i>
-                        </div>
-                    </div>
-                    <div class="text-left">
-                        <h1 class="text-6xl font-black bg-gradient-to-r from-slate-900 via-indigo-600 to-blue-600 bg-clip-text text-transparent leading-none">
-                            Linux.do
-                        </h1>
-                        <p class="text-2xl font-semibold text-indigo-600 mt-2">数据分析平台</p>
-                    </div>
-                </div>
+  <!-- Main Container -->
+  <div class="relative z-10 max-w-7xl mx-auto px-4 py-8">
 
-                <!-- 核心价值主张 - 更突出 -->
-                <div class="mb-16">
-                    <h2 class="text-4xl md:text-5xl font-bold mb-8 leading-tight" style="color: var(--text-color);">
-                        让您的论坛数据
-                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
-                            开口说话
-                        </span>
-                    </h2>
-                    <p class="text-xl md:text-2xl leading-relaxed max-w-4xl mx-auto mb-12" style="color: var(--text-secondary);">
-                        专业的 Linux.do 论坛数据分析工具，将您的活动数据转化为
-                        <strong class="text-indigo-600">直观图表</strong>、
-                        <strong class="text-purple-600">深度洞察</strong>和
-                        <strong class="text-blue-600">行为分析</strong>
-                    </p>
-
-                    <!-- 产品预览图片 -->
-                    <div id="productPreview" class="relative max-w-4xl mx-auto mb-12">
-                        <div class="relative rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-slate-100 to-slate-200 p-8">
-                            <!-- 模拟浏览器窗口 -->
-                            <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                                <!-- 浏览器顶栏 -->
-                                <div class="bg-gray-100 px-4 py-3 flex items-center space-x-2">
-                                    <div class="flex space-x-2">
-                                        <div class="w-3 h-3 bg-red-400 rounded-full"></div>
-                                        <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                                        <div class="w-3 h-3 bg-green-400 rounded-full"></div>
-                                    </div>
-                                    <div class="flex-1 bg-white rounded-lg px-3 py-1 mx-8">
-                                        <span id="previewUrl" class="text-sm text-gray-500">🔒 正在加载...</span>
-                                    </div>
-                                </div>
-
-                                <!-- 动态内容区域 -->
-                                <div id="previewContent" class="p-6 bg-gradient-to-br from-indigo-50 to-purple-50">
-                                    <!-- 默认演示内容会在这里，数据上传后会被替换 -->
-                                    <!-- 模拟导航栏 -->
-                                    <div class="flex justify-between items-center mb-6">
-                                        <div class="flex items-center space-x-3">
-                                            <div class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
-                                                <i class="fas fa-chart-bar text-white text-sm"></i>
-                                            </div>
-                                            <a href="index.html" class="text-sm font-semibold text-gray-700 hover:text-indigo-600 transition-colors cursor-pointer">Linux.do Analyzer</a>
-                                        </div>
-                                        <div class="flex items-center space-x-2">
-                                            <div class="w-4 h-4 bg-green-400 rounded-full"></div>
-                                            <div class="text-xs text-gray-600">演示数据</div>
-                                        </div>
-                                    </div>
-
-                                    <!-- 模拟统计卡片 -->
-                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-                                        <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-blue-500">
-                                            <div class="text-xs text-blue-600 font-medium mb-1">总帖数</div>
-                                            <div class="text-lg font-bold text-blue-800">2,847</div>
-                                            <div class="text-xs text-blue-500 flex items-center">
-                                                <i class="fas fa-arrow-up text-xs mr-1"></i> 演示
-                                            </div>
-                                        </div>
-                                        <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-green-500">
-                                            <div class="text-xs text-green-600 font-medium mb-1">获赞数</div>
-                                            <div class="text-lg font-bold text-green-800">15,692</div>
-                                            <div class="text-xs text-green-500 flex items-center">
-                                                <i class="fas fa-arrow-up text-xs mr-1"></i> 演示
-                                            </div>
-                                        </div>
-                                        <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-purple-500">
-                                            <div class="text-xs text-purple-600 font-medium mb-1">活跃天数</div>
-                                            <div class="text-lg font-bold text-purple-800">342</div>
-                                            <div class="text-xs text-purple-500 flex items-center">
-                                                <i class="fas fa-arrow-up text-xs mr-1"></i> 演示
-                                            </div>
-                                        </div>
-                                        <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-orange-500">
-                                            <div class="text-xs text-orange-600 font-medium mb-1">徽章数</div>
-                                            <div class="text-lg font-bold text-orange-800">28</div>
-                                            <div class="text-xs text-orange-500 flex items-center">
-                                                <i class="fas fa-plus text-xs mr-1"></i> 演示
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- 提示信息 -->
-                                    <div class="bg-white p-4 rounded-xl shadow-sm border border-dashed border-gray-300">
-                                        <div class="text-center">
-                                            <div class="text-sm text-gray-600 mb-2">
-                                                <i class="fas fa-info-circle text-blue-500 mr-2"></i>
-                                                这是演示界面，上传您的数据文件后将显示真实分析结果
-                                            </div>
-                                            <div class="text-xs text-gray-500">支持 Linux.do 论坛导出的 ZIP 数据包</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                <!-- 核心特性卡片 - 重新设计 -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-                    <!-- 数据安全 -->
-                    <div style="background: var(--card-bg);" class="p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border" style="border-color: var(--border-color);">
-                        <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-6 mx-auto">
-                            <i class="fas fa-shield-alt text-white text-2xl"></i>
-                        </div>
-                        <h3 class="text-xl font-bold mb-3" style="color: var(--text-color);">100% 数据安全</h3>
-                        <p class="text-base leading-relaxed" style="color: var(--text-secondary);">
-                            所有数据在您的浏览器本地处理，绝不上传到任何服务器，确保您的隐私安全
-                        </p>
-                        <div class="flex items-center mt-4 text-green-600">
-                            <i class="fas fa-lock mr-2"></i>
-                            <span class="text-sm font-medium">端到端加密</span>
-                        </div>
-                    </div>
-
-                    <!-- 专业分析 -->
-                    <div style="background: var(--card-bg);" class="p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border" style="border-color: var(--border-color);">
-                        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-6 mx-auto">
-                            <i class="fas fa-brain text-white text-2xl"></i>
-                        </div>
-                        <h3 class="text-xl font-bold mb-3" style="color: var(--text-color);">智能深度分析</h3>
-                        <p class="text-base leading-relaxed" style="color: var(--text-secondary);">
-                            多维度数据挖掘，从活动趋势到行为模式，为您提供全方位的数据洞察
-                        </p>
-                        <div class="flex items-center mt-4 text-blue-600">
-                            <i class="fas fa-chart-pie mr-2"></i>
-                            <span class="text-sm font-medium">8种分析维度</span>
-                        </div>
-                    </div>
-
-                    <!-- 易于使用 -->
-                    <div style="background: var(--card-bg);" class="p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border" style="border-color: var(--border-color);">
-                        <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mb-6 mx-auto">
-                            <i class="fas fa-magic text-white text-2xl"></i>
-                        </div>
-                        <h3 class="text-xl font-bold mb-3" style="color: var(--text-color);">一键生成报告</h3>
-                        <p class="text-base leading-relaxed" style="color: var(--text-secondary);">
-                            上传数据文件，即可自动生成专业的可视化报告，无需任何技术背景
-                        </p>
-                        <div class="flex items-center mt-4 text-purple-600">
-                            <i class="fas fa-bolt mr-2"></i>
-                            <span class="text-sm font-medium">3秒快速上手</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- CTA按钮区域 -->
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <a href="https://linux.do/my/preferences/account" target="_blank"
-                       class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
-                        <i class="fas fa-download mr-3"></i>
-                        获取我的数据
-                        <i class="fas fa-external-link-alt ml-2 text-sm"></i>
-                    </a>
-                    <button id="helpBtn"
-                            class="inline-flex items-center px-6 py-4 bg-white hover:bg-gray-50 text-gray-700 text-lg font-medium rounded-2xl shadow-md hover:shadow-lg border border-gray-200 transition-all duration-300">
-                        <i class="fas fa-question-circle mr-2 text-indigo-600"></i>
-                        使用帮助
-                    </button>
-                </div>
+    <!-- Hero Section - 重点突出价值主张 -->
+    <section id="hero" class="text-center mb-20">
+      <div class="max-w-6xl mx-auto">
+        <!-- 品牌标识区 -->
+        <div class="flex items-center justify-center mb-12">
+          <div class="relative">
+            <!-- 现代化Logo设计 -->
+            <div
+              class="w-28 h-28 bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-600 rounded-3xl flex items-center justify-center mr-6 shadow-2xl transform hover:rotate-3 transition-all duration-500">
+              <i class="fas fa-chart-line text-white text-4xl"></i>
             </div>
-        </section>
+            <!-- 活跃状态指示器 -->
+            <div
+              class="absolute -top-1 -right-1 w-10 h-10 bg-green-400 rounded-full flex items-center justify-center shadow-lg">
+              <i class="fas fa-check text-white text-lg"></i>
+            </div>
+          </div>
+          <div class="text-left">
+            <h1
+              class="text-6xl font-black bg-gradient-to-r from-slate-900 via-indigo-600 to-blue-600 bg-clip-text text-transparent leading-none">
+              Linux.do
+            </h1>
+            <p class="text-2xl font-semibold text-indigo-600 mt-2">数据分析平台</p>
+          </div>
+        </div>
 
-        <!-- 分析功能展示区 - 重新设计 -->
-        <section class="mb-20">
-            <div class="max-w-6xl mx-auto">
-                <!-- 标题区域 -->
-                <div class="text-center mb-16">
-                    <h3 class="text-3xl md:text-4xl font-bold mb-6" style="color: var(--text-color);">
-                        <i class="fas fa-microscope text-indigo-600 mr-3"></i>
-                        数据分析功能
-                    </h3>
-                    <p class="text-xl max-w-3xl mx-auto" style="color: var(--text-secondary);">
-                        从用户行为到内容质量，从设备偏好到时间规律，全方位解读您的论坛数据
-                    </p>
+        <!-- 核心价值主张 - 更突出 -->
+        <div class="mb-16">
+          <h2 class="text-4xl md:text-5xl font-bold mb-8 leading-tight" style="color: var(--text-color);">
+            让您的论坛数据
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
+              开口说话
+            </span>
+          </h2>
+          <p class="text-xl md:text-2xl leading-relaxed max-w-4xl mx-auto mb-12" style="color: var(--text-secondary);">
+            专业的 Linux.do 论坛数据分析工具，将您的活动数据转化为
+            <strong class="text-indigo-600">直观图表</strong>、
+            <strong class="text-purple-600">深度洞察</strong>和
+            <strong class="text-blue-600">行为分析</strong>
+          </p>
+
+          <!-- 产品预览图片 -->
+          <div id="productPreview" class="relative max-w-4xl mx-auto mb-12">
+            <div
+              class="relative rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-slate-100 to-slate-200 p-8">
+              <!-- 模拟浏览器窗口 -->
+              <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                <!-- 浏览器顶栏 -->
+                <div class="bg-gray-100 px-4 py-3 flex items-center space-x-2">
+                  <div class="flex space-x-2">
+                    <div class="w-3 h-3 bg-red-400 rounded-full"></div>
+                    <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                    <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                  </div>
+                  <div class="flex-1 bg-white rounded-lg px-3 py-1 mx-8">
+                    <span id="previewUrl" class="text-sm text-gray-500">🔒 正在加载...</span>
+                  </div>
                 </div>
 
-                <!-- 功能网格 -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <!-- 用户活动分析 -->
-                    <div style="background: var(--card-bg);" class="p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border group hover:-translate-y-2" style="border-color: var(--border-color);">
-                        <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
-                            <i class="fas fa-user-chart text-white text-xl"></i>
-                        </div>
-                        <h4 class="text-lg font-bold mb-3" style="color: var(--text-color);">用户活动分析</h4>
-                        <ul class="space-y-2 text-sm" style="color: var(--text-secondary);">
-                            <li class="flex items-center">
-                                <i class="fas fa-check-circle text-blue-500 mr-2 text-xs"></i>
-                                发帖频率统计
-                            </li>
-                            <li class="flex items-center">
-                                <i class="fas fa-check-circle text-blue-500 mr-2 text-xs"></i>
-                                回复互动分析
-                            </li>
-                            <li class="flex items-center">
-                                <i class="fas fa-check-circle text-blue-500 mr-2 text-xs"></i>
-                                活跃时间分布
-                            </li>
-                        </ul>
+                <!-- 动态内容区域 -->
+                <div id="previewContent" class="p-6 bg-gradient-to-br from-indigo-50 to-purple-50">
+                  <!-- 默认演示内容会在这里，数据上传后会被替换 -->
+                  <!-- 模拟导航栏 -->
+                  <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center space-x-3">
+                      <div
+                        class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-chart-bar text-white text-sm"></i>
+                      </div>
+                      <a href="index.html"
+                        class="text-sm font-semibold text-gray-700 hover:text-indigo-600 transition-colors cursor-pointer">Linux.do
+                        Analyzer</a>
                     </div>
-
-                    <!-- 内容质量分析 -->
-                    <div style="background: var(--card-bg);" class="p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border group hover:-translate-y-2" style="border-color: var(--border-color);">
-                        <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
-                            <i class="fas fa-file-alt text-white text-xl"></i>
-                        </div>
-                        <h4 class="text-lg font-bold mb-3" style="color: var(--text-color);">内容质量分析</h4>
-                        <ul class="space-y-2 text-sm" style="color: var(--text-secondary);">
-                            <li class="flex items-center">
-                                <i class="fas fa-check-circle text-green-500 mr-2 text-xs"></i>
-                                主题分类统计
-                            </li>
-                            <li class="flex items-center">
-                                <i class="fas fa-check-circle text-green-500 mr-2 text-xs"></i>
-                                内容长度分析
-                            </li>
-                            <li class="flex items-center">
-                                <i class="fas fa-check-circle text-green-500 mr-2 text-xs"></i>
-                                互动质量评估
-                            </li>
-                        </ul>
+                    <div class="flex items-center space-x-2">
+                      <div class="w-4 h-4 bg-green-400 rounded-full"></div>
+                      <div class="text-xs text-gray-600">演示数据</div>
                     </div>
+                  </div>
 
-                    <!-- 设备与偏好 -->
-                    <div style="background: var(--card-bg);" class="p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border group hover:-translate-y-2" style="border-color: var(--border-color);">
-                        <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
-                            <i class="fas fa-mobile-alt text-white text-xl"></i>
-                        </div>
-                        <h4 class="text-lg font-bold mb-3" style="color: var(--text-color);">设备使用分析</h4>
-                        <ul class="space-y-2 text-sm" style="color: var(--text-secondary);">
-                            <li class="flex items-center">
-                                <i class="fas fa-check-circle text-purple-500 mr-2 text-xs"></i>
-                                设备类型分布
-                            </li>
-                            <li class="flex items-center">
-                                <i class="fas fa-check-circle text-purple-500 mr-2 text-xs"></i>
-                                浏览器偏好
-                            </li>
-                            <li class="flex items-center">
-                                <i class="fas fa-check-circle text-purple-500 mr-2 text-xs"></i>
-                                访问地域分析
-                            </li>
-                        </ul>
+                  <!-- 模拟统计卡片 -->
+                  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                    <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-blue-500">
+                      <div class="text-xs text-blue-600 font-medium mb-1">总帖数</div>
+                      <div class="text-lg font-bold text-blue-800">2,847</div>
+                      <div class="text-xs text-blue-500 flex items-center">
+                        <i class="fas fa-arrow-up text-xs mr-1"></i> 演示
+                      </div>
                     </div>
-
-                    <!-- 时间趋势 -->
-                    <div style="background: var(--card-bg);" class="p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border group hover:-translate-y-2" style="border-color: var(--border-color);">
-                        <div class="w-14 h-14 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
-                            <i class="fas fa-chart-line text-white text-xl"></i>
-                        </div>
-                        <h4 class="text-lg font-bold mb-3" style="color: var(--text-color);">时间趋势洞察</h4>
-                        <ul class="space-y-2 text-sm" style="color: var(--text-secondary);">
-                            <li class="flex items-center">
-                                <i class="fas fa-check-circle text-orange-500 mr-2 text-xs"></i>
-                                活动趋势变化
-                            </li>
-                            <li class="flex items-center">
-                                <i class="fas fa-check-circle text-orange-500 mr-2 text-xs"></i>
-                                成长轨迹分析
-                            </li>
-                            <li class="flex items-center">
-                                <i class="fas fa-check-circle text-orange-500 mr-2 text-xs"></i>
-                                周期性规律
-                            </li>
-                        </ul>
+                    <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-green-500">
+                      <div class="text-xs text-green-600 font-medium mb-1">获赞数</div>
+                      <div class="text-lg font-bold text-green-800">15,692</div>
+                      <div class="text-xs text-green-500 flex items-center">
+                        <i class="fas fa-arrow-up text-xs mr-1"></i> 演示
+                      </div>
                     </div>
-                </div>
+                    <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-purple-500">
+                      <div class="text-xs text-purple-600 font-medium mb-1">活跃天数</div>
+                      <div class="text-lg font-bold text-purple-800">342</div>
+                      <div class="text-xs text-purple-500 flex items-center">
+                        <i class="fas fa-arrow-up text-xs mr-1"></i> 演示
+                      </div>
+                    </div>
+                    <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-orange-500">
+                      <div class="text-xs text-orange-600 font-medium mb-1">徽章数</div>
+                      <div class="text-lg font-bold text-orange-800">28</div>
+                      <div class="text-xs text-orange-500 flex items-center">
+                        <i class="fas fa-plus text-xs mr-1"></i> 演示
+                      </div>
+                    </div>
+                  </div>
 
-                <!-- 特色功能亮点 -->
-                <div class="mt-16 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 rounded-3xl p-8 border border-indigo-100">
+                  <!-- 提示信息 -->
+                  <div class="bg-white p-4 rounded-xl shadow-sm border border-dashed border-gray-300">
                     <div class="text-center">
-                        <h4 class="text-2xl font-bold text-indigo-900 mb-4">
-                            <i class="fas fa-star text-yellow-500 mr-2"></i>
-                            特色分析功能
-                        </h4>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-                            <div class="text-center group">
-                                <div class="relative mb-4">
-                                    <!-- 装饰性背景 -->
-                                    <div class="absolute inset-0 bg-indigo-200 rounded-full opacity-20 transform scale-150 group-hover:scale-175 transition-transform duration-300"></div>
-                                    <div class="relative w-16 h-16 bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-full flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-all duration-300">
-                                        <i class="fas fa-trophy text-2xl"></i>
-                                    </div>
-                                    <!-- 小装饰图标 -->
-                                    <div class="absolute -top-1 -right-1 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
-                                        <i class="fas fa-crown text-white text-xs"></i>
-                                    </div>
-                                </div>
-                                <h5 class="font-semibold text-indigo-900 mb-2">成就徽章追踪</h5>
-                                <p class="text-sm text-indigo-700 leading-relaxed">分析您获得的各类徽章和成就进度，了解您在社区中的成长轨迹</p>
-                            </div>
-
-                            <div class="text-center group">
-                                <div class="relative mb-4">
-                                    <!-- 装饰性背景 -->
-                                    <div class="absolute inset-0 bg-purple-200 rounded-full opacity-20 transform scale-150 group-hover:scale-175 transition-transform duration-300"></div>
-                                    <div class="relative w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-full flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-all duration-300">
-                                        <i class="fas fa-heart text-2xl"></i>
-                                    </div>
-                                    <!-- 小装饰图标 -->
-                                    <div class="absolute -top-1 -right-1 w-6 h-6 bg-pink-400 rounded-full flex items-center justify-center">
-                                        <i class="fas fa-thumbs-up text-white text-xs"></i>
-                                    </div>
-                                </div>
-                                <h5 class="font-semibold text-indigo-900 mb-2">点赞互动分析</h5>
-                                <p class="text-sm text-indigo-700 leading-relaxed">深入了解您的点赞行为和互动模式，发现您的兴趣偏好</p>
-                            </div>
-
-                            <div class="text-center group">
-                                <div class="relative mb-4">
-                                    <!-- 装饰性背景 -->
-                                    <div class="absolute inset-0 bg-pink-200 rounded-full opacity-20 transform scale-150 group-hover:scale-175 transition-transform duration-300"></div>
-                                    <div class="relative w-16 h-16 bg-gradient-to-br from-pink-500 to-pink-600 text-white rounded-full flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-all duration-300">
-                                        <i class="fas fa-bookmark text-2xl"></i>
-                                    </div>
-                                    <!-- 小装饰图标 -->
-                                    <div class="absolute -top-1 -right-1 w-6 h-6 bg-orange-400 rounded-full flex items-center justify-center">
-                                        <i class="fas fa-star text-white text-xs"></i>
-                                    </div>
-                                </div>
-                                <h5 class="font-semibold text-indigo-900 mb-2">收藏偏好洞察</h5>
-                                <p class="text-sm text-indigo-700 leading-relaxed">分析您的收藏习惯和内容偏好，了解您最关注的话题领域</p>
-                            </div>
-                        </div>
-
-                        <!-- 数据可视化预览 -->
-                        <div class="mt-10 bg-white rounded-2xl p-6 shadow-lg">
-                            <h6 class="text-lg font-semibold text-gray-800 mb-4">
-                                <i class="fas fa-chart-pie text-indigo-500 mr-2"></i>
-                                数据可视化示例
-                            </h6>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <!-- 折线图示例 -->
-                                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-xl">
-                                    <div class="flex items-center mb-3">
-                                        <i class="fas fa-chart-line text-blue-500 mr-2"></i>
-                                        <span class="text-sm font-medium text-gray-700">活动趋势</span>
-                                    </div>
-                                    <div class="h-16 relative">
-                                        <!-- 模拟折线图 -->
-                                        <svg class="w-full h-full" viewBox="0 0 100 40">
-                                            <polyline
-                                                fill="none"
-                                                stroke="#3B82F6"
-                                                stroke-width="2"
-                                                points="0,35 20,25 40,15 60,20 80,10 100,5"
-                                            />
-                                            <circle cx="0" cy="35" r="2" fill="#3B82F6"/>
-                                            <circle cx="20" cy="25" r="2" fill="#3B82F6"/>
-                                            <circle cx="40" cy="15" r="2" fill="#3B82F6"/>
-                                            <circle cx="60" cy="20" r="2" fill="#3B82F6"/>
-                                            <circle cx="80" cy="10" r="2" fill="#3B82F6"/>
-                                            <circle cx="100" cy="5" r="2" fill="#3B82F6"/>
-                                        </svg>
-                                    </div>
-                                </div>
-
-                                <!-- 饼图示例 -->
-                                <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-xl">
-                                    <div class="flex items-center mb-3">
-                                        <i class="fas fa-chart-pie text-purple-500 mr-2"></i>
-                                        <span class="text-sm font-medium text-gray-700">内容分布</span>
-                                    </div>
-                                    <div class="h-16 flex items-center justify-center">
-                                        <div class="relative w-12 h-12">
-                                            <div class="absolute inset-0 rounded-full" style="background: conic-gradient(#8B5CF6 0deg 120deg, #EC4899 120deg 240deg, #F59E0B 240deg 360deg);"></div>
-                                            <div class="absolute inset-2 bg-white rounded-full"></div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- 柱状图示例 -->
-                                <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-xl">
-                                    <div class="flex items-center mb-3">
-                                        <i class="fas fa-chart-bar text-green-500 mr-2"></i>
-                                        <span class="text-sm font-medium text-gray-700">设备统计</span>
-                                    </div>
-                                    <div class="h-16 flex items-end justify-center space-x-1">
-                                        <div class="w-2 bg-green-400 rounded-t" style="height: 70%;"></div>
-                                        <div class="w-2 bg-green-500 rounded-t" style="height: 100%;"></div>
-                                        <div class="w-2 bg-green-400 rounded-t" style="height: 45%;"></div>
-                                        <div class="w-2 bg-green-300 rounded-t" style="height: 60%;"></div>
-                                        <div class="w-2 bg-green-500 rounded-t" style="height: 80%;"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                      <div class="text-sm text-gray-600 mb-2">
+                        <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                        这是演示界面，上传您的数据文件后将显示真实分析结果
+                      </div>
+                      <div class="text-xs text-gray-500">支持 Linux.do 论坛导出的 ZIP 数据包</div>
                     </div>
+                  </div>
                 </div>
+              </div>
             </div>
-        </section>
+          </div>
 
-        <!-- 使用流程指南 -->
-        <section class="mb-20">
-            <div class="max-w-5xl mx-auto">
-                <div class="text-center mb-12">
-                    <h3 class="text-3xl font-bold mb-4" style="color: var(--text-color);">
-                        <i class="fas fa-rocket text-indigo-600 mr-3"></i>
-                        三步开始分析
-                    </h3>
-                    <p class="text-xl" style="color: var(--text-secondary);">简单三步，即可获得专业的数据分析报告</p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-                    <!-- 连接线装饰 -->
-                    <div class="hidden md:block absolute top-24 left-1/4 right-1/4 h-0.5 bg-gradient-to-r from-indigo-200 via-purple-200 to-pink-200"></div>
-                    <div class="hidden md:block absolute top-24 left-1/4 w-3 h-3 bg-indigo-400 rounded-full transform -translate-x-1/2"></div>
-                    <div class="hidden md:block absolute top-24 right-1/4 w-3 h-3 bg-pink-400 rounded-full transform translate-x-1/2"></div>
-
-                    <!-- 步骤1 -->
-                    <div class="text-center relative group">
-                        <div class="relative mb-6">
-                            <!-- 背景装饰 -->
-                            <div class="absolute inset-0 bg-indigo-100 rounded-full opacity-30 transform scale-150 group-hover:scale-175 transition-transform duration-500"></div>
-                            <div class="relative w-24 h-24 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-full flex items-center justify-center mx-auto shadow-2xl group-hover:shadow-3xl transition-all duration-300">
-                                <i class="fas fa-download text-white text-3xl"></i>
-                            </div>
-                            <div class="absolute -top-2 -right-2 w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center text-lg font-bold shadow-lg">1</div>
-                            <!-- 装饰小图标 -->
-                            <div class="absolute -bottom-2 -left-2 w-8 h-8 bg-blue-400 rounded-full flex items-center justify-center opacity-80">
-                                <i class="fas fa-globe text-white text-sm"></i>
-                            </div>
-                        </div>
-                        <h4 class="text-xl font-bold mb-3" style="color: var(--text-color);">导出数据</h4>
-                        <p class="text-base leading-relaxed" style="color: var(--text-secondary);">
-                            访问 Linux.do 个人设置页面，申请并下载您的个人数据档案
-                        </p>
-                        <!-- 时间提示 -->
-                        <div class="mt-4 inline-flex items-center px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-sm">
-                            <i class="fas fa-clock mr-1"></i>
-                            通常 1-2 分钟
-                        </div>
-                    </div>
-
-                    <!-- 步骤2 -->
-                    <div class="text-center relative group">
-                        <div class="relative mb-6">
-                            <!-- 背景装饰 -->
-                            <div class="absolute inset-0 bg-purple-100 rounded-full opacity-30 transform scale-150 group-hover:scale-175 transition-transform duration-500"></div>
-                            <div class="relative w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto shadow-2xl group-hover:shadow-3xl transition-all duration-300">
-                                <i class="fas fa-upload text-white text-3xl"></i>
-                            </div>
-                            <div class="absolute -top-2 -right-2 w-10 h-10 bg-purple-600 text-white rounded-full flex items-center justify-center text-lg font-bold shadow-lg">2</div>
-                            <!-- 装饰小图标 -->
-                            <div class="absolute -bottom-2 -left-2 w-8 h-8 bg-pink-400 rounded-full flex items-center justify-center opacity-80">
-                                <i class="fas fa-file-archive text-white text-sm"></i>
-                            </div>
-                        </div>
-                        <h4 class="text-xl font-bold mb-3" style="color: var(--text-color);">上传文件</h4>
-                        <p class="text-base leading-relaxed" style="color: var(--text-secondary);">
-                            将下载的 ZIP 文件拖拽到下方上传区域，系统会自动开始解析
-                        </p>
-                        <!-- 安全提示 -->
-                        <div class="mt-4 inline-flex items-center px-3 py-1 bg-green-50 text-green-600 rounded-full text-sm">
-                            <i class="fas fa-shield-alt mr-1"></i>
-                            100% 本地处理
-                        </div>
-                    </div>
-
-                    <!-- 步骤3 -->
-                    <div class="text-center relative group">
-                        <div class="relative mb-6">
-                            <!-- 背景装饰 -->
-                            <div class="absolute inset-0 bg-green-100 rounded-full opacity-30 transform scale-150 group-hover:scale-175 transition-transform duration-500"></div>
-                            <div class="relative w-24 h-24 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-2xl group-hover:shadow-3xl transition-all duration-300">
-                                <i class="fas fa-chart-bar text-white text-3xl"></i>
-                            </div>
-                            <div class="absolute -top-2 -right-2 w-10 h-10 bg-green-600 text-white rounded-full flex items-center justify-center text-lg font-bold shadow-lg">3</div>
-                            <!-- 装饰小图标 -->
-                            <div class="absolute -bottom-2 -left-2 w-8 h-8 bg-emerald-400 rounded-full flex items-center justify-center opacity-80">
-                                <i class="fas fa-magic text-white text-sm"></i>
-                            </div>
-                        </div>
-                        <h4 class="text-xl font-bold mb-3" style="color: var(--text-color);">查看报告</h4>
-                        <p class="text-base leading-relaxed" style="color: var(--text-secondary);">
-                            自动生成包含图表、统计和洞察的专业分析报告
-                        </p>
-                        <!-- 功能提示 -->
-                        <div class="mt-4 inline-flex items-center px-3 py-1 bg-purple-50 text-purple-600 rounded-full text-sm">
-                            <i class="fas fa-sparkles mr-1"></i>
-                            多维度分析
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 底部补充信息 -->
-                <div class="mt-16 bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl p-8 border border-gray-200">
-                    <div class="text-center">
-                        <h5 class="text-lg font-semibold mb-4" style="color: var(--text-color);">
-                            <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
-                            为什么选择我们的分析工具？
-                        </h5>
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                            <div class="flex items-center justify-center space-x-3">
-                                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-tachometer-alt text-blue-600"></i>
-                                </div>
-                                <div class="text-left">
-                                    <p class="font-medium text-gray-800">秒级处理</p>
-                                    <p class="text-sm text-gray-600">快速解析</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center justify-center space-x-3">
-                                <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-lock text-green-600"></i>
-                                </div>
-                                <div class="text-left">
-                                    <p class="font-medium text-gray-800">隐私保护</p>
-                                    <p class="text-sm text-gray-600">本地处理</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center justify-center space-x-3">
-                                <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-palette text-purple-600"></i>
-                                </div>
-                                <div class="text-left">
-                                    <p class="font-medium text-gray-800">美观图表</p>
-                                    <p class="text-sm text-gray-600">专业设计</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center justify-center space-x-3">
-                                <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-heart text-orange-600"></i>
-                                </div>
-                                <div class="text-left">
-                                    <p class="font-medium text-gray-800">完全免费</p>
-                                    <p class="text-sm text-gray-600">无限使用</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+          <!-- 核心特性卡片 - 重新设计 -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+            <!-- 数据安全 -->
+            <div style="background: var(--card-bg);"
+              class="p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border"
+              style="border-color: var(--border-color);">
+              <div
+                class="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-6 mx-auto">
+                <i class="fas fa-shield-alt text-white text-2xl"></i>
+              </div>
+              <h3 class="text-xl font-bold mb-3" style="color: var(--text-color);">100% 数据安全</h3>
+              <p class="text-base leading-relaxed" style="color: var(--text-secondary);">
+                所有数据在您的浏览器本地处理，绝不上传到任何服务器，确保您的隐私安全
+              </p>
+              <div class="flex items-center mt-4 text-green-600">
+                <i class="fas fa-lock mr-2"></i>
+                <span class="text-sm font-medium">端到端加密</span>
+              </div>
             </div>
-        </section>
 
-        <!-- Upload Section - 专业化上传区域 -->
-        <section class="mb-16">
-            <div style="background: var(--card-bg);" class="rounded-3xl shadow-2xl border overflow-hidden" style="border-color: var(--border-color);">
+            <!-- 专业分析 -->
+            <div style="background: var(--card-bg);"
+              class="p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border"
+              style="border-color: var(--border-color);">
+              <div
+                class="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-6 mx-auto">
+                <i class="fas fa-brain text-white text-2xl"></i>
+              </div>
+              <h3 class="text-xl font-bold mb-3" style="color: var(--text-color);">智能深度分析</h3>
+              <p class="text-base leading-relaxed" style="color: var(--text-secondary);">
+                多维度数据挖掘，从活动趋势到行为模式，为您提供全方位的数据洞察
+              </p>
+              <div class="flex items-center mt-4 text-blue-600">
+                <i class="fas fa-chart-pie mr-2"></i>
+                <span class="text-sm font-medium">8种分析维度</span>
+              </div>
+            </div>
 
-                <!-- 上传区域标题 -->
-                <div class="bg-gradient-to-r from-indigo-500 to-purple-600 px-8 py-6">
-                    <div class="flex items-center justify-center text-white">
-                        <i class="fas fa-cloud-upload-alt text-2xl mr-4"></i>
-                        <div class="text-center">
-                            <h3 class="text-2xl font-bold">开始分析您的数据</h3>
-                            <p class="text-indigo-100 mt-1">上传 Linux.do 数据导出文件</p>
-                        </div>
-                    </div>
+            <!-- 易于使用 -->
+            <div style="background: var(--card-bg);"
+              class="p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border"
+              style="border-color: var(--border-color);">
+              <div
+                class="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mb-6 mx-auto">
+                <i class="fas fa-magic text-white text-2xl"></i>
+              </div>
+              <h3 class="text-xl font-bold mb-3" style="color: var(--text-color);">一键生成报告</h3>
+              <p class="text-base leading-relaxed" style="color: var(--text-secondary);">
+                上传数据文件，即可自动生成专业的可视化报告，无需任何技术背景
+              </p>
+              <div class="flex items-center mt-4 text-purple-600">
+                <i class="fas fa-bolt mr-2"></i>
+                <span class="text-sm font-medium">3秒快速上手</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CTA按钮区域 -->
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a href="https://linux.do/my/preferences/account" target="_blank"
+              class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
+              <i class="fas fa-download mr-3"></i>
+              获取我的数据
+              <i class="fas fa-external-link-alt ml-2 text-sm"></i>
+            </a>
+            <button id="helpBtn"
+              class="inline-flex items-center px-6 py-4 bg-white hover:bg-gray-50 text-gray-700 text-lg font-medium rounded-2xl shadow-md hover:shadow-lg border border-gray-200 transition-all duration-300">
+              <i class="fas fa-question-circle mr-2 text-indigo-600"></i>
+              使用帮助
+            </button>
+          </div>
+        </div>
+    </section>
+
+    <!-- 分析功能展示区 - 重新设计 -->
+    <section id="features" class="mb-20">
+      <div class="max-w-6xl mx-auto">
+        <!-- 标题区域 -->
+        <div class="text-center mb-16">
+          <h3 class="text-3xl md:text-4xl font-bold mb-6" style="color: var(--text-color);">
+            <i class="fas fa-microscope text-indigo-600 mr-3"></i>
+            数据分析功能
+          </h3>
+          <p class="text-xl max-w-3xl mx-auto" style="color: var(--text-secondary);">
+            从用户行为到内容质量，从设备偏好到时间规律，全方位解读您的论坛数据
+          </p>
+        </div>
+
+        <!-- 功能网格 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <!-- 用户活动分析 -->
+          <div style="background: var(--card-bg);"
+            class="p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border group hover:-translate-y-2"
+            style="border-color: var(--border-color);">
+            <div
+              class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
+              <i class="fas fa-user-chart text-white text-xl"></i>
+            </div>
+            <h4 class="text-lg font-bold mb-3" style="color: var(--text-color);">用户活动分析</h4>
+            <ul class="space-y-2 text-sm" style="color: var(--text-secondary);">
+              <li class="flex items-center">
+                <i class="fas fa-check-circle text-blue-500 mr-2 text-xs"></i>
+                发帖频率统计
+              </li>
+              <li class="flex items-center">
+                <i class="fas fa-check-circle text-blue-500 mr-2 text-xs"></i>
+                回复互动分析
+              </li>
+              <li class="flex items-center">
+                <i class="fas fa-check-circle text-blue-500 mr-2 text-xs"></i>
+                活跃时间分布
+              </li>
+            </ul>
+          </div>
+
+          <!-- 内容质量分析 -->
+          <div style="background: var(--card-bg);"
+            class="p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border group hover:-translate-y-2"
+            style="border-color: var(--border-color);">
+            <div
+              class="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
+              <i class="fas fa-file-alt text-white text-xl"></i>
+            </div>
+            <h4 class="text-lg font-bold mb-3" style="color: var(--text-color);">内容质量分析</h4>
+            <ul class="space-y-2 text-sm" style="color: var(--text-secondary);">
+              <li class="flex items-center">
+                <i class="fas fa-check-circle text-green-500 mr-2 text-xs"></i>
+                主题分类统计
+              </li>
+              <li class="flex items-center">
+                <i class="fas fa-check-circle text-green-500 mr-2 text-xs"></i>
+                内容长度分析
+              </li>
+              <li class="flex items-center">
+                <i class="fas fa-check-circle text-green-500 mr-2 text-xs"></i>
+                互动质量评估
+              </li>
+            </ul>
+          </div>
+
+          <!-- 设备与偏好 -->
+          <div style="background: var(--card-bg);"
+            class="p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border group hover:-translate-y-2"
+            style="border-color: var(--border-color);">
+            <div
+              class="w-14 h-14 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
+              <i class="fas fa-mobile-alt text-white text-xl"></i>
+            </div>
+            <h4 class="text-lg font-bold mb-3" style="color: var(--text-color);">设备使用分析</h4>
+            <ul class="space-y-2 text-sm" style="color: var(--text-secondary);">
+              <li class="flex items-center">
+                <i class="fas fa-check-circle text-purple-500 mr-2 text-xs"></i>
+                设备类型分布
+              </li>
+              <li class="flex items-center">
+                <i class="fas fa-check-circle text-purple-500 mr-2 text-xs"></i>
+                浏览器偏好
+              </li>
+              <li class="flex items-center">
+                <i class="fas fa-check-circle text-purple-500 mr-2 text-xs"></i>
+                访问地域分析
+              </li>
+            </ul>
+          </div>
+
+          <!-- 时间趋势 -->
+          <div style="background: var(--card-bg);"
+            class="p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border group hover:-translate-y-2"
+            style="border-color: var(--border-color);">
+            <div
+              class="w-14 h-14 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
+              <i class="fas fa-chart-line text-white text-xl"></i>
+            </div>
+            <h4 class="text-lg font-bold mb-3" style="color: var(--text-color);">时间趋势洞察</h4>
+            <ul class="space-y-2 text-sm" style="color: var(--text-secondary);">
+              <li class="flex items-center">
+                <i class="fas fa-check-circle text-orange-500 mr-2 text-xs"></i>
+                活动趋势变化
+              </li>
+              <li class="flex items-center">
+                <i class="fas fa-check-circle text-orange-500 mr-2 text-xs"></i>
+                成长轨迹分析
+              </li>
+              <li class="flex items-center">
+                <i class="fas fa-check-circle text-orange-500 mr-2 text-xs"></i>
+                周期性规律
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 特色功能亮点 -->
+        <div
+          class="mt-16 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 rounded-3xl p-8 border border-indigo-100">
+          <div class="text-center">
+            <h4 class="text-2xl font-bold text-indigo-900 mb-4">
+              <i class="fas fa-star text-yellow-500 mr-2"></i>
+              特色分析功能
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+              <div class="text-center group">
+                <div class="relative mb-4">
+                  <!-- 装饰性背景 -->
+                  <div
+                    class="absolute inset-0 bg-indigo-200 rounded-full opacity-20 transform scale-150 group-hover:scale-175 transition-transform duration-300">
+                  </div>
+                  <div
+                    class="relative w-16 h-16 bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-full flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-all duration-300">
+                    <i class="fas fa-trophy text-2xl"></i>
+                  </div>
+                  <!-- 小装饰图标 -->
+                  <div
+                    class="absolute -top-1 -right-1 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
+                    <i class="fas fa-crown text-white text-xs"></i>
+                  </div>
+                </div>
+                <h5 class="font-semibold text-indigo-900 mb-2">成就徽章追踪</h5>
+                <p class="text-sm text-indigo-700 leading-relaxed">分析您获得的各类徽章和成就进度，了解您在社区中的成长轨迹</p>
+              </div>
+
+              <div class="text-center group">
+                <div class="relative mb-4">
+                  <!-- 装饰性背景 -->
+                  <div
+                    class="absolute inset-0 bg-purple-200 rounded-full opacity-20 transform scale-150 group-hover:scale-175 transition-transform duration-300">
+                  </div>
+                  <div
+                    class="relative w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-full flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-all duration-300">
+                    <i class="fas fa-heart text-2xl"></i>
+                  </div>
+                  <!-- 小装饰图标 -->
+                  <div
+                    class="absolute -top-1 -right-1 w-6 h-6 bg-pink-400 rounded-full flex items-center justify-center">
+                    <i class="fas fa-thumbs-up text-white text-xs"></i>
+                  </div>
+                </div>
+                <h5 class="font-semibold text-indigo-900 mb-2">点赞互动分析</h5>
+                <p class="text-sm text-indigo-700 leading-relaxed">深入了解您的点赞行为和互动模式，发现您的兴趣偏好</p>
+              </div>
+
+              <div class="text-center group">
+                <div class="relative mb-4">
+                  <!-- 装饰性背景 -->
+                  <div
+                    class="absolute inset-0 bg-pink-200 rounded-full opacity-20 transform scale-150 group-hover:scale-175 transition-transform duration-300">
+                  </div>
+                  <div
+                    class="relative w-16 h-16 bg-gradient-to-br from-pink-500 to-pink-600 text-white rounded-full flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-all duration-300">
+                    <i class="fas fa-bookmark text-2xl"></i>
+                  </div>
+                  <!-- 小装饰图标 -->
+                  <div
+                    class="absolute -top-1 -right-1 w-6 h-6 bg-orange-400 rounded-full flex items-center justify-center">
+                    <i class="fas fa-star text-white text-xs"></i>
+                  </div>
+                </div>
+                <h5 class="font-semibold text-indigo-900 mb-2">收藏偏好洞察</h5>
+                <p class="text-sm text-indigo-700 leading-relaxed">分析您的收藏习惯和内容偏好，了解您最关注的话题领域</p>
+              </div>
+            </div>
+
+            <!-- 数据可视化预览 -->
+            <div class="mt-10 bg-white rounded-2xl p-6 shadow-lg">
+              <h6 class="text-lg font-semibold text-gray-800 mb-4">
+                <i class="fas fa-chart-pie text-indigo-500 mr-2"></i>
+                数据可视化示例
+              </h6>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- 折线图示例 -->
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-xl">
+                  <div class="flex items-center mb-3">
+                    <i class="fas fa-chart-line text-blue-500 mr-2"></i>
+                    <span class="text-sm font-medium text-gray-700">活动趋势</span>
+                  </div>
+                  <div class="h-16 relative">
+                    <!-- 模拟折线图 -->
+                    <svg class="w-full h-full" viewBox="0 0 100 40">
+                      <polyline fill="none" stroke="#3B82F6" stroke-width="2"
+                        points="0,35 20,25 40,15 60,20 80,10 100,5" />
+                      <circle cx="0" cy="35" r="2" fill="#3B82F6" />
+                      <circle cx="20" cy="25" r="2" fill="#3B82F6" />
+                      <circle cx="40" cy="15" r="2" fill="#3B82F6" />
+                      <circle cx="60" cy="20" r="2" fill="#3B82F6" />
+                      <circle cx="80" cy="10" r="2" fill="#3B82F6" />
+                      <circle cx="100" cy="5" r="2" fill="#3B82F6" />
+                    </svg>
+                  </div>
                 </div>
 
-                <!-- Upload Area -->
-                <div id="uploadArea" class="relative p-12 text-center border-3 border-dashed transition-all duration-500 cursor-pointer group" style="border-color: var(--border-color);">
+                <!-- 饼图示例 -->
+                <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-xl">
+                  <div class="flex items-center mb-3">
+                    <i class="fas fa-chart-pie text-purple-500 mr-2"></i>
+                    <span class="text-sm font-medium text-gray-700">内容分布</span>
+                  </div>
+                  <div class="h-16 flex items-center justify-center">
+                    <div class="relative w-12 h-12">
+                      <div class="absolute inset-0 rounded-full"
+                        style="background: conic-gradient(#8B5CF6 0deg 120deg, #EC4899 120deg 240deg, #F59E0B 240deg 360deg);">
+                      </div>
+                      <div class="absolute inset-2 bg-white rounded-full"></div>
+                    </div>
+                  </div>
+                </div>
 
-                    <!-- 背景装饰 -->
-                    <div class="absolute inset-0 bg-gradient-to-br from-indigo-50/50 to-purple-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <!-- 柱状图示例 -->
+                <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-xl">
+                  <div class="flex items-center mb-3">
+                    <i class="fas fa-chart-bar text-green-500 mr-2"></i>
+                    <span class="text-sm font-medium text-gray-700">设备统计</span>
+                  </div>
+                  <div class="h-16 flex items-end justify-center space-x-1">
+                    <div class="w-2 bg-green-400 rounded-t" style="height: 70%;"></div>
+                    <div class="w-2 bg-green-500 rounded-t" style="height: 100%;"></div>
+                    <div class="w-2 bg-green-400 rounded-t" style="height: 45%;"></div>
+                    <div class="w-2 bg-green-300 rounded-t" style="height: 60%;"></div>
+                    <div class="w-2 bg-green-500 rounded-t" style="height: 80%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-                    <div class="relative z-10">
-                        <!-- 图标区域 -->
-                        <div class="mb-8">
-                            <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center shadow-2xl transform group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 relative overflow-hidden">
-                                <!-- 背景闪光效果 -->
-                                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000"></div>
-                                <i class="fas fa-file-upload text-white text-3xl relative z-10"></i>
-                            </div>
+    <!-- 使用流程指南 -->
+    <section id="guide" class="mb-20">
+      <div class="max-w-5xl mx-auto">
+        <div class="text-center mb-12">
+          <h3 class="text-3xl font-bold mb-4" style="color: var(--text-color);">
+            <i class="fas fa-rocket text-indigo-600 mr-3"></i>
+            三步开始分析
+          </h3>
+          <p class="text-xl" style="color: var(--text-secondary);">简单三步，即可获得专业的数据分析报告</p>
+        </div>
 
-                            <!-- 环绕装饰元素 -->
-                            <div class="relative">
-                                <div class="absolute -top-20 left-1/2 transform -translate-x-1/2">
-                                    <div class="flex space-x-4">
-                                        <div class="w-2 h-2 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full opacity-60 animate-bounce" style="animation-delay: 0s"></div>
-                                        <div class="w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full opacity-60 animate-bounce" style="animation-delay: 0.3s"></div>
-                                        <div class="w-2 h-2 bg-gradient-to-r from-pink-400 to-indigo-400 rounded-full opacity-60 animate-bounce" style="animation-delay: 0.6s"></div>
-                                    </div>
-                                </div>
-                            </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+          <!-- 连接线装饰 -->
+          <div
+            class="hidden md:block absolute top-24 left-1/4 right-1/4 h-0.5 bg-gradient-to-r from-indigo-200 via-purple-200 to-pink-200">
+          </div>
+          <div
+            class="hidden md:block absolute top-24 left-1/4 w-3 h-3 bg-indigo-400 rounded-full transform -translate-x-1/2">
+          </div>
+          <div
+            class="hidden md:block absolute top-24 right-1/4 w-3 h-3 bg-pink-400 rounded-full transform translate-x-1/2">
+          </div>
 
-                            <!-- 状态指示器 -->
-                            <div class="flex justify-center space-x-3 mb-6">
-                                <div class="w-3 h-3 bg-indigo-400 rounded-full animate-pulse"></div>
-                                <div class="w-3 h-3 bg-purple-400 rounded-full animate-pulse" style="animation-delay: 0.2s"></div>
-                                <div class="w-3 h-3 bg-pink-400 rounded-full animate-pulse" style="animation-delay: 0.4s"></div>
-                            </div>
-                        </div>
+          <!-- 步骤1 -->
+          <div class="text-center relative group">
+            <div class="relative mb-6">
+              <!-- 背景装饰 -->
+              <div
+                class="absolute inset-0 bg-indigo-100 rounded-full opacity-30 transform scale-150 group-hover:scale-175 transition-transform duration-500">
+              </div>
+              <div
+                class="relative w-24 h-24 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-full flex items-center justify-center mx-auto shadow-2xl group-hover:shadow-3xl transition-all duration-300">
+                <i class="fas fa-download text-white text-3xl"></i>
+              </div>
+              <div
+                class="absolute -top-2 -right-2 w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center text-lg font-bold shadow-lg">
+                1</div>
+              <!-- 装饰小图标 -->
+              <div
+                class="absolute -bottom-2 -left-2 w-8 h-8 bg-blue-400 rounded-full flex items-center justify-center opacity-80">
+                <i class="fas fa-globe text-white text-sm"></i>
+              </div>
+            </div>
+            <h4 class="text-xl font-bold mb-3" style="color: var(--text-color);">导出数据</h4>
+            <p class="text-base leading-relaxed" style="color: var(--text-secondary);">
+              访问 Linux.do 个人设置页面，申请并下载您的个人数据档案
+            </p>
+            <!-- 时间提示 -->
+            <div class="mt-4 inline-flex items-center px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-sm">
+              <i class="fas fa-clock mr-1"></i>
+              通常 1-2 分钟
+            </div>
+          </div>
 
-                        <!-- 主要文字 -->
-                        <div class="space-y-4 mb-8">
-                            <h4 class="text-2xl font-bold group-hover:text-indigo-600 transition-colors duration-300" style="color: var(--text-color);">
-                                <i class="fas fa-hand-pointer text-indigo-500 mr-2"></i>
-                                拖拽 ZIP 文件到此处
-                            </h4>
-                            <p class="text-lg leading-relaxed max-w-md mx-auto" style="color: var(--text-secondary);">
-                                或者点击下方按钮选择文件<br/>
-                                <span class="text-sm">支持最大 10MB 的 ZIP 文件</span>
-                            </p>
-                        </div>
+          <!-- 步骤2 -->
+          <div class="text-center relative group">
+            <div class="relative mb-6">
+              <!-- 背景装饰 -->
+              <div
+                class="absolute inset-0 bg-purple-100 rounded-full opacity-30 transform scale-150 group-hover:scale-175 transition-transform duration-500">
+              </div>
+              <div
+                class="relative w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto shadow-2xl group-hover:shadow-3xl transition-all duration-300">
+                <i class="fas fa-upload text-white text-3xl"></i>
+              </div>
+              <div
+                class="absolute -top-2 -right-2 w-10 h-10 bg-purple-600 text-white rounded-full flex items-center justify-center text-lg font-bold shadow-lg">
+                2</div>
+              <!-- 装饰小图标 -->
+              <div
+                class="absolute -bottom-2 -left-2 w-8 h-8 bg-pink-400 rounded-full flex items-center justify-center opacity-80">
+                <i class="fas fa-file-archive text-white text-sm"></i>
+              </div>
+            </div>
+            <h4 class="text-xl font-bold mb-3" style="color: var(--text-color);">上传文件</h4>
+            <p class="text-base leading-relaxed" style="color: var(--text-secondary);">
+              将下载的 ZIP 文件拖拽到下方上传区域，系统会自动开始解析
+            </p>
+            <!-- 安全提示 -->
+            <div class="mt-4 inline-flex items-center px-3 py-1 bg-green-50 text-green-600 rounded-full text-sm">
+              <i class="fas fa-shield-alt mr-1"></i>
+              100% 本地处理
+            </div>
+          </div>
 
-                        <!-- 操作按钮 -->
-                        <div class="space-y-4">
-                            <button id="selectFileBtn"
-                                    class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600
+          <!-- 步骤3 -->
+          <div class="text-center relative group">
+            <div class="relative mb-6">
+              <!-- 背景装饰 -->
+              <div
+                class="absolute inset-0 bg-green-100 rounded-full opacity-30 transform scale-150 group-hover:scale-175 transition-transform duration-500">
+              </div>
+              <div
+                class="relative w-24 h-24 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-2xl group-hover:shadow-3xl transition-all duration-300">
+                <i class="fas fa-chart-bar text-white text-3xl"></i>
+              </div>
+              <div
+                class="absolute -top-2 -right-2 w-10 h-10 bg-green-600 text-white rounded-full flex items-center justify-center text-lg font-bold shadow-lg">
+                3</div>
+              <!-- 装饰小图标 -->
+              <div
+                class="absolute -bottom-2 -left-2 w-8 h-8 bg-emerald-400 rounded-full flex items-center justify-center opacity-80">
+                <i class="fas fa-magic text-white text-sm"></i>
+              </div>
+            </div>
+            <h4 class="text-xl font-bold mb-3" style="color: var(--text-color);">查看报告</h4>
+            <p class="text-base leading-relaxed" style="color: var(--text-secondary);">
+              自动生成包含图表、统计和洞察的专业分析报告
+            </p>
+            <!-- 功能提示 -->
+            <div class="mt-4 inline-flex items-center px-3 py-1 bg-purple-50 text-purple-600 rounded-full text-sm">
+              <i class="fas fa-sparkles mr-1"></i>
+              多维度分析
+            </div>
+          </div>
+        </div>
+
+        <!-- 底部补充信息 -->
+        <div class="mt-16 bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl p-8 border border-gray-200">
+          <div class="text-center">
+            <h5 class="text-lg font-semibold mb-4" style="color: var(--text-color);">
+              <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
+              为什么选择我们的分析工具？
+            </h5>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div class="flex items-center justify-center space-x-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                  <i class="fas fa-tachometer-alt text-blue-600"></i>
+                </div>
+                <div class="text-left">
+                  <p class="font-medium text-gray-800">秒级处理</p>
+                  <p class="text-sm text-gray-600">快速解析</p>
+                </div>
+              </div>
+              <div class="flex items-center justify-center space-x-3">
+                <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                  <i class="fas fa-lock text-green-600"></i>
+                </div>
+                <div class="text-left">
+                  <p class="font-medium text-gray-800">隐私保护</p>
+                  <p class="text-sm text-gray-600">本地处理</p>
+                </div>
+              </div>
+              <div class="flex items-center justify-center space-x-3">
+                <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                  <i class="fas fa-palette text-purple-600"></i>
+                </div>
+                <div class="text-left">
+                  <p class="font-medium text-gray-800">美观图表</p>
+                  <p class="text-sm text-gray-600">专业设计</p>
+                </div>
+              </div>
+              <div class="flex items-center justify-center space-x-3">
+                <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                  <i class="fas fa-heart text-orange-600"></i>
+                </div>
+                <div class="text-left">
+                  <p class="font-medium text-gray-800">完全免费</p>
+                  <p class="text-sm text-gray-600">无限使用</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Upload Section - 专业化上传区域 -->
+    <section id="upload" class="mb-16">
+      <div style="background: var(--card-bg);" class="rounded-3xl shadow-2xl border overflow-hidden"
+        style="border-color: var(--border-color);">
+
+        <!-- 上传区域标题 -->
+        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 px-8 py-6">
+          <div class="flex items-center justify-center text-white">
+            <i class="fas fa-cloud-upload-alt text-2xl mr-4"></i>
+            <div class="text-center">
+              <h3 class="text-2xl font-bold">开始分析您的数据</h3>
+              <p class="text-indigo-100 mt-1">上传 Linux.do 数据导出文件</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upload Area -->
+        <div id="uploadArea"
+          class="relative p-12 text-center border-3 border-dashed transition-all duration-500 cursor-pointer group"
+          style="border-color: var(--border-color);">
+
+          <!-- 背景装饰 -->
+          <div
+            class="absolute inset-0 bg-gradient-to-br from-indigo-50/50 to-purple-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+          </div>
+
+          <div class="relative z-10">
+            <!-- 图标区域 -->
+            <div class="mb-8">
+              <div
+                class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center shadow-2xl transform group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 relative overflow-hidden">
+                <!-- 背景闪光效果 -->
+                <div
+                  class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000">
+                </div>
+                <i class="fas fa-file-upload text-white text-3xl relative z-10"></i>
+              </div>
+
+              <!-- 环绕装饰元素 -->
+              <div class="relative">
+                <div class="absolute -top-20 left-1/2 transform -translate-x-1/2">
+                  <div class="flex space-x-4">
+                    <div
+                      class="w-2 h-2 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full opacity-60 animate-bounce"
+                      style="animation-delay: 0s"></div>
+                    <div
+                      class="w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full opacity-60 animate-bounce"
+                      style="animation-delay: 0.3s"></div>
+                    <div
+                      class="w-2 h-2 bg-gradient-to-r from-pink-400 to-indigo-400 rounded-full opacity-60 animate-bounce"
+                      style="animation-delay: 0.6s"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 状态指示器 -->
+              <div class="flex justify-center space-x-3 mb-6">
+                <div class="w-3 h-3 bg-indigo-400 rounded-full animate-pulse"></div>
+                <div class="w-3 h-3 bg-purple-400 rounded-full animate-pulse" style="animation-delay: 0.2s"></div>
+                <div class="w-3 h-3 bg-pink-400 rounded-full animate-pulse" style="animation-delay: 0.4s"></div>
+              </div>
+            </div>
+
+            <!-- 主要文字 -->
+            <div class="space-y-4 mb-8">
+              <h4 class="text-2xl font-bold group-hover:text-indigo-600 transition-colors duration-300"
+                style="color: var(--text-color);">
+                <i class="fas fa-hand-pointer text-indigo-500 mr-2"></i>
+                拖拽 ZIP 文件到此处
+              </h4>
+              <p class="text-lg leading-relaxed max-w-md mx-auto" style="color: var(--text-secondary);">
+                或者点击下方按钮选择文件<br />
+                <span class="text-sm">支持最大 10MB 的 ZIP 文件</span>
+              </p>
+            </div>
+
+            <!-- 操作按钮 -->
+            <div class="space-y-4">
+              <button id="selectFileBtn" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600
                                            hover:from-indigo-700 hover:to-purple-700 text-white font-semibold rounded-2xl
                                            shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300
                                            group-hover:scale-105">
-                                <i class="fas fa-folder-open mr-3"></i>
-                                选择文件
-                                <i class="fas fa-chevron-right ml-2"></i>
-                            </button>
+                <i class="fas fa-folder-open mr-3"></i>
+                选择文件
+                <i class="fas fa-chevron-right ml-2"></i>
+              </button>
 
-                            <!-- 文件要求说明 -->
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 text-sm">
-                                <div class="flex items-center justify-center space-x-2" style="color: var(--text-secondary);">
-                                    <i class="fas fa-file-archive text-indigo-500"></i>
-                                    <span>ZIP 格式</span>
-                                </div>
-                                <div class="flex items-center justify-center space-x-2" style="color: var(--text-secondary);">
-                                    <i class="fas fa-weight-hanging text-purple-500"></i>
-                                    <span>最大 10MB</span>
-                                </div>
-                                <div class="flex items-center justify-center space-x-2" style="color: var(--text-secondary);">
-                                    <i class="fas fa-shield-alt text-green-500"></i>
-                                    <span>本地处理</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+              <!-- 文件要求说明 -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 text-sm">
+                <div class="flex items-center justify-center space-x-2" style="color: var(--text-secondary);">
+                  <i class="fas fa-file-archive text-indigo-500"></i>
+                  <span>ZIP 格式</span>
                 </div>
-
-                <input type="file" id="fileInput" class="hidden" accept=".zip">
-
-                <!-- Progress Bar -->
-                <div id="progressContainer" class="hidden px-8 pb-8">
-                    <div class="mb-4">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-sm font-medium" style="color: var(--text-color);">处理进度</span>
-                            <span id="progressPercent" class="text-sm font-bold text-indigo-600">0%</span>
-                        </div>
-                        <div class="bg-gray-200 rounded-full h-3 overflow-hidden">
-                            <div id="progressBar"
-                                 class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-600 h-full rounded-full
-                                        transition-all duration-700 ease-out relative overflow-hidden"
-                                 style="width: 0%">
-                                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent
-                                            animate-pulse progress-shimmer"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-center">
-                        <div class="flex items-center space-x-3">
-                            <div class="flex space-x-1">
-                                <div class="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
-                                <div class="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
-                                <div class="w-2 h-2 bg-pink-400 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
-                            </div>
-                            <p id="progressText" class="font-medium" style="color: var(--text-color);">准备中...</p>
-                        </div>
-                    </div>
+                <div class="flex items-center justify-center space-x-2" style="color: var(--text-secondary);">
+                  <i class="fas fa-weight-hanging text-purple-500"></i>
+                  <span>最大 10MB</span>
                 </div>
-
-                <!-- Status Messages -->
-                <div id="statusContainer" class="hidden px-8 pb-6">
-                    <div id="statusMessage" class="p-4 rounded-2xl text-center font-medium"></div>
+                <div class="flex items-center justify-center space-x-2" style="color: var(--text-secondary);">
+                  <i class="fas fa-shield-alt text-green-500"></i>
+                  <span>本地处理</span>
                 </div>
-
+              </div>
             </div>
-        </section>
+          </div>
+        </div>
 
-        <!-- Action Buttons -->
-        <section class="mb-8">
-            <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-6 shadow-2xl border border-white/20">
-                <div class="flex flex-wrap justify-center gap-4">
-                    <button id="exportBtn"
-                            class="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700
+        <input type="file" id="fileInput" class="hidden" accept=".zip">
+
+        <!-- Progress Bar -->
+        <div id="progressContainer" class="hidden px-8 pb-8">
+          <div class="mb-4">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm font-medium" style="color: var(--text-color);">处理进度</span>
+              <span id="progressPercent" class="text-sm font-bold text-indigo-600">0%</span>
+            </div>
+            <div class="bg-gray-200 rounded-full h-3 overflow-hidden">
+              <div id="progressBar" class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-600 h-full rounded-full
+                                        transition-all duration-700 ease-out relative overflow-hidden"
+                style="width: 0%">
+                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent
+                                            animate-pulse progress-shimmer"></div>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center justify-center">
+            <div class="flex items-center space-x-3">
+              <div class="flex space-x-1">
+                <div class="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                <div class="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                <div class="w-2 h-2 bg-pink-400 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+              </div>
+              <p id="progressText" class="font-medium" style="color: var(--text-color);">准备中...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Status Messages -->
+        <div id="statusContainer" class="hidden px-8 pb-6">
+          <div id="statusMessage" class="p-4 rounded-2xl text-center font-medium"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Action Buttons -->
+    <section id="actions" class="mb-8">
+      <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-6 shadow-2xl border border-white/20">
+        <div class="flex flex-wrap justify-center gap-4">
+          <button id="exportBtn" class="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700
                                    text-white px-6 py-3 rounded-2xl font-medium transition-all duration-200
                                    transform hover:-translate-y-1 shadow-lg hover:shadow-xl hidden group">
-                        <i class="fas fa-download mr-2 group-hover:animate-bounce"></i>
-                        导出分析数据
-                    </button>
-                    <button id="viewStoredBtn"
-                            class="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700
+            <i class="fas fa-download mr-2 group-hover:animate-bounce"></i>
+            导出分析数据
+          </button>
+          <button id="viewStoredBtn" class="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700
                                    text-white px-6 py-3 rounded-2xl font-medium transition-all duration-200
                                    transform hover:-translate-y-1 shadow-lg hover:shadow-xl group">
-                        <i class="fas fa-database mr-2 group-hover:animate-pulse"></i>
-                        查看已存储数据
-                    </button>
-                    <button id="clearDataBtn"
-                            class="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700
+            <i class="fas fa-database mr-2 group-hover:animate-pulse"></i>
+            查看已存储数据
+          </button>
+          <button id="clearDataBtn" class="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700
                                    text-white px-6 py-3 rounded-2xl font-medium transition-all duration-200
                                    transform hover:-translate-y-1 shadow-lg hover:shadow-xl group">
-                        <i class="fas fa-trash-alt mr-2 group-hover:animate-pulse"></i>
-                        清空所有数据
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Stored Data Section -->
-        <section id="storedDataSection" class="mb-8 hidden">
-            <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
-                <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
-                    <i class="fas fa-archive text-blue-400 mr-3"></i>
-                    已存储的分析数据
-                </h3>
-                <div id="storedDataList" class="space-y-4">
-                    <!-- 动态内容 -->
-                </div>
-            </div>
-        </section>
-
-        <!-- Analysis Results -->
-        <section id="analysisSection" class="hidden">
-
-            <!-- User Info Card -->
-            <div id="userInfoSection" class="mb-8 animate-fade-in">
-                <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
-                    <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
-                        <i class="fas fa-user-circle text-blue-400 mr-3"></i>
-                        用户信息概览
-                    </h3>
-                    <div id="userInfoContent" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <!-- 动态生成的用户信息 -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Summary Cards -->
-            <div id="summaryCards" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mb-8">
-                <!-- 动态生成的摘要卡片 -->
-            </div>
-
-            <!-- Data Completeness Card -->
-            <div id="dataCompletenessSection" class="mb-8 animate-slide-up">
-                <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
-                    <h3 class="text-xl font-bold text-white mb-6 flex items-center">
-                        <i class="fas fa-chart-pie text-green-400 mr-3"></i>
-                        数据完整性评估
-                    </h3>
-                    <div id="dataCompletenessContent">
-                        <!-- 动态生成的数据完整性信息 -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Charts Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-
-                <!-- Visits Chart -->
-                <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20 hover:bg-white/15 transition-all duration-300">
-                    <h3 class="text-xl font-bold text-white mb-6 text-center flex items-center justify-center">
-                        <i class="fas fa-chart-line text-blue-400 mr-3"></i>
-                        每日访问活动（最近60天）
-                    </h3>
-                    <div class="relative h-64">
-                        <canvas id="visitsChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Badges Chart -->
-                <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20 hover:bg-white/15 transition-all duration-300">
-                    <h3 class="text-xl font-bold text-white mb-6 text-center flex items-center justify-center">
-                        <i class="fas fa-medal text-yellow-400 mr-3"></i>
-                        徽章获得时间线
-                    </h3>
-                    <div class="relative h-64">
-                        <canvas id="badgesChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Device Chart -->
-                <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20 hover:bg-white/15 transition-all duration-300">
-                    <h3 class="text-xl font-bold text-white mb-6 text-center flex items-center justify-center">
-                        <i class="fas fa-mobile-alt text-purple-400 mr-3"></i>
-                        设备使用分布
-                    </h3>
-                    <div class="relative h-64">
-                        <canvas id="deviceChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Posts Activity Chart -->
-                <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20 hover:bg-white/15 transition-all duration-300">
-                    <h3 class="text-xl font-bold text-white mb-6 text-center flex items-center justify-center">
-                        <i class="fas fa-clock text-orange-400 mr-3"></i>
-                        发帖活动热力图（24小时）
-                    </h3>
-                    <div class="relative h-64">
-                        <canvas id="postsChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Likes Activity Chart -->
-                <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20 hover:bg-white/15 transition-all duration-300">
-                    <h3 class="text-xl font-bold text-white mb-6 text-center flex items-center justify-center">
-                        <i class="fas fa-heart text-red-400 mr-3"></i>
-                        点赞活动趋势
-                    </h3>
-                    <div class="relative h-64">
-                        <canvas id="likesChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Auth Tokens Analysis -->
-                <div id="authTokensSection" class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20 hover:bg-white/15 transition-all duration-300">
-                    <h3 class="text-xl font-bold text-white mb-6 text-center flex items-center justify-center">
-                        <i class="fas fa-key text-indigo-400 mr-3"></i>
-                        认证令牌分析
-                    </h3>
-                    <div id="authTokensContent">
-                        <!-- 动态生成的认证令牌分析 -->
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Category Analysis -->
-            <div id="categorySection" class="mb-8 animate-slide-up">
-                <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
-                    <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
-                        <i class="fas fa-folder text-cyan-400 mr-3"></i>
-                        分类活动分析
-                    </h3>
-                    <div id="categoryContent" class="overflow-x-auto">
-                        <!-- 动态生成的分类分析表格 -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Badge Stats -->
-            <div id="badgeStatsSection" class="mb-8 animate-slide-up">
-                <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
-                    <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
-                        <i class="fas fa-trophy text-yellow-400 mr-3"></i>
-                        徽章统计详情
-                    </h3>
-                    <div id="badgeStatsContent" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                        <!-- 动态生成的徽章统计 -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Additional Analysis Sections -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-
-                <!-- Bookmarks Analysis -->
-                <div id="bookmarksSection" class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20 hover:bg-white/15 transition-all duration-300">
-                    <h3 class="text-xl font-bold text-white mb-6 flex items-center">
-                        <i class="fas fa-bookmark text-amber-400 mr-3"></i>
-                        书签分析
-                    </h3>
-                    <div id="bookmarksContent">
-                        <!-- 动态生成的书签分析 -->
-                    </div>
-                </div>
-
-                <!-- Flags Analysis -->
-                <div id="flagsSection" class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20 hover:bg-white/15 transition-all duration-300">
-                    <h3 class="text-xl font-bold text-white mb-6 flex items-center">
-                        <i class="fas fa-flag text-red-400 mr-3"></i>
-                        举报分析
-                    </h3>
-                    <div id="flagsContent">
-                        <!-- 动态生成的举报分析 -->
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Detailed Data Tables Section -->
-            <div id="detailedDataSection" class="mb-8 animate-slide-up">
-                <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
-                    <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
-                        <i class="fas fa-table text-emerald-400 mr-3"></i>
-                        详细数据表格
-                    </h3>
-
-                    <!-- Tab Navigation -->
-                    <div class="border-b border-white/20 mb-6">
-                        <nav class="-mb-px flex flex-wrap gap-2" id="dataTableTabs">
-                            <button class="tab-button active" data-tab="userArchive">
-                                <i class="fas fa-edit mr-2"></i>
-                                发帖记录
-                                <span class="ml-2 text-xs bg-blue-500/30 text-blue-200 px-2 py-1 rounded-full" id="userArchiveCount">0</span>
-                            </button>
-                            <button class="tab-button" data-tab="visits">
-                                <i class="fas fa-eye mr-2"></i>
-                                访问记录
-                                <span class="ml-2 text-xs bg-green-500/30 text-green-200 px-2 py-1 rounded-full" id="visitsCount">0</span>
-                            </button>
-                            <button class="tab-button" data-tab="likes">
-                                <i class="fas fa-heart mr-2"></i>
-                                点赞记录
-                                <span class="ml-2 text-xs bg-red-500/30 text-red-200 px-2 py-1 rounded-full" id="likesCount">0</span>
-                            </button>
-                            <button class="tab-button" data-tab="userBadges">
-                                <i class="fas fa-medal mr-2"></i>
-                                徽章记录
-                                <span class="ml-2 text-xs bg-yellow-500/30 text-yellow-200 px-2 py-1 rounded-full" id="userBadgesCount">0</span>
-                            </button>
-                            <button class="tab-button" data-tab="authTokens">
-                                <i class="fas fa-key mr-2"></i>
-                                认证令牌
-                                <span class="ml-2 text-xs bg-purple-500/30 text-purple-200 px-2 py-1 rounded-full" id="authTokensCount">0</span>
-                            </button>
-                            <button class="tab-button" data-tab="bookmarks">
-                                <i class="fas fa-bookmark mr-2"></i>
-                                书签记录
-                                <span class="ml-2 text-xs bg-indigo-500/30 text-indigo-200 px-2 py-1 rounded-full" id="bookmarksCount">0</span>
-                            </button>
-                            <button class="tab-button" data-tab="flags">
-                                <i class="fas fa-flag mr-2"></i>
-                                举报记录
-                                <span class="ml-2 text-xs bg-pink-500/30 text-pink-200 px-2 py-1 rounded-full" id="flagsCount">0</span>
-                            </button>
-                            <button class="tab-button" data-tab="queuedPosts">
-                                <i class="fas fa-clock mr-2"></i>
-                                待审核帖子
-                                <span class="ml-2 text-xs bg-orange-500/30 text-orange-200 px-2 py-1 rounded-full" id="queuedPostsCount">0</span>
-                            </button>
-                        </nav>
-                    </div>
-
-                    <!-- Pagination Controls -->
-                    <div id="paginationControls" class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-                        <div class="flex items-center gap-4">
-                            <label class="text-white/80 text-sm font-medium">每页显示:</label>
-                            <select id="pageSizeSelect" class="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm backdrop-blur-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="10">10</option>
-                                <option value="25" selected>25</option>
-                                <option value="50">50</option>
-                                <option value="100">100</option>
-                            </select>
-                        </div>
-
-                        <div id="paginationInfo" class="text-white/70 text-sm"></div>
-
-                        <div class="flex items-center gap-2">
-                            <button id="prevPageBtn" class="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
-                                <i class="fas fa-chevron-left mr-2"></i>上一页
-                            </button>
-                            <div id="pageNumbers" class="flex gap-1">
-                                <!-- 动态生成的页码 -->
-                            </div>
-                            <button id="nextPageBtn" class="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
-                                下一页<i class="fas fa-chevron-right ml-2"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Search Bar -->
-                    <div class="mb-6">
-                        <div class="relative">
-                            <input type="text" id="dataSearchInput" placeholder="搜索数据..."
-                                   class="w-full bg-white/10 border border-white/20 rounded-xl px-6 py-3 pl-12 text-white placeholder-white/50 backdrop-blur-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
-                            <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-white/50"></i>
-                            <button id="clearSearchBtn" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/50 hover:text-white transition-colors hidden">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Tab Content -->
-                    <div id="dataTableContent" class="overflow-x-auto">
-                        <!-- 动态生成的表格内容 -->
-                    </div>
-                </div>
-            </div>
-
-        </section>
-
-    </div>
-
-    <!-- Toast Notifications -->
-    <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2">
-        <!-- 动态生成的通知 -->
-    </div>
-
-    <!-- Help Modal -->
-    <div id="helpModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-2xl font-bold text-white flex items-center">
-                    <i class="fas fa-question-circle text-blue-400 mr-3"></i>
-                    使用帮助
-                </h3>
-                <button id="closeHelpBtn" class="text-white/70 hover:text-white text-2xl">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-
-            <div class="space-y-6 text-white/80">
-                <div class="help-section">
-                    <h4 class="text-lg font-semibold text-white mb-3 flex items-center">
-                        <i class="fas fa-download text-green-400 mr-2"></i>
-                        如何导出数据
-                    </h4>
-                    <ol class="space-y-2 text-sm pl-4">
-                        <li class="flex items-start">
-                            <span class="inline-block w-6 h-6 bg-blue-500 text-white rounded-full text-xs flex items-center justify-center mr-3 mt-0.5">1</span>
-                            <span>访问 <a href="https://linux.do/my/preferences/account" target="_blank" class="text-blue-300 underline">linux.do/my/preferences/account</a></span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="inline-block w-6 h-6 bg-blue-500 text-white rounded-full text-xs flex items-center justify-center mr-3 mt-0.5">2</span>
-                            <span>滚动到页面底部，找到"下载我的数据"选项</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="inline-block w-6 h-6 bg-blue-500 text-white rounded-full text-xs flex items-center justify-center mr-3 mt-0.5">3</span>
-                            <span>点击"请求我的数据"按钮</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="inline-block w-6 h-6 bg-blue-500 text-white rounded-full text-xs flex items-center justify-center mr-3 mt-0.5">4</span>
-                            <span>等待处理完成后，下载ZIP文件</span>
-                        </li>
-                    </ol>
-                </div>
-
-                <div class="help-section">
-                    <h4 class="text-lg font-semibold text-white mb-3 flex items-center">
-                        <i class="fas fa-upload text-purple-400 mr-2"></i>
-                        如何使用工具
-                    </h4>
-                    <ul class="space-y-2 text-sm pl-4">
-                        <li class="flex items-start">
-                            <i class="fas fa-check text-green-400 mr-3 mt-1"></i>
-                            <span>将下载的ZIP文件拖拽到上传区域，或点击选择文件</span>
-                        </li>
-                        <li class="flex items-start">
-                            <i class="fas fa-check text-green-400 mr-3 mt-1"></i>
-                            <span>工具会自动解析并生成可视化分析报告</span>
-                        </li>
-                        <li class="flex items-start">
-                            <i class="fas fa-check text-green-400 mr-3 mt-1"></i>
-                            <span>所有数据完全在浏览器本地处理，不会上传到服务器</span>
-                        </li>
-                    </ul>
-                </div>
-
-                <div class="help-section">
-                    <h4 class="text-lg font-semibold text-white mb-3 flex items-center">
-                        <i class="fas fa-shield-alt text-green-400 mr-2"></i>
-                        数据安全
-                    </h4>
-                    <div class="bg-green-500/10 border border-green-400/30 rounded-lg p-4">
-                        <p class="text-sm">
-                            <i class="fas fa-lock text-green-400 mr-2"></i>
-                            您的数据完全安全！所有分析都在您的浏览器中进行，不会发送到任何服务器。
-                            数据仅保存在浏览器本地存储中，只有您能够访问。
-                        </p>
-                    </div>
-                </div>
-            </div>
+            <i class="fas fa-trash-alt mr-2 group-hover:animate-pulse"></i>
+            清空所有数据
+          </button>
         </div>
-    </div>
+      </div>
+    </section>
 
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden
+    <!-- Stored Data Section -->
+    <section id="storedDataSection" class="mb-8 hidden">
+      <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
+        <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
+          <i class="fas fa-archive text-blue-400 mr-3"></i>
+          已存储的分析数据
+        </h3>
+        <div id="storedDataList" class="space-y-4">
+          <!-- 动态内容 -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Analysis Results -->
+    <section id="analysisSection" class="hidden">
+
+      <!-- User Info Card -->
+      <div id="userInfoSection" class="mb-8 animate-fade-in">
+        <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
+          <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
+            <i class="fas fa-user-circle text-blue-400 mr-3"></i>
+            用户信息概览
+          </h3>
+          <div id="userInfoContent" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- 动态生成的用户信息 -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary Cards -->
+      <div id="summaryCards" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mb-8">
+        <!-- 动态生成的摘要卡片 -->
+      </div>
+
+      <!-- Data Completeness Card -->
+      <div id="dataCompletenessSection" class="mb-8 animate-slide-up">
+        <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
+          <h3 class="text-xl font-bold text-white mb-6 flex items-center">
+            <i class="fas fa-chart-pie text-green-400 mr-3"></i>
+            数据完整性评估
+          </h3>
+          <div id="dataCompletenessContent">
+            <!-- 动态生成的数据完整性信息 -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+
+        <!-- Visits Chart -->
+        <div
+          class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20 hover:bg-white/15 transition-all duration-300">
+          <h3 class="text-xl font-bold text-white mb-6 text-center flex items-center justify-center">
+            <i class="fas fa-chart-line text-blue-400 mr-3"></i>
+            每日访问活动（最近60天）
+          </h3>
+          <div class="relative h-64">
+            <canvas id="visitsChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Badges Chart -->
+        <div
+          class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20 hover:bg-white/15 transition-all duration-300">
+          <h3 class="text-xl font-bold text-white mb-6 text-center flex items-center justify-center">
+            <i class="fas fa-medal text-yellow-400 mr-3"></i>
+            徽章获得时间线
+          </h3>
+          <div class="relative h-64">
+            <canvas id="badgesChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Device Chart -->
+        <div
+          class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20 hover:bg-white/15 transition-all duration-300">
+          <h3 class="text-xl font-bold text-white mb-6 text-center flex items-center justify-center">
+            <i class="fas fa-mobile-alt text-purple-400 mr-3"></i>
+            设备使用分布
+          </h3>
+          <div class="relative h-64">
+            <canvas id="deviceChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Posts Activity Chart -->
+        <div
+          class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20 hover:bg-white/15 transition-all duration-300">
+          <h3 class="text-xl font-bold text-white mb-6 text-center flex items-center justify-center">
+            <i class="fas fa-clock text-orange-400 mr-3"></i>
+            发帖活动热力图（24小时）
+          </h3>
+          <div class="relative h-64">
+            <canvas id="postsChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Likes Activity Chart -->
+        <div
+          class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20 hover:bg-white/15 transition-all duration-300">
+          <h3 class="text-xl font-bold text-white mb-6 text-center flex items-center justify-center">
+            <i class="fas fa-heart text-red-400 mr-3"></i>
+            点赞活动趋势
+          </h3>
+          <div class="relative h-64">
+            <canvas id="likesChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Auth Tokens Analysis -->
+        <div id="authTokensSection"
+          class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20 hover:bg-white/15 transition-all duration-300">
+          <h3 class="text-xl font-bold text-white mb-6 text-center flex items-center justify-center">
+            <i class="fas fa-key text-indigo-400 mr-3"></i>
+            认证令牌分析
+          </h3>
+          <div id="authTokensContent">
+            <!-- 动态生成的认证令牌分析 -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Category Analysis -->
+      <div id="categorySection" class="mb-8 animate-slide-up">
+        <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
+          <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
+            <i class="fas fa-folder text-cyan-400 mr-3"></i>
+            分类活动分析
+          </h3>
+          <div id="categoryContent" class="overflow-x-auto">
+            <!-- 动态生成的分类分析表格 -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Badge Stats -->
+      <div id="badgeStatsSection" class="mb-8 animate-slide-up">
+        <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
+          <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
+            <i class="fas fa-trophy text-yellow-400 mr-3"></i>
+            徽章统计详情
+          </h3>
+          <div id="badgeStatsContent" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            <!-- 动态生成的徽章统计 -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Additional Analysis Sections -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+
+        <!-- Bookmarks Analysis -->
+        <div id="bookmarksSection"
+          class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20 hover:bg-white/15 transition-all duration-300">
+          <h3 class="text-xl font-bold text-white mb-6 flex items-center">
+            <i class="fas fa-bookmark text-amber-400 mr-3"></i>
+            书签分析
+          </h3>
+          <div id="bookmarksContent">
+            <!-- 动态生成的书签分析 -->
+          </div>
+        </div>
+
+        <!-- Flags Analysis -->
+        <div id="flagsSection"
+          class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20 hover:bg-white/15 transition-all duration-300">
+          <h3 class="text-xl font-bold text-white mb-6 flex items-center">
+            <i class="fas fa-flag text-red-400 mr-3"></i>
+            举报分析
+          </h3>
+          <div id="flagsContent">
+            <!-- 动态生成的举报分析 -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Detailed Data Tables Section -->
+      <div id="detailedDataSection" class="mb-8 animate-slide-up">
+        <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
+          <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
+            <i class="fas fa-table text-emerald-400 mr-3"></i>
+            详细数据表格
+          </h3>
+
+          <!-- Tab Navigation -->
+          <div class="border-b border-white/20 mb-6">
+            <nav class="-mb-px flex flex-wrap gap-2" id="dataTableTabs">
+              <button class="tab-button active" data-tab="userArchive">
+                <i class="fas fa-edit mr-2"></i>
+                发帖记录
+                <span class="ml-2 text-xs bg-blue-500/30 text-blue-200 px-2 py-1 rounded-full"
+                  id="userArchiveCount">0</span>
+              </button>
+              <button class="tab-button" data-tab="visits">
+                <i class="fas fa-eye mr-2"></i>
+                访问记录
+                <span class="ml-2 text-xs bg-green-500/30 text-green-200 px-2 py-1 rounded-full"
+                  id="visitsCount">0</span>
+              </button>
+              <button class="tab-button" data-tab="likes">
+                <i class="fas fa-heart mr-2"></i>
+                点赞记录
+                <span class="ml-2 text-xs bg-red-500/30 text-red-200 px-2 py-1 rounded-full" id="likesCount">0</span>
+              </button>
+              <button class="tab-button" data-tab="userBadges">
+                <i class="fas fa-medal mr-2"></i>
+                徽章记录
+                <span class="ml-2 text-xs bg-yellow-500/30 text-yellow-200 px-2 py-1 rounded-full"
+                  id="userBadgesCount">0</span>
+              </button>
+              <button class="tab-button" data-tab="authTokens">
+                <i class="fas fa-key mr-2"></i>
+                认证令牌
+                <span class="ml-2 text-xs bg-purple-500/30 text-purple-200 px-2 py-1 rounded-full"
+                  id="authTokensCount">0</span>
+              </button>
+              <button class="tab-button" data-tab="bookmarks">
+                <i class="fas fa-bookmark mr-2"></i>
+                书签记录
+                <span class="ml-2 text-xs bg-indigo-500/30 text-indigo-200 px-2 py-1 rounded-full"
+                  id="bookmarksCount">0</span>
+              </button>
+              <button class="tab-button" data-tab="flags">
+                <i class="fas fa-flag mr-2"></i>
+                举报记录
+                <span class="ml-2 text-xs bg-pink-500/30 text-pink-200 px-2 py-1 rounded-full" id="flagsCount">0</span>
+              </button>
+              <button class="tab-button" data-tab="queuedPosts">
+                <i class="fas fa-clock mr-2"></i>
+                待审核帖子
+                <span class="ml-2 text-xs bg-orange-500/30 text-orange-200 px-2 py-1 rounded-full"
+                  id="queuedPostsCount">0</span>
+              </button>
+            </nav>
+          </div>
+
+          <!-- Pagination Controls -->
+          <div id="paginationControls" class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+            <div class="flex items-center gap-4">
+              <label class="text-white/80 text-sm font-medium">每页显示:</label>
+              <select id="pageSizeSelect"
+                class="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm backdrop-blur-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <option value="10">10</option>
+                <option value="25" selected>25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </div>
+
+            <div id="paginationInfo" class="text-white/70 text-sm"></div>
+
+            <div class="flex items-center gap-2">
+              <button id="prevPageBtn"
+                class="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                <i class="fas fa-chevron-left mr-2"></i>上一页
+              </button>
+              <div id="pageNumbers" class="flex gap-1">
+                <!-- 动态生成的页码 -->
+              </div>
+              <button id="nextPageBtn"
+                class="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                下一页<i class="fas fa-chevron-right ml-2"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Search Bar -->
+          <div class="mb-6">
+            <div class="relative">
+              <input type="text" id="dataSearchInput" placeholder="搜索数据..."
+                class="w-full bg-white/10 border border-white/20 rounded-xl px-6 py-3 pl-12 text-white placeholder-white/50 backdrop-blur-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+              <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-white/50"></i>
+              <button id="clearSearchBtn"
+                class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/50 hover:text-white transition-colors hidden">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Tab Content -->
+          <div id="dataTableContent" class="overflow-x-auto">
+            <!-- 动态生成的表格内容 -->
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <!-- Toast Notifications -->
+  <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2">
+    <!-- 动态生成的通知 -->
+  </div>
+
+  <!-- Help Modal -->
+  <div id="helpModal"
+    class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div
+      class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-2xl font-bold text-white flex items-center">
+          <i class="fas fa-question-circle text-blue-400 mr-3"></i>
+          使用帮助
+        </h3>
+        <button id="closeHelpBtn" class="text-white/70 hover:text-white text-2xl">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="space-y-6 text-white/80">
+        <div class="help-section">
+          <h4 class="text-lg font-semibold text-white mb-3 flex items-center">
+            <i class="fas fa-download text-green-400 mr-2"></i>
+            如何导出数据
+          </h4>
+          <ol class="space-y-2 text-sm pl-4">
+            <li class="flex items-start">
+              <span
+                class="inline-block w-6 h-6 bg-blue-500 text-white rounded-full text-xs flex items-center justify-center mr-3 mt-0.5">1</span>
+              <span>访问 <a href="https://linux.do/my/preferences/account" target="_blank"
+                  class="text-blue-300 underline">linux.do/my/preferences/account</a></span>
+            </li>
+            <li class="flex items-start">
+              <span
+                class="inline-block w-6 h-6 bg-blue-500 text-white rounded-full text-xs flex items-center justify-center mr-3 mt-0.5">2</span>
+              <span>滚动到页面底部，找到"下载我的数据"选项</span>
+            </li>
+            <li class="flex items-start">
+              <span
+                class="inline-block w-6 h-6 bg-blue-500 text-white rounded-full text-xs flex items-center justify-center mr-3 mt-0.5">3</span>
+              <span>点击"请求我的数据"按钮</span>
+            </li>
+            <li class="flex items-start">
+              <span
+                class="inline-block w-6 h-6 bg-blue-500 text-white rounded-full text-xs flex items-center justify-center mr-3 mt-0.5">4</span>
+              <span>等待处理完成后，下载ZIP文件</span>
+            </li>
+          </ol>
+        </div>
+
+        <div class="help-section">
+          <h4 class="text-lg font-semibold text-white mb-3 flex items-center">
+            <i class="fas fa-upload text-purple-400 mr-2"></i>
+            如何使用工具
+          </h4>
+          <ul class="space-y-2 text-sm pl-4">
+            <li class="flex items-start">
+              <i class="fas fa-check text-green-400 mr-3 mt-1"></i>
+              <span>将下载的ZIP文件拖拽到上传区域，或点击选择文件</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check text-green-400 mr-3 mt-1"></i>
+              <span>工具会自动解析并生成可视化分析报告</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check text-green-400 mr-3 mt-1"></i>
+              <span>所有数据完全在浏览器本地处理，不会上传到服务器</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="help-section">
+          <h4 class="text-lg font-semibold text-white mb-3 flex items-center">
+            <i class="fas fa-shield-alt text-green-400 mr-2"></i>
+            数据安全
+          </h4>
+          <div class="bg-green-500/10 border border-green-400/30 rounded-lg p-4">
+            <p class="text-sm">
+              <i class="fas fa-lock text-green-400 mr-2"></i>
+              您的数据完全安全！所有分析都在您的浏览器中进行，不会发送到任何服务器。
+              数据仅保存在浏览器本地存储中，只有您能够访问。
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden
                                    flex items-center justify-center">
-        <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 shadow-2xl border border-white/20">
-            <div class="flex items-center space-x-4">
-                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                <span class="text-lg font-medium text-white">处理中...</span>
-            </div>
-        </div>
+    <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 shadow-2xl border border-white/20">
+      <div class="flex items-center space-x-4">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        <span class="text-lg font-medium text-white">处理中...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="relative z-10 bg-white border-t border-gray-200 overflow-hidden">
+    <!-- 背景装饰 -->
+    <div class="absolute inset-0 opacity-30">
+      <!-- 光晕效果 -->
+      <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-100 rounded-full filter blur-3xl"></div>
+      <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-100 rounded-full filter blur-3xl"></div>
     </div>
 
-    <!-- Footer -->
-    <footer class="relative z-10 text-center py-12 text-white/50 text-sm bg-gradient-to-r from-slate-900 via-indigo-900 to-slate-900 overflow-hidden">
-        <!-- 背景装饰 -->
-        <div class="absolute inset-0 opacity-20">
-            <div class="absolute top-0 left-1/4 w-1 h-full bg-gradient-to-b from-transparent via-indigo-400 to-transparent"></div>
-            <div class="absolute top-0 right-1/4 w-1 h-full bg-gradient-to-b from-transparent via-purple-400 to-transparent"></div>
-            <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-px h-full bg-gradient-to-b from-transparent via-blue-400 to-transparent"></div>
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- 主要内容区域 -->
+      <div class="py-16">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <!-- 品牌介绍 -->
+          <div class="md:col-span-2">
+            <div class="flex items-center space-x-3 mb-6">
+              <div
+                class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
+                <span class="text-white text-2xl">📊</span>
+              </div>
+              <div>
+                <h3 class="text-2xl font-bold text-gray-800">
+                  Linux.do Analyzer
+                </h3>
+                <p class="text-sm text-gray-600">专业的论坛数据分析工具</p>
+              </div>
+            </div>
+            <p class="text-gray-600 leading-relaxed mb-6 max-w-md">
+              为 Linux.do 社区用户提供专业的个人数据分析服务，
+              100% 本地处理，保护隐私安全，助您深入了解自己的论坛活动模式。
+            </p>
+
+            <!-- 特性标签 -->
+            <div class="flex flex-wrap gap-2">
+              <span
+                class="px-3 py-1 bg-indigo-500/20 text-indigo-300 rounded-full text-xs font-medium border border-indigo-500/30">
+                🔒 隐私保护
+              </span>
+              <span
+                class="px-3 py-1 bg-green-500/20 text-green-300 rounded-full text-xs font-medium border border-green-500/30">
+                📊 数据可视化
+              </span>
+              <span
+                class="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-xs font-medium border border-purple-500/30">
+                ⚡ 实时分析
+              </span>
+            </div>
+          </div>
+
+          <!-- 快速链接 -->
+          <div>
+            <h4 class="text-lg font-semibold mb-4 text-gray-800">快速导航</h4>
+            <ul class="space-y-3">
+              <li>
+                <a href="index.html"
+                  class="text-gray-600 hover:text-indigo-600 transition-colors duration-200 flex items-center group">
+                  <i class="fas fa-chart-bar mr-2 group-hover:text-indigo-400"></i>
+                  数据分析
+                </a>
+              </li>
+              <li>
+                <a href="help.html"
+                  class="text-gray-600 hover:text-indigo-600 transition-colors duration-200 flex items-center group">
+                  <i class="fas fa-question-circle mr-2 group-hover:text-blue-400"></i>
+                  使用帮助
+                </a>
+              </li>
+              <li>
+                <a href="faq.html"
+                  class="text-gray-600 hover:text-indigo-600 transition-colors duration-200 flex items-center group">
+                  <i class="fas fa-comments mr-2 group-hover:text-green-400"></i>
+                  常见问题
+                </a>
+              </li>
+              <li>
+                <a href="privacy.html"
+                  class="text-gray-600 hover:text-indigo-600 transition-colors duration-200 flex items-center group">
+                  <i class="fas fa-shield-alt mr-2 group-hover:text-purple-400"></i>
+                  隐私政策
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- 社区连接 -->
+          <div>
+            <h4 class="text-lg font-semibold mb-4 text-gray-800">社区连接</h4>
+            <ul class="space-y-3">
+              <li>
+                <a href="https://linux.do" target="_blank"
+                  class="text-gray-600 hover:text-indigo-600 transition-colors duration-200 flex items-center group">
+                  <i class="fas fa-external-link-alt mr-2 group-hover:text-orange-400"></i>
+                  Linux.do 论坛
+                </a>
+              </li>
+              <li>
+                <a href="https://github.com/dext7r/linux-do-analyzer" target="_blank"
+                  class="text-gray-600 hover:text-indigo-600 transition-colors duration-200 flex items-center group">
+                  <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub"
+                    class="w-4 h-4 mr-2 opacity-70 group-hover:opacity-100 transition-opacity">
+                  GitHub 源码
+                </a>
+              </li>
+              <li>
+                <a href="#"
+                  class="text-gray-600 hover:text-indigo-600 transition-colors duration-200 flex items-center group">
+                  <i class="fas fa-bug mr-2 group-hover:text-red-400"></i>
+                  反馈问题
+                </a>
+              </li>
+              <li>
+                <a href="about.html"
+                  class="text-gray-600 hover:text-indigo-600 transition-colors duration-200 flex items-center group">
+                  <i class="fas fa-info-circle mr-2 group-hover:text-blue-400"></i>
+                  关于项目
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
+      </div>
 
-        <div class="relative z-10">
-            <!-- 顶部装饰图标 -->
-            <div class="flex justify-center mb-6">
-                <div class="flex space-x-6">
-                    <div class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-chart-line text-white text-sm"></i>
-                    </div>
-                    <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-shield-alt text-white text-sm"></i>
-                    </div>
-                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-code text-white text-sm"></i>
-                    </div>
-                </div>
-            </div>
+      <!-- 分隔线 -->
+      <div class="border-t border-gray-700/50"></div>
 
-            <div class="flex items-center justify-center gap-6 flex-wrap">
-                <span class="flex items-center gap-2 hover:text-white/70 transition-colors duration-300">
-                    <i class="fas fa-heart text-red-400"></i>
-                    Made with love for Linux.do community
-                </span>
-                <span class="hidden sm:inline text-white/30">•</span>
-                <span class="flex items-center gap-2 hover:text-white/70 transition-colors duration-300">
-                    <i class="fas fa-shield-alt text-green-400"></i>
-                    100% 客户端处理，数据安全
-                </span>
-                <span class="hidden sm:inline text-white/30">•</span>
-                <span class="flex items-center gap-2 hover:text-white/70 transition-colors duration-300">
-                    <i class="fas fa-code text-blue-400"></i>
-                    Powered by Deno + TailwindCSS
-                </span>
-            </div>
+      <!-- 底部信息 -->
+      <div class="py-8">
+        <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+          <!-- 版权信息 -->
+          <div class="text-center md:text-left">
+            <p class="text-gray-600 text-sm">
+              © 2025 Linux.do Analyzer. Made with
+              <i class="fas fa-heart text-red-500 mx-1"></i>
+              for Linux.do Community
+            </p>
+            <p class="text-gray-500 text-xs mt-1">
+              Powered by Deno + TailwindCSS + Chart.js
+            </p>
+          </div>
 
-            <!-- 底部装饰线 -->
-            <div class="mt-8 flex justify-center">
-                <div class="w-32 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+          <!-- 技术标识 -->
+          <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-2 text-gray-600 text-sm">
+              <i class="fas fa-shield-alt text-green-500"></i>
+              <span>100% 本地处理</span>
             </div>
+            <div class="flex items-center space-x-2 text-gray-600 text-sm">
+              <i class="fas fa-lock text-blue-500"></i>
+              <span>数据安全</span>
+            </div>
+            <div class="flex items-center space-x-2 text-gray-600 text-sm">
+              <i class="fas fa-code text-purple-500"></i>
+              <span>开源项目</span>
+            </div>
+          </div>
         </div>
-    </footer>
+      </div>
+    </div>
 
-    <!-- Scripts -->
-    <script src="js/data-manager.js"></script>
-    <script src="js/zip-parser.js"></script>
-    <script src="js/data-analyzer.js"></script>
-    <script src="js/chart-renderer.js"></script>
-    <script src="js/ui-manager.js"></script>
-    <script src="js/app.js"></script>
+    <!-- 底部装饰 -->
+    <div class="h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+  </footer>
 
-    <!-- 动态更新预览URL -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const previewUrl = document.getElementById('previewUrl');
-            if (previewUrl) {
-                // 获取当前页面的完整URL
-                const currentUrl = window.location.href;
-                previewUrl.textContent = `🔒 ${currentUrl}`;
-            }
+  <!-- 返回顶部按钮 -->
+  <button id="backToTop"
+    class="fixed bottom-8 right-8 w-12 h-12 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 opacity-0 invisible z-50"
+    title="返回顶部">
+    <i class="fas fa-chevron-up"></i>
+  </button>
+
+  <!-- Scripts -->
+  <script src="js/data-manager.js"></script>
+  <script src="js/zip-parser.js"></script>
+  <script src="js/data-analyzer.js"></script>
+  <script src="js/chart-renderer.js"></script>
+  <script src="js/ui-manager.js"></script>
+  <script src="js/app.js"></script>
+
+  <!-- 动态更新预览URL和锚点导航功能 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // 更新预览URL
+      const previewUrl = document.getElementById('previewUrl');
+      if (previewUrl) {
+        const currentUrl = window.location.href;
+        previewUrl.textContent = `🔒 ${currentUrl}`;
+      }
+
+      // 移动端菜单功能
+      const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+      const mobileMenu = document.getElementById('mobileMenu');
+      const mobileMenuIcon = mobileMenuBtn.querySelector('i');
+
+      mobileMenuBtn.addEventListener('click', function () {
+        mobileMenu.classList.toggle('hidden');
+        mobileMenuIcon.classList.toggle('fa-bars');
+        mobileMenuIcon.classList.toggle('fa-times');
+      });
+
+      // 同步主题选择器
+      const themeSelector = document.getElementById('themeSelector');
+      const mobileThemeSelector = document.getElementById('mobileThemeSelector');
+
+      themeSelector.addEventListener('change', function () {
+        mobileThemeSelector.value = this.value;
+      });
+
+      mobileThemeSelector.addEventListener('change', function () {
+        themeSelector.value = this.value;
+        // 触发主题切换事件
+        const event = new Event('change');
+        themeSelector.dispatchEvent(event);
+      });
+
+      // 返回顶部按钮功能
+      const backToTopButton = document.getElementById('backToTop');
+
+      // 监听滚动事件 - 控制返回顶部按钮显示
+      window.addEventListener('scroll', function () {
+        if (window.pageYOffset > 300) {
+          backToTopButton.classList.remove('opacity-0', 'invisible');
+          backToTopButton.classList.add('opacity-100', 'visible');
+        } else {
+          backToTopButton.classList.add('opacity-0', 'invisible');
+          backToTopButton.classList.remove('opacity-100', 'visible');
+        }
+      });
+
+      // 点击返回顶部
+      backToTopButton.addEventListener('click', function () {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
         });
-    </script>
+      });
+
+      // 活动导航高亮功能
+      const sections = document.querySelectorAll('section[id]');
+      const navLinks = document.querySelectorAll('a[href^="#"]');
+
+      function highlightCurrentSection() {
+        let current = '';
+        const scrollPosition = window.pageYOffset + 100;
+
+        sections.forEach(section => {
+          const sectionTop = section.offsetTop;
+          const sectionHeight = section.offsetHeight;
+
+          if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+            current = section.getAttribute('id');
+          }
+        });
+
+        // 更新导航链接高亮状态
+        navLinks.forEach(link => {
+          link.classList.remove('text-indigo-600', 'bg-indigo-50');
+          if (link.getAttribute('href') === '#' + current) {
+            link.classList.add('text-indigo-600', 'bg-indigo-50');
+          }
+        });
+      }
+
+      // 监听滚动事件以高亮当前区块
+      window.addEventListener('scroll', highlightCurrentSection);
+
+      // 初始化高亮
+      highlightCurrentSection();
+    });
+  </script>
 
 </body>
+
 </html>
