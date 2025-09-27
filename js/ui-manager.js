@@ -4,700 +4,700 @@
  * 支持所有新的数据展示功能
  */
 class UIManager {
-    constructor() {
-        this.$ = $; // jQuery引用
-        this.toastContainer = $('#toastContainer');
-        this.loadingOverlay = $('#loadingOverlay');
-        this.progressContainer = $('#progressContainer');
-        this.progressBar = $('#progressBar');
-        this.progressText = $('#progressText');
-        this.statusContainer = $('#statusContainer');
-        this.statusMessage = $('#statusMessage');
+  constructor() {
+    this.$ = $; // jQuery引用
+    this.toastContainer = $('#toastContainer');
+    this.loadingOverlay = $('#loadingOverlay');
+    this.progressContainer = $('#progressContainer');
+    this.progressBar = $('#progressBar');
+    this.progressText = $('#progressText');
+    this.statusContainer = $('#statusContainer');
+    this.statusMessage = $('#statusMessage');
 
-        this.toastQueue = [];
-        this.isInitialized = false;
-        this.currentTabData = null;
-        // 初始化为'overview'标签
-        this.activeTab = 'overview';
+    this.toastQueue = [];
+    this.isInitialized = false;
+    this.currentTabData = null;
+    // 初始化为'overview'标签
+    this.activeTab = 'overview';
 
-        // 分页状态
-        this.pagination = {
-            currentPage: 1,
-            pageSize: 50,
-            totalItems: 0,
-            searchQuery: ''
-        };
+    // 分页状态
+    this.pagination = {
+      currentPage: 1,
+      pageSize: 50,
+      totalItems: 0,
+      searchQuery: ''
+    };
+  }
+
+  /**
+   * 初始化UI管理器
+   */
+  init() {
+    if (this.isInitialized) return;
+
+    console.log('初始化UI管理器');
+    this.bindEvents();
+    this.setupDragAndDrop();
+    this.setupTabNavigation();
+    this.setupMobileOptimizations();
+    this.setupThemeSystem();
+    this.isInitialized = true;
+  }
+
+  /**
+   * 绑定事件处理器
+   */
+  bindEvents() {
+    // 文件选择按钮
+    $('#selectFileBtn').on('click', () => {
+      $('#fileInput').click();
+    });
+
+    // 上传区域点击
+    $('#uploadArea').on('click', (e) => {
+      if (e.target.id !== 'selectFileBtn') {
+        $('#fileInput').click();
+      }
+    });
+
+    // 新建分析按钮
+    $('#newAnalysisBtn').on('click', () => {
+      // 重置UI状态
+      this.hideAnalysisResults();
+      this.hideExportButton();
+      $('#newAnalysisBtn').addClass('hidden');
+      $('#storedDataSection').addClass('hidden');
+      $('#upload').removeClass('hidden');
+      $('#hero').removeClass('hidden');
+      // 滚动到上传区域
+      $('html, body').animate({
+        scrollTop: $('#upload').offset().top - 100
+      }, 500);
+    });
+
+    // 导出按钮
+    $('#exportBtn').on('click', () => {
+      window.app?.exportCurrentAnalysis();
+    });
+
+    // 查看已存储数据按钮
+    $('#viewStoredBtn').on('click', () => {
+      window.app?.loadStoredData();
+    });
+
+    // 清空数据按钮
+    $('#clearDataBtn').on('click', () => {
+      this.showConfirmDialog(
+        '确定要清空所有数据吗？',
+        '此操作不可撤销！',
+        () => window.app?.clearAllData()
+      );
+    });
+
+    // 帮助按钮
+    $('#helpBtn').on('click', () => {
+      this.showHelpModal();
+    });
+
+    // 关闭帮助按钮
+    $('#closeHelpBtn').on('click', () => {
+      this.hideHelpModal();
+    });
+
+    // 点击模态框外部关闭
+    $('#helpModal').on('click', (e) => {
+      if (e.target.id === 'helpModal') {
+        this.hideHelpModal();
+      }
+    });
+
+    // 键盘快捷键
+    $(document).on('keydown', (e) => {
+      this.handleKeyboardShortcuts(e);
+    });
+
+    // 按钮点击反馈效果
+    $(document).on('mousedown', 'button, .tab-button, .pagination-btn', (e) => {
+      $(e.currentTarget).addClass('btn-press');
+    });
+
+    $(document).on('mouseup mouseleave', 'button, .tab-button, .pagination-btn', (e) => {
+      $(e.currentTarget).removeClass('btn-press');
+    });
+
+    // 分析结果标签页切换事件
+    $(document).on('click', '.analysis-tab', (e) => {
+      const tab = $(e.currentTarget).data('tab');
+      this.switchAnalysisTab(tab);
+    });
+
+    console.log('事件绑定完成');
+  }
+
+  /**
+   * 切换分析结果标签页
+   */
+  switchAnalysisTab(tabName) {
+    // 更新标签按钮状态
+    $('.analysis-tab').removeClass('active');
+    $(`.analysis-tab[data-tab="${tabName}"]`).addClass('active');
+
+    // 切换内容显示
+    $('.tab-content').addClass('hidden').removeClass('active');
+    $(`#tab-${tabName}`).removeClass('hidden').addClass('active');
+
+    // 如果是charts标签，重新渲染图表以确保尺寸正确
+    if (tabName === 'charts') {
+      setTimeout(() => {
+        // 触发图表重新渲染
+        window.dispatchEvent(new Event('resize'));
+      }, 100);
     }
+  }
 
-    /**
-     * 初始化UI管理器
-     */
-    init() {
-        if (this.isInitialized) return;
+  /**
+   * 绑定分页事件
+   */
+  bindPaginationEvents() {
+    // 搜索框
+    $(document).on('input', '#searchInput', (e) => {
+      this.pagination.searchQuery = e.target.value;
+      this.pagination.currentPage = 1;
+      this.renderTabContent(this.activeTab);
+    });
 
-        console.log('初始化UI管理器');
-        this.bindEvents();
-        this.setupDragAndDrop();
-        this.setupTabNavigation();
-        this.setupMobileOptimizations();
-        this.setupThemeSystem();
-        this.isInitialized = true;
-    }
+    // 页面大小选择
+    $(document).on('change', '#pageSizeSelect', (e) => {
+      this.pagination.pageSize = parseInt(e.target.value);
+      this.pagination.currentPage = 1;
+      this.renderTabContent(this.activeTab);
+    });
 
-    /**
-     * 绑定事件处理器
-     */
-    bindEvents() {
-        // 文件选择按钮
-        $('#selectFileBtn').on('click', () => {
-            $('#fileInput').click();
-        });
+    // 分页按钮（使用事件委托）
+    $(document).on('click', '.pagination-btn', (e) => {
+      const action = $(e.currentTarget).data('action');
+      this.handlePaginationAction(action);
+    });
+  }
 
-        // 上传区域点击
-        $('#uploadArea').on('click', (e) => {
-            if (e.target.id !== 'selectFileBtn') {
-                $('#fileInput').click();
-            }
-        });
+  /**
+   * 处理分页操作
+   */
+  handlePaginationAction(action) {
+    const totalPages = Math.ceil(this.pagination.totalItems / this.pagination.pageSize);
 
-        // 新建分析按钮
-        $('#newAnalysisBtn').on('click', () => {
-            // 重置UI状态
-            this.hideAnalysisResults();
-            this.hideExportButton();
-            $('#newAnalysisBtn').addClass('hidden');
-            $('#storedDataSection').addClass('hidden');
-            $('#upload').removeClass('hidden');
-            $('#hero').removeClass('hidden');
-            // 滚动到上传区域
-            $('html, body').animate({
-                scrollTop: $('#upload').offset().top - 100
-            }, 500);
-        });
-
-        // 导出按钮
-        $('#exportBtn').on('click', () => {
-            window.app?.exportCurrentAnalysis();
-        });
-
-        // 查看已存储数据按钮
-        $('#viewStoredBtn').on('click', () => {
-            window.app?.loadStoredData();
-        });
-
-        // 清空数据按钮
-        $('#clearDataBtn').on('click', () => {
-            this.showConfirmDialog(
-                '确定要清空所有数据吗？',
-                '此操作不可撤销！',
-                () => window.app?.clearAllData()
-            );
-        });
-
-        // 帮助按钮
-        $('#helpBtn').on('click', () => {
-            this.showHelpModal();
-        });
-
-        // 关闭帮助按钮
-        $('#closeHelpBtn').on('click', () => {
-            this.hideHelpModal();
-        });
-
-        // 点击模态框外部关闭
-        $('#helpModal').on('click', (e) => {
-            if (e.target.id === 'helpModal') {
-                this.hideHelpModal();
-            }
-        });
-
-        // 键盘快捷键
-        $(document).on('keydown', (e) => {
-            this.handleKeyboardShortcuts(e);
-        });
-
-        // 按钮点击反馈效果
-        $(document).on('mousedown', 'button, .tab-button, .pagination-btn', (e) => {
-            $(e.currentTarget).addClass('btn-press');
-        });
-
-        $(document).on('mouseup mouseleave', 'button, .tab-button, .pagination-btn', (e) => {
-            $(e.currentTarget).removeClass('btn-press');
-        });
-
-        // 分析结果标签页切换事件
-        $(document).on('click', '.analysis-tab', (e) => {
-            const tab = $(e.currentTarget).data('tab');
-            this.switchAnalysisTab(tab);
-        });
-
-        console.log('事件绑定完成');
-    }
-
-    /**
-     * 切换分析结果标签页
-     */
-    switchAnalysisTab(tabName) {
-        // 更新标签按钮状态
-        $('.analysis-tab').removeClass('active');
-        $(`.analysis-tab[data-tab="${tabName}"]`).addClass('active');
-
-        // 切换内容显示
-        $('.tab-content').addClass('hidden').removeClass('active');
-        $(`#tab-${tabName}`).removeClass('hidden').addClass('active');
-
-        // 如果是charts标签，重新渲染图表以确保尺寸正确
-        if (tabName === 'charts') {
-            setTimeout(() => {
-                // 触发图表重新渲染
-                window.dispatchEvent(new Event('resize'));
-            }, 100);
-        }
-    }
-
-    /**
-     * 绑定分页事件
-     */
-    bindPaginationEvents() {
-        // 搜索框
-        $(document).on('input', '#searchInput', (e) => {
-            this.pagination.searchQuery = e.target.value;
-            this.pagination.currentPage = 1;
-            this.renderTabContent(this.activeTab);
-        });
-
-        // 页面大小选择
-        $(document).on('change', '#pageSizeSelect', (e) => {
-            this.pagination.pageSize = parseInt(e.target.value);
-            this.pagination.currentPage = 1;
-            this.renderTabContent(this.activeTab);
-        });
-
-        // 分页按钮（使用事件委托）
-        $(document).on('click', '.pagination-btn', (e) => {
-            const action = $(e.currentTarget).data('action');
-            this.handlePaginationAction(action);
-        });
-    }
-
-    /**
-     * 处理分页操作
-     */
-    handlePaginationAction(action) {
-        const totalPages = Math.ceil(this.pagination.totalItems / this.pagination.pageSize);
-
-        switch (action) {
-            case 'first':
-                this.pagination.currentPage = 1;
-                break;
-            case 'prev':
-                this.pagination.currentPage = Math.max(1, this.pagination.currentPage - 1);
-                break;
-            case 'next':
-                this.pagination.currentPage = Math.min(totalPages, this.pagination.currentPage + 1);
-                break;
-            case 'last':
-                this.pagination.currentPage = totalPages;
-                break;
-            default:
-                // 数字页面
-                const page = parseInt(action);
-                if (page >= 1 && page <= totalPages) {
-                    this.pagination.currentPage = page;
-                }
-        }
-
-        this.renderTabContent(this.activeTab);
-    }
-
-    /**
-     * 重置分页状态
-     */
-    resetPagination() {
+    switch (action) {
+      case 'first':
         this.pagination.currentPage = 1;
-        this.pagination.searchQuery = '';
-        // 不能在这里重置搜索框，因为可能还没有渲染
-    }
-
-    /**
-     * 设置移动端优化
-     */
-    setupMobileOptimizations() {
-        // 检测移动设备
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-        if (isMobile) {
-            // 移动端特殊处理
-            document.body.classList.add('mobile-device');
-
-            // 禁用双击缩放（对于数据表格更友好）
-            let lastTouchEnd = 0;
-            $(document).on('touchend', (e) => {
-                const now = (new Date()).getTime();
-                if (now - lastTouchEnd <= 300) {
-                    e.preventDefault();
-                }
-                lastTouchEnd = now;
-            });
-
-            // 移动端滑动优化
-            this.setupMobileSwipeGestures();
+        break;
+      case 'prev':
+        this.pagination.currentPage = Math.max(1, this.pagination.currentPage - 1);
+        break;
+      case 'next':
+        this.pagination.currentPage = Math.min(totalPages, this.pagination.currentPage + 1);
+        break;
+      case 'last':
+        this.pagination.currentPage = totalPages;
+        break;
+      default:
+        // 数字页面
+        const page = parseInt(action);
+        if (page >= 1 && page <= totalPages) {
+          this.pagination.currentPage = page;
         }
-
-        // 响应式字体大小调整
-        this.adjustFontSizeForDevice();
-
-        // 监听屏幕方向变化
-        $(window).on('orientationchange resize', () => {
-            setTimeout(() => {
-                this.handleScreenSizeChange();
-            }, 100);
-        });
     }
 
-    /**
-     * 设置移动端滑动手势
-     */
-    setupMobileSwipeGestures() {
-        let startX = 0;
-        let startY = 0;
+    this.renderTabContent(this.activeTab);
+  }
 
-        $(document).on('touchstart', '.pagination-area', (e) => {
-            startX = e.originalEvent.touches[0].clientX;
-            startY = e.originalEvent.touches[0].clientY;
-        });
+  /**
+   * 重置分页状态
+   */
+  resetPagination() {
+    this.pagination.currentPage = 1;
+    this.pagination.searchQuery = '';
+    // 不能在这里重置搜索框，因为可能还没有渲染
+  }
 
-        $(document).on('touchend', '.pagination-area', (e) => {
-            if (!startX || !startY) return;
+  /**
+   * 设置移动端优化
+   */
+  setupMobileOptimizations() {
+    // 检测移动设备
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-            const endX = e.originalEvent.changedTouches[0].clientX;
-            const endY = e.originalEvent.changedTouches[0].clientY;
+    if (isMobile) {
+      // 移动端特殊处理
+      document.body.classList.add('mobile-device');
 
-            const deltaX = startX - endX;
-            const deltaY = startY - endY;
+      // 禁用双击缩放（对于数据表格更友好）
+      let lastTouchEnd = 0;
+      $(document).on('touchend', (e) => {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+          e.preventDefault();
+        }
+        lastTouchEnd = now;
+      });
 
-            // 水平滑动距离大于垂直滑动距离，且滑动距离足够
-            if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
-                if (deltaX > 0) {
-                    // 向左滑动 - 下一页
-                    this.handlePaginationAction('next');
-                } else {
-                    // 向右滑动 - 上一页
-                    this.handlePaginationAction('prev');
-                }
-            }
-
-            startX = 0;
-            startY = 0;
-        });
+      // 移动端滑动优化
+      this.setupMobileSwipeGestures();
     }
 
-    /**
-     * 调整字体大小适应设备
-     */
-    adjustFontSizeForDevice() {
-        const screenWidth = $(window).width();
+    // 响应式字体大小调整
+    this.adjustFontSizeForDevice();
 
-        if (screenWidth < 480) {
-            // 小屏手机
-            document.documentElement.style.fontSize = '14px';
-        } else if (screenWidth < 768) {
-            // 大屏手机/小平板
-            document.documentElement.style.fontSize = '15px';
+    // 监听屏幕方向变化
+    $(window).on('orientationchange resize', () => {
+      setTimeout(() => {
+        this.handleScreenSizeChange();
+      }, 100);
+    });
+  }
+
+  /**
+   * 设置移动端滑动手势
+   */
+  setupMobileSwipeGestures() {
+    let startX = 0;
+    let startY = 0;
+
+    $(document).on('touchstart', '.pagination-area', (e) => {
+      startX = e.originalEvent.touches[0].clientX;
+      startY = e.originalEvent.touches[0].clientY;
+    });
+
+    $(document).on('touchend', '.pagination-area', (e) => {
+      if (!startX || !startY) return;
+
+      const endX = e.originalEvent.changedTouches[0].clientX;
+      const endY = e.originalEvent.changedTouches[0].clientY;
+
+      const deltaX = startX - endX;
+      const deltaY = startY - endY;
+
+      // 水平滑动距离大于垂直滑动距离，且滑动距离足够
+      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+        if (deltaX > 0) {
+          // 向左滑动 - 下一页
+          this.handlePaginationAction('next');
         } else {
-            // 桌面/大平板
-            document.documentElement.style.fontSize = '16px';
+          // 向右滑动 - 上一页
+          this.handlePaginationAction('prev');
         }
+      }
+
+      startX = 0;
+      startY = 0;
+    });
+  }
+
+  /**
+   * 调整字体大小适应设备
+   */
+  adjustFontSizeForDevice() {
+    const screenWidth = $(window).width();
+
+    if (screenWidth < 480) {
+      // 小屏手机
+      document.documentElement.style.fontSize = '14px';
+    } else if (screenWidth < 768) {
+      // 大屏手机/小平板
+      document.documentElement.style.fontSize = '15px';
+    } else {
+      // 桌面/大平板
+      document.documentElement.style.fontSize = '16px';
+    }
+  }
+
+  /**
+   * 处理屏幕尺寸变化
+   */
+  handleScreenSizeChange() {
+    this.adjustFontSizeForDevice();
+
+    // 重新渲染当前标签页以适应新的屏幕尺寸
+    if (this.currentTabData && this.activeTab) {
+      this.renderTabContent(this.activeTab);
     }
 
-    /**
-     * 处理屏幕尺寸变化
-     */
-    handleScreenSizeChange() {
-        this.adjustFontSizeForDevice();
+    // 调整图表大小
+    if (window.app && window.app.chartRenderer) {
+      // 延迟调整以确保DOM已更新
+      setTimeout(() => {
+        window.app.chartRenderer.resizeAllCharts();
+      }, 200);
+    }
+  }
 
-        // 重新渲染当前标签页以适应新的屏幕尺寸
-        if (this.currentTabData && this.activeTab) {
-            this.renderTabContent(this.activeTab);
-        }
+  /**
+   * 设置主题系统
+   */
+  setupThemeSystem() {
+    // 从本地存储获取保存的主题，默认为苹果主题
+    const savedTheme = localStorage.getItem('app-theme') || 'apple';
+    this.setTheme(savedTheme, false);
 
-        // 调整图表大小
+    // 绑定主题切换事件 - 支持新的select元素
+    $('#themeSelector').on('change', (e) => {
+      const theme = e.target.value;
+      this.setTheme(theme, true);
+    });
+
+    // 兼容原有的按钮方式
+    $('.theme-btn').on('click', (e) => {
+      const theme = $(e.currentTarget).data('theme');
+      this.setTheme(theme, true);
+    });
+
+    console.log('主题系统设置完成');
+  }
+
+  /**
+   * 设置主题
+   */
+  setTheme(theme, animate = true) {
+    // 移除之前的主题
+    document.documentElement.removeAttribute('data-theme');
+
+    // 设置新主题
+    if (theme !== 'apple') {
+      document.documentElement.setAttribute('data-theme', theme);
+    }
+
+    // 更新选择器状态
+    $('#themeSelector').val(theme);
+
+    // 更新主题按钮状态（如果存在）
+    $('.theme-btn').removeClass('active');
+    $(`.theme-btn[data-theme="${theme}"]`).addClass('active');
+
+    // 保存到本地存储
+    localStorage.setItem('app-theme', theme);
+
+    // 如果需要动画效果
+    if (animate) {
+      // 添加切换动画
+      document.body.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+
+      // 显示主题切换提示
+      this.showToast(`已切换到${this.getThemeName(theme)}主题`, 'success');
+
+      // 重新渲染图表以适应新主题
+      setTimeout(() => {
         if (window.app && window.app.chartRenderer) {
-            // 延迟调整以确保DOM已更新
-            setTimeout(() => {
-                window.app.chartRenderer.resizeAllCharts();
-            }, 200);
+          this.updateChartsForTheme(theme);
         }
+      }, 300);
     }
 
-    /**
-     * 设置主题系统
-     */
-    setupThemeSystem() {
-        // 从本地存储获取保存的主题，默认为苹果主题
-        const savedTheme = localStorage.getItem('app-theme') || 'apple';
-        this.setTheme(savedTheme, false);
+    console.log(`主题已切换到: ${theme}`);
+  }
 
-        // 绑定主题切换事件 - 支持新的select元素
-        $('#themeSelector').on('change', (e) => {
-            const theme = e.target.value;
-            this.setTheme(theme, true);
-        });
+  /**
+   * 获取主题显示名称
+   */
+  getThemeName(theme) {
+    const names = {
+      apple: '苹果',
+      xiaomi: '小米',
+      huawei: '华为'
+    };
+    return names[theme] || theme;
+  }
 
-        // 兼容原有的按钮方式
-        $('.theme-btn').on('click', (e) => {
-            const theme = $(e.currentTarget).data('theme');
-            this.setTheme(theme, true);
-        });
+  /**
+   * 为新主题更新图表样式
+   */
+  updateChartsForTheme(theme) {
+    if (!window.app || !window.app.chartRenderer) return;
 
-        console.log('主题系统设置完成');
-    }
+    const themeColors = this.getThemeColors(theme);
 
-    /**
-     * 设置主题
-     */
-    setTheme(theme, animate = true) {
-        // 移除之前的主题
-        document.documentElement.removeAttribute('data-theme');
+    // 更新所有现有图表的颜色
+    window.app.chartRenderer.charts.forEach((chart, id) => {
+      this.updateChartColors(chart, themeColors);
+    });
+  }
 
-        // 设置新主题
-        if (theme !== 'apple') {
-            document.documentElement.setAttribute('data-theme', theme);
-        }
+  /**
+   * 获取主题颜色配置
+   */
+  getThemeColors(theme) {
+    const colors = {
+      apple: {
+        primary: '#007AFF',
+        secondary: '#5856D6',
+        accent: '#FF2D92',
+        success: '#30D158',
+        warning: '#FF9500',
+        gradients: ['#007AFF', '#5856D6', '#FF2D92', '#30D158', '#FF9500']
+      },
+      xiaomi: {
+        primary: '#FF6900',
+        secondary: '#FFB800',
+        accent: '#FF4081',
+        success: '#4CAF50',
+        warning: '#FF9800',
+        gradients: ['#FF6900', '#FFB800', '#FF4081', '#4CAF50', '#FF9800']
+      },
+      huawei: {
+        primary: '#C5282F',
+        secondary: '#2D3748',
+        accent: '#E53E3E',
+        success: '#38A169',
+        warning: '#D69E2E',
+        gradients: ['#C5282F', '#2D3748', '#E53E3E', '#38A169', '#D69E2E']
+      }
+    };
+    return colors[theme] || colors.apple;
+  }
 
-        // 更新选择器状态
-        $('#themeSelector').val(theme);
+  /**
+   * 更新单个图表的颜色
+   */
+  updateChartColors(chart, themeColors) {
+    if (!chart || !chart.data) return;
 
-        // 更新主题按钮状态（如果存在）
-        $('.theme-btn').removeClass('active');
-        $(`.theme-btn[data-theme="${theme}"]`).addClass('active');
+    try {
+      // 更新数据集颜色
+      chart.data.datasets.forEach((dataset, index) => {
+        const colorIndex = index % themeColors.gradients.length;
+        const color = themeColors.gradients[colorIndex];
 
-        // 保存到本地存储
-        localStorage.setItem('app-theme', theme);
-
-        // 如果需要动画效果
-        if (animate) {
-            // 添加切换动画
-            document.body.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
-
-            // 显示主题切换提示
-            this.showToast(`已切换到${this.getThemeName(theme)}主题`, 'success');
-
-            // 重新渲染图表以适应新主题
-            setTimeout(() => {
-                if (window.app && window.app.chartRenderer) {
-                    this.updateChartsForTheme(theme);
-                }
-            }, 300);
-        }
-
-        console.log(`主题已切换到: ${theme}`);
-    }
-
-    /**
-     * 获取主题显示名称
-     */
-    getThemeName(theme) {
-        const names = {
-            apple: '苹果',
-            xiaomi: '小米',
-            huawei: '华为'
-        };
-        return names[theme] || theme;
-    }
-
-    /**
-     * 为新主题更新图表样式
-     */
-    updateChartsForTheme(theme) {
-        if (!window.app || !window.app.chartRenderer) return;
-
-        const themeColors = this.getThemeColors(theme);
-
-        // 更新所有现有图表的颜色
-        window.app.chartRenderer.charts.forEach((chart, id) => {
-            this.updateChartColors(chart, themeColors);
-        });
-    }
-
-    /**
-     * 获取主题颜色配置
-     */
-    getThemeColors(theme) {
-        const colors = {
-            apple: {
-                primary: '#007AFF',
-                secondary: '#5856D6',
-                accent: '#FF2D92',
-                success: '#30D158',
-                warning: '#FF9500',
-                gradients: ['#007AFF', '#5856D6', '#FF2D92', '#30D158', '#FF9500']
-            },
-            xiaomi: {
-                primary: '#FF6900',
-                secondary: '#FFB800',
-                accent: '#FF4081',
-                success: '#4CAF50',
-                warning: '#FF9800',
-                gradients: ['#FF6900', '#FFB800', '#FF4081', '#4CAF50', '#FF9800']
-            },
-            huawei: {
-                primary: '#C5282F',
-                secondary: '#2D3748',
-                accent: '#E53E3E',
-                success: '#38A169',
-                warning: '#D69E2E',
-                gradients: ['#C5282F', '#2D3748', '#E53E3E', '#38A169', '#D69E2E']
-            }
-        };
-        return colors[theme] || colors.apple;
-    }
-
-    /**
-     * 更新单个图表的颜色
-     */
-    updateChartColors(chart, themeColors) {
-        if (!chart || !chart.data) return;
-
-        try {
-            // 更新数据集颜色
-            chart.data.datasets.forEach((dataset, index) => {
-                const colorIndex = index % themeColors.gradients.length;
-                const color = themeColors.gradients[colorIndex];
-
-                if (dataset.backgroundColor) {
-                    if (Array.isArray(dataset.backgroundColor)) {
-                        dataset.backgroundColor = dataset.backgroundColor.map(() =>
-                            color.replace('#', 'rgba(').replace('#', '').match(/.{2}/g).map(hex => parseInt(hex, 16)).join(', ') + ', 0.8)'
-                        );
-                    } else {
-                        dataset.backgroundColor = color + '80'; // 50% 透明度
-                    }
-                }
-
-                if (dataset.borderColor) {
-                    dataset.borderColor = color;
-                }
-            });
-
-            // 更新图表
-            chart.update('resize');
-        } catch (error) {
-            console.warn('更新图表颜色失败:', error);
-        }
-    }
-
-    /**
-     * 设置标签页导航
-     */
-    setupTabNavigation() {
-        $('#dataTableTabs').on('click', '.tab-button', (e) => {
-            const $button = $(e.currentTarget);
-            const tabName = $button.data('tab');
-
-            // 更新活动状态
-            $('.tab-button').removeClass('active');
-            $button.addClass('active');
-
-            // 切换内容
-            this.activeTab = tabName;
-            this.resetPagination();
-            this.renderTabContent(tabName);
-        });
-
-        // 绑定分页控件事件
-        this.bindPaginationEvents();
-    }
-
-    /**
-     * 设置拖拽上传
-     */
-    setupDragAndDrop() {
-        const uploadArea = $('#uploadArea');
-
-        uploadArea.on('dragover', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            uploadArea.addClass('drag-over');
-        });
-
-        uploadArea.on('dragleave', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            uploadArea.removeClass('drag-over');
-        });
-
-        uploadArea.on('drop', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            uploadArea.removeClass('drag-over');
-
-            const files = e.originalEvent.dataTransfer.files;
-            if (files.length > 0) {
-                window.app?.processFile(files[0]);
-            }
-        });
-
-        console.log('拖拽上传设置完成');
-    }
-
-    /**
-     * 处理键盘快捷键
-     */
-    handleKeyboardShortcuts(e) {
-        // Ctrl/Cmd + O: 打开文件
-        if ((e.ctrlKey || e.metaKey) && e.key === 'o') {
-            e.preventDefault();
-            $('#fileInput').click();
+        if (dataset.backgroundColor) {
+          if (Array.isArray(dataset.backgroundColor)) {
+            dataset.backgroundColor = dataset.backgroundColor.map(() =>
+              color.replace('#', 'rgba(').replace('#', '').match(/.{2}/g).map(hex => parseInt(hex, 16)).join(', ') + ', 0.8)'
+            );
+          } else {
+            dataset.backgroundColor = color + '80'; // 50% 透明度
+          }
         }
 
-        // Ctrl/Cmd + E: 导出数据
-        if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
-            e.preventDefault();
-            window.app?.exportCurrentAnalysis();
+        if (dataset.borderColor) {
+          dataset.borderColor = color;
         }
+      });
 
-        // Escape: 关闭模态框或覆盖层
-        if (e.key === 'Escape') {
-            this.hideLoading();
-            this.hideAllToasts();
-        }
+      // 更新图表
+      chart.update('resize');
+    } catch (error) {
+      console.warn('更新图表颜色失败:', error);
+    }
+  }
+
+  /**
+   * 设置标签页导航
+   */
+  setupTabNavigation() {
+    $('#dataTableTabs').on('click', '.tab-button', (e) => {
+      const $button = $(e.currentTarget);
+      const tabName = $button.data('tab');
+
+      // 更新活动状态
+      $('.tab-button').removeClass('active');
+      $button.addClass('active');
+
+      // 切换内容
+      this.activeTab = tabName;
+      this.resetPagination();
+      this.renderTabContent(tabName);
+    });
+
+    // 绑定分页控件事件
+    this.bindPaginationEvents();
+  }
+
+  /**
+   * 设置拖拽上传
+   */
+  setupDragAndDrop() {
+    const uploadArea = $('#uploadArea');
+
+    uploadArea.on('dragover', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      uploadArea.addClass('drag-over');
+    });
+
+    uploadArea.on('dragleave', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      uploadArea.removeClass('drag-over');
+    });
+
+    uploadArea.on('drop', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      uploadArea.removeClass('drag-over');
+
+      const files = e.originalEvent.dataTransfer.files;
+      if (files.length > 0) {
+        window.app?.processFile(files[0]);
+      }
+    });
+
+    console.log('拖拽上传设置完成');
+  }
+
+  /**
+   * 处理键盘快捷键
+   */
+  handleKeyboardShortcuts(e) {
+    // Ctrl/Cmd + O: 打开文件
+    if ((e.ctrlKey || e.metaKey) && e.key === 'o') {
+      e.preventDefault();
+      $('#fileInput').click();
     }
 
-    /**
-     * 显示进度条
-     */
-    showProgress(percent = 0, text = '处理中...') {
-        this.progressContainer.removeClass('hidden');
-        this.progressBar.css('width', `${percent}%`);
-        this.progressText.text(text);
-
-        if (percent > 0) {
-            this.progressBar.addClass('progress-bar-animated');
-        }
+    // Ctrl/Cmd + E: 导出数据
+    if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+      e.preventDefault();
+      window.app?.exportCurrentAnalysis();
     }
 
-    /**
-     * 隐藏进度条
-     */
-    hideProgress() {
-        this.progressContainer.addClass('hidden');
-        this.progressBar.removeClass('progress-bar-animated');
+    // Escape: 关闭模态框或覆盖层
+    if (e.key === 'Escape') {
+      this.hideLoading();
+      this.hideAllToasts();
+    }
+  }
+
+  /**
+   * 显示进度条
+   */
+  showProgress(percent = 0, text = '处理中...') {
+    this.progressContainer.removeClass('hidden');
+    this.progressBar.css('width', `${percent}%`);
+    this.progressText.text(text);
+
+    if (percent > 0) {
+      this.progressBar.addClass('progress-bar-animated');
+    }
+  }
+
+  /**
+   * 隐藏进度条
+   */
+  hideProgress() {
+    this.progressContainer.addClass('hidden');
+    this.progressBar.removeClass('progress-bar-animated');
+  }
+
+  /**
+   * 更新进度
+   */
+  updateProgress(percent, text) {
+    this.progressBar.css('width', `${percent}%`);
+    if (text) {
+      this.progressText.text(text);
+    }
+  }
+
+  /**
+   * 显示状态消息
+   */
+  showStatus(message, type = 'info', duration = 5000) {
+    this.statusContainer.removeClass('hidden');
+
+    // 移除之前的样式类
+    this.statusMessage.removeClass('bg-green-100 text-green-800 border-green-200');
+    this.statusMessage.removeClass('bg-red-100 text-red-800 border-red-200');
+    this.statusMessage.removeClass('bg-blue-100 text-blue-800 border-blue-200');
+    this.statusMessage.removeClass('bg-yellow-100 text-yellow-800 border-yellow-200');
+
+    // 应用新的样式类
+    switch (type) {
+      case 'success':
+        this.statusMessage.addClass('bg-green-100 text-green-800 border-green-200');
+        break;
+      case 'error':
+        this.statusMessage.addClass('bg-red-100 text-red-800 border-red-200');
+        break;
+      case 'warning':
+        this.statusMessage.addClass('bg-yellow-100 text-yellow-800 border-yellow-200');
+        break;
+      default:
+        this.statusMessage.addClass('bg-blue-100 text-blue-800 border-blue-200');
     }
 
-    /**
-     * 更新进度
-     */
-    updateProgress(percent, text) {
-        this.progressBar.css('width', `${percent}%`);
-        if (text) {
-            this.progressText.text(text);
-        }
+    this.statusMessage.text(message);
+
+    // 自动隐藏
+    if (duration > 0) {
+      setTimeout(() => {
+        this.hideStatus();
+      }, duration);
     }
+  }
 
-    /**
-     * 显示状态消息
-     */
-    showStatus(message, type = 'info', duration = 5000) {
-        this.statusContainer.removeClass('hidden');
+  /**
+   * 隐藏状态消息
+   */
+  hideStatus() {
+    this.statusContainer.addClass('hidden');
+  }
 
-        // 移除之前的样式类
-        this.statusMessage.removeClass('bg-green-100 text-green-800 border-green-200');
-        this.statusMessage.removeClass('bg-red-100 text-red-800 border-red-200');
-        this.statusMessage.removeClass('bg-blue-100 text-blue-800 border-blue-200');
-        this.statusMessage.removeClass('bg-yellow-100 text-yellow-800 border-yellow-200');
+  /**
+   * 显示加载覆盖层
+   */
+  showLoading(text = '处理中...') {
+    this.loadingOverlay.find('span').text(text);
+    this.loadingOverlay.removeClass('hidden');
+  }
 
-        // 应用新的样式类
-        switch (type) {
-            case 'success':
-                this.statusMessage.addClass('bg-green-100 text-green-800 border-green-200');
-                break;
-            case 'error':
-                this.statusMessage.addClass('bg-red-100 text-red-800 border-red-200');
-                break;
-            case 'warning':
-                this.statusMessage.addClass('bg-yellow-100 text-yellow-800 border-yellow-200');
-                break;
-            default:
-                this.statusMessage.addClass('bg-blue-100 text-blue-800 border-blue-200');
-        }
+  /**
+   * 隐藏加载覆盖层
+   */
+  hideLoading() {
+    this.loadingOverlay.addClass('hidden');
+  }
 
-        this.statusMessage.text(message);
+  /**
+   * 显示Toast通知
+   */
+  showToast(message, type = 'info', duration = 4000) {
+    const toast = this.createToast(message, type);
+    this.toastContainer.append(toast);
 
-        // 自动隐藏
-        if (duration > 0) {
-            setTimeout(() => {
-                this.hideStatus();
-            }, duration);
-        }
+    // 触发入场动画
+    setTimeout(() => {
+      toast.addClass('toast-enter-active').removeClass('toast-enter');
+    }, 10);
+
+    // 自动移除
+    setTimeout(() => {
+      this.removeToast(toast);
+    }, duration);
+
+    this.toastQueue.push(toast);
+
+    // 限制Toast数量
+    if (this.toastQueue.length > 3) {
+      this.removeToast(this.toastQueue.shift());
     }
+  }
 
-    /**
-     * 隐藏状态消息
-     */
-    hideStatus() {
-        this.statusContainer.addClass('hidden');
-    }
+  /**
+   * 创建Toast元素
+   */
+  createToast(message, type) {
+    const iconMap = {
+      success: '✅',
+      error: '❌',
+      warning: '⚠️',
+      info: 'ℹ️'
+    };
 
-    /**
-     * 显示加载覆盖层
-     */
-    showLoading(text = '处理中...') {
-        this.loadingOverlay.find('span').text(text);
-        this.loadingOverlay.removeClass('hidden');
-    }
+    const colorMap = {
+      success: 'bg-green-500',
+      error: 'bg-red-500',
+      warning: 'bg-yellow-500',
+      info: 'bg-blue-500'
+    };
 
-    /**
-     * 隐藏加载覆盖层
-     */
-    hideLoading() {
-        this.loadingOverlay.addClass('hidden');
-    }
-
-    /**
-     * 显示Toast通知
-     */
-    showToast(message, type = 'info', duration = 4000) {
-        const toast = this.createToast(message, type);
-        this.toastContainer.append(toast);
-
-        // 触发入场动画
-        setTimeout(() => {
-            toast.addClass('toast-enter-active').removeClass('toast-enter');
-        }, 10);
-
-        // 自动移除
-        setTimeout(() => {
-            this.removeToast(toast);
-        }, duration);
-
-        this.toastQueue.push(toast);
-
-        // 限制Toast数量
-        if (this.toastQueue.length > 3) {
-            this.removeToast(this.toastQueue.shift());
-        }
-    }
-
-    /**
-     * 创建Toast元素
-     */
-    createToast(message, type) {
-        const iconMap = {
-            success: '✅',
-            error: '❌',
-            warning: '⚠️',
-            info: 'ℹ️'
-        };
-
-        const colorMap = {
-            success: 'bg-green-500',
-            error: 'bg-red-500',
-            warning: 'bg-yellow-500',
-            info: 'bg-blue-500'
-        };
-
-        const toast = $(`
+    const toast = $(`
             <div class="toast-enter ${colorMap[type]} text-white px-6 py-4 rounded-lg shadow-lg mb-2 max-w-sm">
                 <div class="flex items-center">
                     <span class="text-xl mr-3">${iconMap[type]}</span>
@@ -707,75 +707,75 @@ class UIManager {
             </div>
         `);
 
-        return toast;
+    return toast;
+  }
+
+  /**
+   * 移除Toast
+   */
+  removeToast(toast) {
+    if (toast && toast.length) {
+      toast.addClass('toast-exit-active').removeClass('toast-enter-active');
+      setTimeout(() => {
+        toast.remove();
+      }, 300);
+
+      // 从队列中移除
+      const index = this.toastQueue.indexOf(toast);
+      if (index > -1) {
+        this.toastQueue.splice(index, 1);
+      }
     }
+  }
 
-    /**
-     * 移除Toast
-     */
-    removeToast(toast) {
-        if (toast && toast.length) {
-            toast.addClass('toast-exit-active').removeClass('toast-enter-active');
-            setTimeout(() => {
-                toast.remove();
-            }, 300);
+  /**
+   * 隐藏所有Toast
+   */
+  hideAllToasts() {
+    this.toastQueue.forEach(toast => this.removeToast(toast));
+    this.toastQueue = [];
+  }
 
-            // 从队列中移除
-            const index = this.toastQueue.indexOf(toast);
-            if (index > -1) {
-                this.toastQueue.splice(index, 1);
-            }
-        }
+  /**
+   * 显示确认对话框
+   */
+  showConfirmDialog(title, message, onConfirm, onCancel) {
+    if (confirm(`${title}\\n\\n${message}`)) {
+      if (onConfirm) onConfirm();
+    } else {
+      if (onCancel) onCancel();
     }
+  }
 
-    /**
-     * 隐藏所有Toast
-     */
-    hideAllToasts() {
-        this.toastQueue.forEach(toast => this.removeToast(toast));
-        this.toastQueue = [];
-    }
+  /**
+   * 显示帮助模态框
+   */
+  showHelpModal() {
+    $('#helpModal').removeClass('hidden');
+    // 防止页面滚动
+    $('body').css('overflow', 'hidden');
+  }
 
-    /**
-     * 显示确认对话框
-     */
-    showConfirmDialog(title, message, onConfirm, onCancel) {
-        if (confirm(`${title}\\n\\n${message}`)) {
-            if (onConfirm) onConfirm();
-        } else {
-            if (onCancel) onCancel();
-        }
-    }
+  /**
+   * 隐藏帮助模态框
+   */
+  hideHelpModal() {
+    $('#helpModal').addClass('hidden');
+    // 恢复页面滚动
+    $('body').css('overflow', 'auto');
+  }
 
-    /**
-     * 显示帮助模态框
-     */
-    showHelpModal() {
-        $('#helpModal').removeClass('hidden');
-        // 防止页面滚动
-        $('body').css('overflow', 'hidden');
-    }
+  /**
+   * 渲染用户信息
+   */
+  /**
+   * 渲染用户信息 - 重新设计版本
+   */
+  renderUserInfo(userInfo) {
+    const container = $('#userInfoContent');
 
-    /**
-     * 隐藏帮助模态框
-     */
-    hideHelpModal() {
-        $('#helpModal').addClass('hidden');
-        // 恢复页面滚动
-        $('body').css('overflow', 'auto');
-    }
-
-    /**
-     * 渲染用户信息
-     */
-    /**
-     * 渲染用户信息 - 重新设计版本
-     */
-    renderUserInfo(userInfo) {
-        const container = $('#userInfoContent');
-
-        if (!userInfo) {
-            container.html(`
+    if (!userInfo) {
+      container.html(`
                 <div class="flex items-center justify-center h-64">
                     <div class="text-center">
                         <div class="text-6xl mb-4">👤</div>
@@ -783,112 +783,112 @@ class UIManager {
                     </div>
                 </div>
             `);
-            return;
-        }
+      return;
+    }
 
-        const formatDate = (dateStr) => {
-            if (!dateStr) return '未知';
-            try {
-                return new Date(dateStr).toLocaleDateString('zh-CN', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                });
-            } catch {
-                return dateStr;
-            }
-        };
+    const formatDate = (dateStr) => {
+      if (!dateStr) return '未知';
+      try {
+        return new Date(dateStr).toLocaleDateString('zh-CN', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+      } catch {
+        return dateStr;
+      }
+    };
 
-        const formatTime = (seconds) => {
-            if (!seconds) return '0 分钟';
-            const hours = Math.floor(seconds / 3600);
-            const minutes = Math.floor((seconds % 3600) / 60);
-            return hours > 0 ? `${hours} 小时 ${minutes} 分钟` : `${minutes} 分钟`;
-        };
+    const formatTime = (seconds) => {
+      if (!seconds) return '0 分钟';
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      return hours > 0 ? `${hours} 小时 ${minutes} 分钟` : `${minutes} 分钟`;
+    };
 
-        // 定义分类数据，使用更美观的布局
-        const sections = [
-            {
-                title: '基本信息',
-                icon: '👤',
-                gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                items: [
-                    { label: '🆔 用户ID', value: userInfo.id || '未知' },
-                    { label: '👨‍💼 用户名', value: userInfo.username || '未设置' },
-                    { label: '✨ 显示名称', value: userInfo.name || '未设置' },
-                    { label: '📧 邮箱地址', value: userInfo.email || '未设置' },
-                    { label: '🌍 所在地区', value: userInfo.location || '未设置' },
-                    { label: '📅 注册时间', value: formatDate(userInfo.created_at) }
-                ]
-            },
-            {
-                title: '权限与角色',
-                icon: '🛡️',
-                gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-                items: [
-                    { label: '⭐ 信任等级', value: `等级 ${userInfo.trust_level || 0}` },
-                    { label: '👑 用户头衔', value: userInfo.title || '无' },
-                    { label: '🔧 管理员', value: userInfo.admin ? '✅ 是' : '❌ 否' },
-                    { label: '🛡️ 版主权限', value: userInfo.moderator ? '✅ 是' : '❌ 否' },
-                    { label: '✏️ 可编辑资料', value: userInfo.can_edit ? '✅ 是' : '❌ 否' },
-                    { label: '💌 可发私信', value: userInfo.can_send_private_messages ? '✅ 是' : '❌ 否' }
-                ]
-            },
-            {
-                title: '活动统计',
-                icon: '📊',
-                gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-                items: [
-                    { label: '🏆 徽章总数', value: `${userInfo.badge_count || 0} 个` },
-                    { label: '💡 被采纳回答', value: `${userInfo.accepted_answers || 0} 个` },
-                    { label: '👀 资料浏览量', value: `${userInfo.profile_view_count || 0} 次` },
-                    { label: '📖 阅读时长', value: formatTime(userInfo.time_read) },
-                    { label: '🎮 积分', value: `${userInfo.gamification_score || 0} 分` },
-                    { label: '🕐 最后在线', value: formatDate(userInfo.last_seen_at) }
-                ]
-            },
-            {
-                title: '社交网络',
-                icon: '🤝',
-                gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-                items: [
-                    { label: '👥 关注数量', value: `${userInfo.total_following || 0} 人` },
-                    { label: '❤️ 粉丝数量', value: `${userInfo.total_followers || 0} 人` },
-                    { label: '🔇 屏蔽用户', value: `${userInfo.muted_usernames?.length || 0} 人` },
-                    { label: '👁️ 忽略用户', value: `${userInfo.ignored_usernames?.length || 0} 人` },
-                    { label: '🌐 显示关注列表', value: userInfo.can_see_following ? '✅ 公开' : '❌ 隐藏' },
-                    { label: '📊 显示粉丝列表', value: userInfo.can_see_followers ? '✅ 公开' : '❌ 隐藏' }
-                ]
-            },
-            {
-                title: '隐私与安全',
-                icon: '🔒',
-                gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
-                items: [
-                    { label: '🔐 双因子认证', value: userInfo.second_factor_enabled ? '✅ 已启用' : '❌ 未启用' },
-                    { label: '🛡️ 备用认证码', value: userInfo.second_factor_backup_enabled ? '✅ 已启用' : '❌ 未启用' },
-                    { label: '📧 邮箱隐私', value: userInfo.email_private ? '🔒 私有' : '🌐 公开' },
-                    { label: '👤 资料可见性', value: userInfo.profile_hidden ? '🔒 隐藏' : '🌐 公开' },
-                    { label: '🖼️ 自定义背景', value: userInfo.can_upload_user_card_background ? '✅ 允许' : '❌ 禁止' },
-                    { label: '🎨 上传头像', value: userInfo.can_upload_profile_header ? '✅ 允许' : '❌ 禁止' }
-                ]
-            },
-            {
-                title: '个性化设置',
-                icon: '🎨',
-                gradient: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
-                items: [
-                    { label: '🌏 语言设置', value: userInfo.locale || '默认' },
-                    { label: '🕰️ 时区设置', value: userInfo.timezone || '未设置' },
-                    { label: '📝 文字大小', value: userInfo.text_size || '普通' },
-                    { label: '🎯 主题配色', value: userInfo.color_scheme_id ? `方案 ${userInfo.color_scheme_id}` : '默认' },
-                    { label: '💬 启用引用', value: userInfo.enable_quoting ? '✅ 启用' : '❌ 禁用' },
-                    { label: '🔗 新窗口打开链接', value: userInfo.external_links_in_new_tab ? '✅ 启用' : '❌ 禁用' }
-                ]
-            }
-        ];
+    // 定义分类数据，使用更美观的布局
+    const sections = [
+      {
+        title: '基本信息',
+        icon: '👤',
+        gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        items: [
+          { label: '🆔 用户ID', value: userInfo.id || '未知' },
+          { label: '👨‍💼 用户名', value: userInfo.username || '未设置' },
+          { label: '✨ 显示名称', value: userInfo.name || '未设置' },
+          { label: '📧 邮箱地址', value: userInfo.email || '未设置' },
+          { label: '🌍 所在地区', value: userInfo.location || '未设置' },
+          { label: '📅 注册时间', value: formatDate(userInfo.created_at) }
+        ]
+      },
+      {
+        title: '权限与角色',
+        icon: '🛡️',
+        gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+        items: [
+          { label: '⭐ 信任等级', value: `等级 ${userInfo.trust_level || 0}` },
+          { label: '👑 用户头衔', value: userInfo.title || '无' },
+          { label: '🔧 管理员', value: userInfo.admin ? '✅ 是' : '❌ 否' },
+          { label: '🛡️ 版主权限', value: userInfo.moderator ? '✅ 是' : '❌ 否' },
+          { label: '✏️ 可编辑资料', value: userInfo.can_edit ? '✅ 是' : '❌ 否' },
+          { label: '💌 可发私信', value: userInfo.can_send_private_messages ? '✅ 是' : '❌ 否' }
+        ]
+      },
+      {
+        title: '活动统计',
+        icon: '📊',
+        gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+        items: [
+          { label: '🏆 徽章总数', value: `${userInfo.badge_count || 0} 个` },
+          { label: '💡 被采纳回答', value: `${userInfo.accepted_answers || 0} 个` },
+          { label: '👀 资料浏览量', value: `${userInfo.profile_view_count || 0} 次` },
+          { label: '📖 阅读时长', value: formatTime(userInfo.time_read) },
+          { label: '🎮 积分', value: `${userInfo.gamification_score || 0} 分` },
+          { label: '🕐 最后在线', value: formatDate(userInfo.last_seen_at) }
+        ]
+      },
+      {
+        title: '社交网络',
+        icon: '🤝',
+        gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+        items: [
+          { label: '👥 关注数量', value: `${userInfo.total_following || 0} 人` },
+          { label: '❤️ 粉丝数量', value: `${userInfo.total_followers || 0} 人` },
+          { label: '🔇 屏蔽用户', value: `${userInfo.muted_usernames?.length || 0} 人` },
+          { label: '👁️ 忽略用户', value: `${userInfo.ignored_usernames?.length || 0} 人` },
+          { label: '🌐 显示关注列表', value: userInfo.can_see_following ? '✅ 公开' : '❌ 隐藏' },
+          { label: '📊 显示粉丝列表', value: userInfo.can_see_followers ? '✅ 公开' : '❌ 隐藏' }
+        ]
+      },
+      {
+        title: '隐私与安全',
+        icon: '🔒',
+        gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+        items: [
+          { label: '🔐 双因子认证', value: userInfo.second_factor_enabled ? '✅ 已启用' : '❌ 未启用' },
+          { label: '🛡️ 备用认证码', value: userInfo.second_factor_backup_enabled ? '✅ 已启用' : '❌ 未启用' },
+          { label: '📧 邮箱隐私', value: userInfo.email_private ? '🔒 私有' : '🌐 公开' },
+          { label: '👤 资料可见性', value: userInfo.profile_hidden ? '🔒 隐藏' : '🌐 公开' },
+          { label: '🖼️ 自定义背景', value: userInfo.can_upload_user_card_background ? '✅ 允许' : '❌ 禁止' },
+          { label: '🎨 上传头像', value: userInfo.can_upload_profile_header ? '✅ 允许' : '❌ 禁止' }
+        ]
+      },
+      {
+        title: '个性化设置',
+        icon: '🎨',
+        gradient: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+        items: [
+          { label: '🌏 语言设置', value: userInfo.locale || '默认' },
+          { label: '🕰️ 时区设置', value: userInfo.timezone || '未设置' },
+          { label: '📝 文字大小', value: userInfo.text_size || '普通' },
+          { label: '🎯 主题配色', value: userInfo.color_scheme_id ? `方案 ${userInfo.color_scheme_id}` : '默认' },
+          { label: '💬 启用引用', value: userInfo.enable_quoting ? '✅ 启用' : '❌ 禁用' },
+          { label: '🔗 新窗口打开链接', value: userInfo.external_links_in_new_tab ? '✅ 启用' : '❌ 禁用' }
+        ]
+      }
+    ];
 
-        const html = `
+    const html = `
             <div class="w-full max-w-7xl mx-auto space-y-8">
                 <!-- 用户头像和基本信息卡片 -->
                 <div class="relative overflow-hidden rounded-3xl shadow-2xl" style="background: ${sections[0].gradient}">
@@ -983,23 +983,23 @@ class UIManager {
             </div>
         `;
 
-        container.html(html);
-    }
+    container.html(html);
+  }
 
-    /**
-     * 渲染数据完整性
-     */
-    renderDataCompleteness(completeness) {
-        const container = $('#dataCompletenessContent');
+  /**
+   * 渲染数据完整性
+   */
+  renderDataCompleteness(completeness) {
+    const container = $('#dataCompletenessContent');
 
-        const getScoreColor = (score) => {
-            if (score >= 80) return 'bg-green-500';
-            if (score >= 60) return 'bg-yellow-500';
-            if (score >= 40) return 'bg-orange-500';
-            return 'bg-red-500';
-        };
+    const getScoreColor = (score) => {
+      if (score >= 80) return 'bg-green-500';
+      if (score >= 60) return 'bg-yellow-500';
+      if (score >= 40) return 'bg-orange-500';
+      return 'bg-red-500';
+    };
 
-        const html = `
+    const html = `
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="text-center">
                     <div class="text-3xl font-bold text-gray-800 mb-2">${completeness.score}%</div>
@@ -1019,35 +1019,35 @@ class UIManager {
                     <h4 class="font-semibold text-red-700 mb-3">❌ 缺失数据文件</h4>
                     <ul class="text-sm space-y-1">
                         ${completeness.missing.length > 0 ?
-                            completeness.missing.map(file => `<li class="text-red-600">• ${file}</li>`).join('') :
-                            '<li class="text-gray-500">无缺失文件</li>'
-                        }
+        completeness.missing.map(file => `<li class="text-red-600">• ${file}</li>`).join('') :
+        '<li class="text-gray-500">无缺失文件</li>'
+      }
                     </ul>
                 </div>
             </div>
         `;
 
-        container.html(html);
-    }
+    container.html(html);
+  }
 
-    /**
-     * 渲染摘要卡片 - 新版本支持更多数据
-     */
-    renderSummaryCards(summary) {
-        const cardsContainer = $('#summaryCards');
+  /**
+   * 渲染摘要卡片 - 新版本支持更多数据
+   */
+  renderSummaryCards(summary) {
+    const cardsContainer = $('#summaryCards');
 
-        const cards = [
-            { label: '总发帖数', value: summary.totalPosts, icon: '📝', color: 'from-blue-500 to-blue-600' },
-            { label: '获得点赞', value: summary.totalLikes, icon: '👍', color: 'from-red-500 to-red-600' },
-            { label: '获得徽章', value: summary.totalBadges, icon: '🏆', color: 'from-yellow-500 to-yellow-600' },
-            { label: '总访问', value: summary.totalVisits, icon: '📊', color: 'from-green-500 to-green-600' },
-            { label: '认证令牌', value: summary.authTokensCount, icon: '🔐', color: 'from-purple-500 to-purple-600' },
-            { label: '书签数', value: summary.bookmarksCount, icon: '📑', color: 'from-indigo-500 to-indigo-600' },
-            { label: '举报数', value: summary.flagsCount, icon: '🚩', color: 'from-pink-500 to-pink-600' },
-            { label: '移动端使用', value: `${summary.mobileUsageRatio}%`, icon: '📱', color: 'from-teal-500 to-teal-600' }
-        ];
+    const cards = [
+      { label: '总发帖数', value: summary.totalPosts, icon: '📝', color: 'from-blue-500 to-blue-600' },
+      { label: '获得点赞', value: summary.totalLikes, icon: '👍', color: 'from-red-500 to-red-600' },
+      { label: '获得徽章', value: summary.totalBadges, icon: '🏆', color: 'from-yellow-500 to-yellow-600' },
+      { label: '总访问', value: summary.totalVisits, icon: '📊', color: 'from-green-500 to-green-600' },
+      { label: '认证令牌', value: summary.authTokensCount, icon: '🔐', color: 'from-purple-500 to-purple-600' },
+      { label: '书签数', value: summary.bookmarksCount, icon: '📑', color: 'from-indigo-500 to-indigo-600' },
+      { label: '举报数', value: summary.flagsCount, icon: '🚩', color: 'from-pink-500 to-pink-600' },
+      { label: '移动端使用', value: `${summary.mobileUsageRatio}%`, icon: '📱', color: 'from-teal-500 to-teal-600' }
+    ];
 
-        const cardHTML = cards.map(card => `
+    const cardHTML = cards.map(card => `
             <div class="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl
                         transition-all duration-300 transform hover:-translate-y-1 summary-card">
                 <div class="text-center">
@@ -1061,26 +1061,26 @@ class UIManager {
             </div>
         `).join('');
 
-        cardsContainer.html(cardHTML);
-    }
+    cardsContainer.html(cardHTML);
+  }
 
-    /**
-     * 渲染分类活动数据
-     */
-    renderCategoryData(categoryData) {
-        const container = $('#categoryContent');
+  /**
+   * 渲染分类活动数据
+   */
+  renderCategoryData(categoryData) {
+    const container = $('#categoryContent');
 
-        if (!categoryData || categoryData.length === 0) {
-            container.html(`
+    if (!categoryData || categoryData.length === 0) {
+      container.html(`
                 <div class="text-center py-8 text-gray-500">
                     <div class="text-4xl mb-4">📂</div>
                     <p>暂无分类数据</p>
                 </div>
             `);
-            return;
-        }
+      return;
+    }
 
-        const tableHTML = `
+    const tableHTML = `
             <div class="table-container">
                 <table class="data-table">
                     <thead>
@@ -1107,26 +1107,26 @@ class UIManager {
             </div>
         `;
 
-        container.html(tableHTML);
-    }
+    container.html(tableHTML);
+  }
 
-    /**
-     * 渲染徽章统计
-     */
-    renderBadgeStats(badgeStats) {
-        const container = $('#badgeStatsContent');
+  /**
+   * 渲染徽章统计
+   */
+  renderBadgeStats(badgeStats) {
+    const container = $('#badgeStatsContent');
 
-        if (!badgeStats || badgeStats.length === 0) {
-            container.html(`
+    if (!badgeStats || badgeStats.length === 0) {
+      container.html(`
                 <div class="text-center py-8 text-gray-500 col-span-full">
                     <div class="text-4xl mb-4">🏆</div>
                     <p>暂无徽章数据</p>
                 </div>
             `);
-            return;
-        }
+      return;
+    }
 
-        const html = badgeStats.map(badge => `
+    const html = badgeStats.map(badge => `
             <div class="badge-item">
                 <div class="text-2xl mb-2">🏆</div>
                 <div class="font-semibold text-gray-800 text-sm mb-1">${badge.name}</div>
@@ -1134,20 +1134,20 @@ class UIManager {
             </div>
         `).join('');
 
-        container.html(html);
-    }
+    container.html(html);
+  }
 
-    /**
-     * 渲染徽章详细分析
-     */
-    /**
-     * 渲染徽章详细分析 - 重新设计版本
-     */
-    renderBadgeDetailedAnalysis(badgeAnalysis) {
-        const container = $('#badgeDetailedContent');
+  /**
+   * 渲染徽章详细分析
+   */
+  /**
+   * 渲染徽章详细分析 - 重新设计版本
+   */
+  renderBadgeDetailedAnalysis(badgeAnalysis) {
+    const container = $('#badgeDetailedContent');
 
-        if (!badgeAnalysis || badgeAnalysis.totalBadges === 0) {
-            container.html(`
+    if (!badgeAnalysis || badgeAnalysis.totalBadges === 0) {
+      container.html(`
                 <div class="flex items-center justify-center h-64">
                     <div class="text-center">
                         <div class="text-6xl mb-4">🏆</div>
@@ -1155,33 +1155,33 @@ class UIManager {
                     </div>
                 </div>
             `);
-            return;
-        }
+      return;
+    }
 
-        const formatDate = (dateStr) => {
-            try {
-                return new Date(dateStr).toLocaleDateString('zh-CN', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric'
-                });
-            } catch {
-                return dateStr;
-            }
-        };
+    const formatDate = (dateStr) => {
+      try {
+        return new Date(dateStr).toLocaleDateString('zh-CN', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        });
+      } catch {
+        return dateStr;
+      }
+    };
 
-        // 按类型分组显示徽章
-        const badgeTypesSummary = Object.entries(badgeAnalysis.badgesByType)
-            .map(([type, badges]) => {
-                const totalCount = badges.reduce((sum, badge) => sum + badge.count, 0);
-                return { type, count: badges.length, totalCount };
-            })
-            .filter(item => item.count > 0);
+    // 按类型分组显示徽章
+    const badgeTypesSummary = Object.entries(badgeAnalysis.badgesByType)
+      .map(([type, badges]) => {
+        const totalCount = badges.reduce((sum, badge) => sum + badge.count, 0);
+        return { type, count: badges.length, totalCount };
+      })
+      .filter(item => item.count > 0);
 
-        // 获取最新的徽章记录
-        const recentBadges = badgeAnalysis.badgeTimeline.slice(-8).reverse();
+    // 获取最新的徽章记录
+    const recentBadges = badgeAnalysis.badgeTimeline.slice(-8).reverse();
 
-        const html = `
+    const html = `
             <div class="space-y-8">
                 <!-- 徽章统计概览 -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -1363,20 +1363,20 @@ class UIManager {
             </div>
         `;
 
-        container.html(html);
-    }
+    container.html(html);
+  }
 
-    /**
-     * 渲染用户权限和设置信息
-     */
-    /**
-     * 渲染用户权限和设置信息 - 重新设计版本
-     */
-    renderUserPermissionsAndSettings(permissionsData) {
-        const container = $('#userPermissionsContent');
+  /**
+   * 渲染用户权限和设置信息
+   */
+  /**
+   * 渲染用户权限和设置信息 - 重新设计版本
+   */
+  renderUserPermissionsAndSettings(permissionsData) {
+    const container = $('#userPermissionsContent');
 
-        if (!permissionsData) {
-            container.html(`
+    if (!permissionsData) {
+      container.html(`
                 <div class="flex items-center justify-center h-64">
                     <div class="text-center">
                         <div class="text-6xl mb-4">⚙️</div>
@@ -1384,25 +1384,25 @@ class UIManager {
                     </div>
                 </div>
             `);
-            return;
-        }
+      return;
+    }
 
-        const formatBoolean = (value) => value ? '✅ 启用' : '❌ 禁用';
-        const formatNumber = (value) => value || 0;
-        const formatArray = (arr) => Array.isArray(arr) ? arr.length : 0;
+    const formatBoolean = (value) => value ? '✅ 启用' : '❌ 禁用';
+    const formatNumber = (value) => value || 0;
+    const formatArray = (arr) => Array.isArray(arr) ? arr.length : 0;
 
-        // 权限等级映射
-        const trustLevelInfo = {
-            0: { name: '新手用户', color: 'from-gray-400 to-gray-500', icon: '🌱' },
-            1: { name: '基础用户', color: 'from-blue-400 to-blue-500', icon: '🌿' },
-            2: { name: '成员用户', color: 'from-green-400 to-green-500', icon: '🌿' },
-            3: { name: '常规用户', color: 'from-yellow-400 to-yellow-500', icon: '🌳' },
-            4: { name: '领导者', color: 'from-purple-400 to-purple-500', icon: '🏆' }
-        };
+    // 权限等级映射
+    const trustLevelInfo = {
+      0: { name: '新手用户', color: 'from-gray-400 to-gray-500', icon: '🌱' },
+      1: { name: '基础用户', color: 'from-blue-400 to-blue-500', icon: '🌿' },
+      2: { name: '成员用户', color: 'from-green-400 to-green-500', icon: '🌿' },
+      3: { name: '常规用户', color: 'from-yellow-400 to-yellow-500', icon: '🌳' },
+      4: { name: '领导者', color: 'from-purple-400 to-purple-500', icon: '🏆' }
+    };
 
-        const currentTrustLevel = trustLevelInfo[permissionsData.permissions.trust_level] || trustLevelInfo[0];
+    const currentTrustLevel = trustLevelInfo[permissionsData.permissions.trust_level] || trustLevelInfo[0];
 
-        const html = `
+    const html = `
             <div class="space-y-8">
                 <!-- 用户权限概览卡片 -->
                 <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br ${currentTrustLevel.color}">
@@ -1713,20 +1713,20 @@ class UIManager {
             </div>
         `;
 
-        container.html(html);
-    }
+    container.html(html);
+  }
 
-    /**
-     * 渲染设备登录历史
-     */
-    /**
-     * 渲染设备登录历史 - 重新设计版本
-     */
-    renderDeviceLoginHistory(loginHistory) {
-        const container = $('#deviceLoginHistoryContent');
+  /**
+   * 渲染设备登录历史
+   */
+  /**
+   * 渲染设备登录历史 - 重新设计版本
+   */
+  renderDeviceLoginHistory(loginHistory) {
+    const container = $('#deviceLoginHistoryContent');
 
-        if (!loginHistory || loginHistory.totalDevices === 0) {
-            container.html(`
+    if (!loginHistory || loginHistory.totalDevices === 0) {
+      container.html(`
                 <div class="flex items-center justify-center h-64">
                     <div class="text-center">
                         <div class="text-6xl mb-4">📱</div>
@@ -1734,48 +1734,48 @@ class UIManager {
                     </div>
                 </div>
             `);
-            return;
-        }
+      return;
+    }
 
-        const formatDate = (dateStr) => {
-            try {
-                return new Date(dateStr).toLocaleDateString('zh-CN', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-            } catch {
-                return dateStr;
-            }
-        };
+    const formatDate = (dateStr) => {
+      try {
+        return new Date(dateStr).toLocaleDateString('zh-CN', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      } catch {
+        return dateStr;
+      }
+    };
 
-        const formatRelativeTime = (days) => {
-            if (days === 0) return '今天';
-            if (days === 1) return '昨天';
-            if (days < 7) return `${days} 天前`;
-            if (days < 30) return `${Math.floor(days / 7)} 周前`;
-            if (days < 365) return `${Math.floor(days / 30)} 个月前`;
-            return `${Math.floor(days / 365)} 年前`;
-        };
+    const formatRelativeTime = (days) => {
+      if (days === 0) return '今天';
+      if (days === 1) return '昨天';
+      if (days < 7) return `${days} 天前`;
+      if (days < 30) return `${Math.floor(days / 7)} 周前`;
+      if (days < 365) return `${Math.floor(days / 30)} 个月前`;
+      return `${Math.floor(days / 365)} 年前`;
+    };
 
-        const getDeviceInfo = (deviceType) => {
-            const deviceMap = {
-                '移动设备': { icon: '📱', color: 'from-blue-400 to-blue-600', bgColor: 'from-blue-50 to-blue-100' },
-                'Chrome浏览器': { icon: '🌐', color: 'from-green-400 to-green-600', bgColor: 'from-green-50 to-green-100' },
-                'Firefox浏览器': { icon: '🦊', color: 'from-orange-400 to-orange-600', bgColor: 'from-orange-50 to-orange-100' },
-                'Safari浏览器': { icon: '🧭', color: 'from-cyan-400 to-cyan-600', bgColor: 'from-cyan-50 to-cyan-100' },
-                'Edge浏览器': { icon: '🔷', color: 'from-purple-400 to-purple-600', bgColor: 'from-purple-50 to-purple-100' },
-                '桌面浏览器': { icon: '💻', color: 'from-gray-400 to-gray-600', bgColor: 'from-gray-50 to-gray-100' },
-                '未知设备': { icon: '❓', color: 'from-gray-400 to-gray-500', bgColor: 'from-gray-50 to-gray-100' }
-            };
-            return deviceMap[deviceType] || deviceMap['未知设备'];
-        };
+    const getDeviceInfo = (deviceType) => {
+      const deviceMap = {
+        '移动设备': { icon: '📱', color: 'from-blue-400 to-blue-600', bgColor: 'from-blue-50 to-blue-100' },
+        'Chrome浏览器': { icon: '🌐', color: 'from-green-400 to-green-600', bgColor: 'from-green-50 to-green-100' },
+        'Firefox浏览器': { icon: '🦊', color: 'from-orange-400 to-orange-600', bgColor: 'from-orange-50 to-orange-100' },
+        'Safari浏览器': { icon: '🧭', color: 'from-cyan-400 to-cyan-600', bgColor: 'from-cyan-50 to-cyan-100' },
+        'Edge浏览器': { icon: '🔷', color: 'from-purple-400 to-purple-600', bgColor: 'from-purple-50 to-purple-100' },
+        '桌面浏览器': { icon: '💻', color: 'from-gray-400 to-gray-600', bgColor: 'from-gray-50 to-gray-100' },
+        '未知设备': { icon: '❓', color: 'from-gray-400 to-gray-500', bgColor: 'from-gray-50 to-gray-100' }
+      };
+      return deviceMap[deviceType] || deviceMap['未知设备'];
+    };
 
-        const deviceTypesArray = Object.entries(loginHistory.devicesByType);
+    const deviceTypesArray = Object.entries(loginHistory.devicesByType);
 
-        const html = `
+    const html = `
             <div class="space-y-8">
                 <!-- 设备统计概览 -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -1811,9 +1811,9 @@ class UIManager {
                     <div class="user-info-section-content">
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             ${deviceTypesArray.map(([type, data], index) => {
-                                const deviceInfo = getDeviceInfo(type);
-                                const percentage = Math.round((data.count / loginHistory.totalDevices) * 100);
-                                return `
+      const deviceInfo = getDeviceInfo(type);
+      const percentage = Math.round((data.count / loginHistory.totalDevices) * 100);
+      return `
                                 <div class="device-card animate-fade-in" style="animation-delay: ${index * 0.1}s">
                                     <div class="flex items-center space-x-4 mb-4">
                                         <div class="w-16 h-16 bg-gradient-to-br ${deviceInfo.color} rounded-2xl flex items-center justify-center shadow-lg">
@@ -1844,7 +1844,7 @@ class UIManager {
                                         </span>
                                     </div>
                                 </div>`;
-                            }).join('')}
+    }).join('')}
                         </div>
                     </div>
                 </div>
@@ -1860,9 +1860,9 @@ class UIManager {
                     <div class="user-info-section-content">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             ${loginHistory.recentDevices.slice(0, 8).map((device, index) => {
-                                const deviceInfo = getDeviceInfo(device.deviceType);
-                                const daysSince = Math.floor((new Date() - new Date(device.seenAt)) / (24 * 60 * 60 * 1000));
-                                return `
+      const deviceInfo = getDeviceInfo(device.deviceType);
+      const daysSince = Math.floor((new Date() - new Date(device.seenAt)) / (24 * 60 * 60 * 1000));
+      return `
                                 <div class="relative p-4 bg-gradient-to-br ${deviceInfo.bgColor} rounded-xl border border-gray-200 animate-slide-up" style="animation-delay: ${index * 0.1}s">
                                     <div class="flex items-center space-x-4">
                                         <div class="relative">
@@ -1888,7 +1888,7 @@ class UIManager {
                                         </span>
                                     </div>
                                 </div>`;
-                            }).join('')}
+    }).join('')}
                         </div>
                     </div>
                 </div>
@@ -1914,8 +1914,8 @@ class UIManager {
                                 </thead>
                                 <tbody>
                                     ${loginHistory.deviceSummary.slice(0, 15).map(device => {
-                                        const deviceInfo = getDeviceInfo(device.deviceType);
-                                        return `
+      const deviceInfo = getDeviceInfo(device.deviceType);
+      return `
                                         <tr class="hover:bg-gray-50 transition-colors">
                                             <td class="py-4 px-6">
                                                 <div class="flex items-center space-x-3">
@@ -1940,16 +1940,15 @@ class UIManager {
                                                 <div class="text-sm text-gray-600">${formatDate(device.seenAt)}</div>
                                             </td>
                                             <td class="py-4 px-6 text-center">
-                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                                                    device.isRecent
-                                                        ? 'bg-green-100 text-green-800'
-                                                        : 'bg-gray-100 text-gray-800'
-                                                }">
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${device.isRecent
+          ? 'bg-green-100 text-green-800'
+          : 'bg-gray-100 text-gray-800'
+        }">
                                                     ${device.isRecent ? '🟢 活跃' : '⚪ ' + formatRelativeTime(device.daysSinceLastSeen)}
                                                 </span>
                                             </td>
                                         </tr>`;
-                                    }).join('')}
+    }).join('')}
                                 </tbody>
                             </table>
                         </div>
@@ -1977,8 +1976,8 @@ class UIManager {
 
                             <div class="space-y-4 max-h-96 overflow-y-auto">
                                 ${loginHistory.loginTimeline.slice(0, 20).map((event, index) => {
-                                    const deviceInfo = getDeviceInfo(event.deviceType);
-                                    return `
+      const deviceInfo = getDeviceInfo(event.deviceType);
+      return `
                                     <div class="relative flex items-center space-x-4 animate-fade-in" style="animation-delay: ${index * 0.05}s">
                                         <!-- 时间线节点 -->
                                         <div class="relative z-10 w-12 h-12 bg-gradient-to-br ${deviceInfo.color} rounded-full flex items-center justify-center shadow-md">
@@ -1999,7 +1998,7 @@ class UIManager {
                                             </div>
                                         </div>
                                     </div>`;
-                                }).join('')}
+    }).join('')}
                             </div>
                         </div>
                     </div>
@@ -2037,26 +2036,26 @@ class UIManager {
             </div>
         `;
 
-        container.html(html);
-    }
+    container.html(html);
+  }
 
-    /**
-     * 渲染认证令牌分析
-     */
-    renderAuthTokensAnalysis(analysis) {
-        const container = $('#authTokensContent');
+  /**
+   * 渲染认证令牌分析
+   */
+  renderAuthTokensAnalysis(analysis) {
+    const container = $('#authTokensContent');
 
-        if (!analysis) {
-            container.html(`
+    if (!analysis) {
+      container.html(`
                 <div class="text-center py-8 text-gray-500">
                     <div class="text-4xl mb-4">🔐</div>
                     <p>暂无认证令牌数据</p>
                 </div>
             `);
-            return;
-        }
+      return;
+    }
 
-        const html = `
+    const html = `
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="analysis-item">
                     <div class="analysis-header">总令牌数</div>
@@ -2082,26 +2081,26 @@ class UIManager {
             </div>
         `;
 
-        container.html(html);
-    }
+    container.html(html);
+  }
 
-    /**
-     * 渲染书签分析
-     */
-    renderBookmarksAnalysis(analysis) {
-        const container = $('#bookmarksContent');
+  /**
+   * 渲染书签分析
+   */
+  renderBookmarksAnalysis(analysis) {
+    const container = $('#bookmarksContent');
 
-        if (!analysis) {
-            container.html(`
+    if (!analysis) {
+      container.html(`
                 <div class="text-center py-8 text-gray-500">
                     <div class="text-4xl mb-4">📑</div>
                     <p>暂无书签数据</p>
                 </div>
             `);
-            return;
-        }
+      return;
+    }
 
-        const html = `
+    const html = `
             <div class="space-y-4">
                 <div class="analysis-item">
                     <div class="analysis-header">总书签数</div>
@@ -2121,26 +2120,26 @@ class UIManager {
             </div>
         `;
 
-        container.html(html);
-    }
+    container.html(html);
+  }
 
-    /**
-     * 渲染举报分析
-     */
-    renderFlagsAnalysis(analysis) {
-        const container = $('#flagsContent');
+  /**
+   * 渲染举报分析
+   */
+  renderFlagsAnalysis(analysis) {
+    const container = $('#flagsContent');
 
-        if (!analysis) {
-            container.html(`
+    if (!analysis) {
+      container.html(`
                 <div class="text-center py-8 text-gray-500">
                     <div class="text-4xl mb-4">🚩</div>
                     <p>暂无举报数据</p>
                 </div>
             `);
-            return;
-        }
+      return;
+    }
 
-        const html = `
+    const html = `
             <div class="space-y-4">
                 <div class="analysis-item">
                     <div class="analysis-header">总举报数</div>
@@ -2160,89 +2159,95 @@ class UIManager {
             </div>
         `;
 
-        container.html(html);
-    }
+    container.html(html);
+  }
 
-    /**
-     * 更新标签计数
-     */
-    updateTabCounts(detailedData) {
-        const counts = {
-            userArchive: detailedData.userArchive?.length || 0,
-            visits: detailedData.visits?.length || 0,
-            likes: detailedData.likes?.length || 0,
-            userBadges: detailedData.userBadges?.length || 0,
-            authTokens: detailedData.authTokens?.length || 0,
-            bookmarks: detailedData.bookmarks?.length || 0,
-            flags: detailedData.flags?.length || 0,
-            queuedPosts: detailedData.queuedPosts?.length || 0
-        };
+  /**
+   * 更新标签计数
+   */
+  updateTabCounts(detailedData) {
+    const counts = {
+      userArchive: detailedData.userArchive?.length || 0,
+      visits: detailedData.visits?.length || 0,
+      likes: detailedData.likes?.length || 0,
+      userBadges: detailedData.userBadges?.length || 0,
+      authTokens: detailedData.authTokens?.length || 0,
+      bookmarks: detailedData.bookmarks?.length || 0,
+      flags: detailedData.flags?.length || 0,
+      queuedPosts: detailedData.queuedPosts?.length || 0
+    };
 
-        Object.keys(counts).forEach(tab => {
-            $(`#${tab}Count`).text(counts[tab]);
-        });
-    }
+    Object.keys(counts).forEach(tab => {
+      $(`#${tab}Count`).text(counts[tab]);
+    });
+  }
 
-    /**
-     * 渲染标签内容
-     */
-    renderTabContent(tabName) {
-        if (!this.currentTabData) return;
+  /**
+   * 渲染标签内容
+   */
+  renderTabContent(tabName) {
+    if (!this.currentTabData) return;
 
-        const allData = this.currentTabData[tabName] || [];
-        const container = $('#dataTableContent');
+    console.log(`%c🎯 renderTabContent called for: ${tabName}`, 'background: #9C27B0; color: white; padding: 2px 8px;');
 
-        if (allData.length === 0) {
-            container.html(`
+    const allData = this.currentTabData[tabName] || [];
+    const container = $('#dataTableContent');
+
+    if (allData.length === 0) {
+      container.html(`
                 <div class="text-center py-8 text-gray-500">
                     <div class="text-4xl mb-4">📄</div>
                     <p>暂无 ${this.getTabDisplayName(tabName)} 数据</p>
                 </div>
             `);
-            return;
-        }
-
-        // 应用搜索过滤
-        const filteredData = this.filterData(allData, this.pagination.searchQuery);
-        this.pagination.totalItems = filteredData.length;
-
-        // 计算分页数据
-        const startIndex = (this.pagination.currentPage - 1) * this.pagination.pageSize;
-        const endIndex = startIndex + this.pagination.pageSize;
-        const pageData = filteredData.slice(startIndex, endIndex);
-
-        // 生成表格HTML
-        const tableHTML = this.generateTableHTML(tabName, pageData, filteredData.length);
-        container.html(tableHTML);
+      return;
     }
 
-    /**
-     * 获取标签显示名称
-     */
-    getTabDisplayName(tabName) {
-        const names = {
-            userArchive: '发帖记录',
-            visits: '访问记录',
-            likes: '点赞记录',
-            userBadges: '徽章记录',
-            authTokens: '认证令牌',
-            bookmarks: '书签记录',
-            flags: '举报记录',
-            queuedPosts: '待审核帖子'
-        };
-        return names[tabName] || tabName;
-    }
+    // 应用搜索过滤
+    const filteredData = this.filterData(allData, this.pagination.searchQuery);
+    this.pagination.totalItems = filteredData.length;
 
-    /**
-     * 生成表格HTML
-     */
-    generateTableHTML(tabName, pageData, totalCount) {
-        const columns = this.getTableColumns(tabName);
-        const totalPages = Math.ceil(this.pagination.totalItems / this.pagination.pageSize);
-        const startItem = (this.pagination.currentPage - 1) * this.pagination.pageSize + 1;
-        const endItem = Math.min(startItem + pageData.length - 1, this.pagination.totalItems);
+    // 计算分页数据
+    const startIndex = (this.pagination.currentPage - 1) * this.pagination.pageSize;
+    const endIndex = startIndex + this.pagination.pageSize;
+    const pageData = filteredData.slice(startIndex, endIndex);
 
-        return `
+    // 生成表格HTML
+    const tableHTML = this.generateTableHTML(tabName, pageData, filteredData.length);
+    container.html(tableHTML);
+  }
+
+  /**
+   * 获取标签显示名称
+   */
+  getTabDisplayName(tabName) {
+    const names = {
+      userArchive: '发帖记录',
+      visits: '访问记录',
+      likes: '点赞记录',
+      userBadges: '徽章记录',
+      authTokens: '认证令牌',
+      bookmarks: '书签记录',
+      flags: '举报记录',
+      queuedPosts: '待审核帖子'
+    };
+    return names[tabName] || tabName;
+  }
+
+  /**
+   * 生成表格HTML
+   */
+  generateTableHTML(tabName, pageData, totalCount) {
+    const columns = this.getTableColumns(tabName);
+
+    // Debug: Log the columns to see if 'actions' is included
+    console.log(`%c📊 Table columns for ${tabName}`, 'background: #2196F3; color: white; padding: 2px 8px;', columns);
+
+    const totalPages = Math.ceil(this.pagination.totalItems / this.pagination.pageSize);
+    const startItem = (this.pagination.currentPage - 1) * this.pagination.pageSize + 1;
+    const endItem = Math.min(startItem + pageData.length - 1, this.pagination.totalItems);
+
+    return `
             <div class="space-y-4">
                 <!-- 数据统计和搜索 -->
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white/80 backdrop-blur-sm rounded-lg p-4">
@@ -2292,23 +2297,23 @@ class UIManager {
                 ${totalPages > 1 ? this.generatePaginationHTML(totalPages) : ''}
             </div>
         `;
+  }
+
+  /**
+   * 生成分页控件HTML
+   */
+  generatePaginationHTML(totalPages) {
+    const current = this.pagination.currentPage;
+    const showPages = 5; // 显示的页码数量
+    let startPage = Math.max(1, current - Math.floor(showPages / 2));
+    let endPage = Math.min(totalPages, startPage + showPages - 1);
+
+    // 调整起始页
+    if (endPage - startPage + 1 < showPages) {
+      startPage = Math.max(1, endPage - showPages + 1);
     }
 
-    /**
-     * 生成分页控件HTML
-     */
-    generatePaginationHTML(totalPages) {
-        const current = this.pagination.currentPage;
-        const showPages = 5; // 显示的页码数量
-        let startPage = Math.max(1, current - Math.floor(showPages / 2));
-        let endPage = Math.min(totalPages, startPage + showPages - 1);
-
-        // 调整起始页
-        if (endPage - startPage + 1 < showPages) {
-            startPage = Math.max(1, endPage - showPages + 1);
-        }
-
-        let paginationHTML = `
+    let paginationHTML = `
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white/80 backdrop-blur-sm rounded-lg p-4">
                 <div class="text-sm text-gray-600">
                     第 ${current} 页，共 ${totalPages} 页
@@ -2316,8 +2321,8 @@ class UIManager {
                 <div class="flex items-center space-x-1">
         `;
 
-        // 首页按钮
-        paginationHTML += `
+    // 首页按钮
+    paginationHTML += `
             <button class="pagination-btn px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-50 hover:text-gray-700 transition-colors duration-150 ${current === 1 ? 'opacity-50 cursor-not-allowed' : ''}"
                     data-action="first" ${current === 1 ? 'disabled' : ''}>
                 <i class="fas fa-angle-double-left"></i>
@@ -2328,22 +2333,21 @@ class UIManager {
             </button>
         `;
 
-        // 页码按钮
-        for (let i = startPage; i <= endPage; i++) {
-            const isActive = i === current;
-            paginationHTML += `
-                <button class="pagination-btn px-3 py-2 text-sm font-medium border-t border-b border-gray-300 transition-colors duration-150 ${
-                    isActive
-                        ? 'bg-blue-500 text-white border-blue-500'
-                        : 'text-gray-500 bg-white hover:bg-gray-50 hover:text-gray-700'
-                }" data-action="${i}">
+    // 页码按钮
+    for (let i = startPage; i <= endPage; i++) {
+      const isActive = i === current;
+      paginationHTML += `
+                <button class="pagination-btn px-3 py-2 text-sm font-medium border-t border-b border-gray-300 transition-colors duration-150 ${isActive
+          ? 'bg-blue-500 text-white border-blue-500'
+          : 'text-gray-500 bg-white hover:bg-gray-50 hover:text-gray-700'
+        }" data-action="${i}">
                     ${i}
                 </button>
             `;
-        }
+    }
 
-        // 末页按钮
-        paginationHTML += `
+    // 末页按钮
+    paginationHTML += `
             <button class="pagination-btn px-3 py-2 text-sm font-medium text-gray-500 bg-white border-t border-b border-gray-300 hover:bg-gray-50 hover:text-gray-700 transition-colors duration-150 ${current === totalPages ? 'opacity-50 cursor-not-allowed' : ''}"
                     data-action="next" ${current === totalPages ? 'disabled' : ''}>
                 <i class="fas fa-angle-right"></i>
@@ -2354,290 +2358,393 @@ class UIManager {
             </button>
         `;
 
-        paginationHTML += `
+    paginationHTML += `
                 </div>
             </div>
         `;
 
-        return paginationHTML;
+    return paginationHTML;
+  }
+
+  /**
+   * 过滤数据
+   */
+  filterData(data, searchQuery) {
+    if (!searchQuery || searchQuery.trim() === '') {
+      return data;
     }
 
-    /**
-     * 过滤数据
-     */
-    filterData(data, searchQuery) {
-        if (!searchQuery || searchQuery.trim() === '') {
-            return data;
+    const query = searchQuery.toLowerCase().trim();
+    return data.filter(row => {
+      return Object.values(row).some(value => {
+        if (value === null || value === undefined) return false;
+        return value.toString().toLowerCase().includes(query);
+      });
+    });
+  }
+
+  /**
+   * 获取表格列定义
+   */
+  getTableColumns(tabName) {
+    const columns = {
+      userArchive: [
+        { key: 'topic_title', label: '主题标题', type: 'topic_title' },
+        { key: 'categories', label: '分类', type: 'text' },
+        { key: 'like_count', label: '点赞数', type: 'number' },
+        { key: 'reply_count', label: '回复数', type: 'number' },
+        { key: 'created_at', label: '发布时间', type: 'datetime' },
+        { key: 'is_pm', label: '私信', type: 'boolean' },
+        { key: 'actions', label: '操作', type: 'actions' }
+      ],
+      visits: [
+        { key: 'visited_at', label: '访问日期', type: 'date' },
+        { key: 'posts_read', label: '阅读帖数', type: 'number' },
+        { key: 'time_read', label: '阅读时长(秒)', type: 'number' },
+        { key: 'mobile', label: '移动端', type: 'boolean' }
+      ],
+      likes: [
+        { key: 'id', label: 'ID', type: 'number' },
+        { key: 'post_id', label: '帖子ID', type: 'number' },
+        { key: 'topic_id', label: '主题ID', type: 'number' },
+        { key: 'post_number', label: '帖子编号', type: 'number' },
+        { key: 'created_at', label: '点赞时间', type: 'datetime' },
+        { key: 'actions', label: '操作', type: 'actions' }
+      ],
+      userBadges: [
+        { key: 'badge_name', label: '徽章名称', type: 'text' },
+        { key: 'granted_at', label: '获得时间', type: 'datetime' },
+        { key: 'granted_manually', label: '手动授予', type: 'boolean' },
+        { key: 'seq', label: '序号', type: 'number' },
+        { key: 'actions', label: '操作', type: 'actions' }
+      ],
+      authTokens: [
+        { key: 'id', label: 'ID', type: 'number' },
+        { key: 'client_ip', label: 'IP地址', type: 'text' },
+        { key: 'user_agent', label: '用户代理', type: 'text' },
+        { key: 'created_at', label: '创建时间', type: 'datetime' },
+        { key: 'seen_at', label: '最后使用', type: 'datetime' }
+      ],
+      bookmarks: [
+        { key: 'name', label: '书签名称', type: 'text' },
+        { key: 'bookmarkable_type', label: '类型', type: 'text' },
+        { key: 'created_at', label: '创建时间', type: 'datetime' },
+        { key: 'reminder_at', label: '提醒时间', type: 'datetime' },
+        { key: 'actions', label: '操作', type: 'actions' }
+      ],
+      flags: [
+        { key: 'id', label: 'ID', type: 'number' },
+        { key: 'post_id', label: '帖子ID', type: 'number' },
+        { key: 'flag_type', label: '举报类型', type: 'text' },
+        { key: 'created_at', label: '举报时间', type: 'datetime' },
+        { key: 'targets_topic', label: '针对主题', type: 'boolean' },
+        { key: 'actions', label: '操作', type: 'actions' }
+      ],
+      queuedPosts: [
+        { key: 'id', label: 'ID', type: 'number' },
+        { key: 'verdict', label: '审核结果', type: 'text' },
+        { key: 'category_id', label: '分类ID', type: 'number' },
+        { key: 'topic_id', label: '主题ID', type: 'number' }
+      ]
+    };
+
+    return columns[tabName] || [];
+  }
+
+  /**
+   * 格式化表格值
+   */
+  formatTableValue(value, type, row = null, tabName = null) {
+    // Debug all calls to formatTableValue
+    if (type === 'actions') {
+      console.log('%c📋 formatTableValue called with type=actions', 'background: #FF5722; color: white; padding: 2px 8px;', {
+        value: value,
+        type: type,
+        tabName: tabName,
+        hasRow: !!row,
+        row: row
+      });
+    }
+
+    if (value === null || value === undefined || value === '') {
+      return '<span class="text-gray-400">-</span>';
+    }
+
+    // 处理特殊情况：likes表的topic_id字段，添加链接图标
+    if (tabName === 'likes' && type === 'number' && row && row.topic_id && value === row.topic_id) {
+      const url = row.post_number ?
+        `https://linux.do/t/topic/${row.topic_id}/${row.post_number}` :
+        `https://linux.do/t/topic/${row.topic_id}`;
+      return `
+                <div class="flex items-center gap-2">
+                    <span>${value}</span>
+                    <a href="${url}" target="_blank"
+                       class="inline-flex items-center text-red-600 hover:text-red-800 transition-colors"
+                       title="在新标签页打开">
+                        <i class="fas fa-external-link-alt text-xs"></i>
+                    </a>
+                </div>
+            `;
+    }
+
+    switch (type) {
+      case 'datetime':
+        try {
+          return new Date(value).toLocaleString('zh-CN');
+        } catch {
+          return value;
         }
-
-        const query = searchQuery.toLowerCase().trim();
-        return data.filter(row => {
-            return Object.values(row).some(value => {
-                if (value === null || value === undefined) return false;
-                return value.toString().toLowerCase().includes(query);
-            });
-        });
-    }
-
-    /**
-     * 获取表格列定义
-     */
-    getTableColumns(tabName) {
-        const columns = {
-            userArchive: [
-                { key: 'topic_title', label: '主题标题', type: 'text' },
-                { key: 'categories', label: '分类', type: 'text' },
-                { key: 'like_count', label: '点赞数', type: 'number' },
-                { key: 'reply_count', label: '回复数', type: 'number' },
-                { key: 'created_at', label: '发布时间', type: 'datetime' },
-                { key: 'is_pm', label: '私信', type: 'boolean' },
-                { key: 'actions', label: '操作', type: 'actions' }
-            ],
-            visits: [
-                { key: 'visited_at', label: '访问日期', type: 'date' },
-                { key: 'posts_read', label: '阅读帖数', type: 'number' },
-                { key: 'time_read', label: '阅读时长(秒)', type: 'number' },
-                { key: 'mobile', label: '移动端', type: 'boolean' }
-            ],
-            likes: [
-                { key: 'id', label: 'ID', type: 'number' },
-                { key: 'post_id', label: '帖子ID', type: 'number' },
-                { key: 'topic_id', label: '主题ID', type: 'number' },
-                { key: 'post_number', label: '帖子编号', type: 'number' },
-                { key: 'created_at', label: '点赞时间', type: 'datetime' },
-                { key: 'actions', label: '操作', type: 'actions' }
-            ],
-            userBadges: [
-                { key: 'badge_name', label: '徽章名称', type: 'text' },
-                { key: 'granted_at', label: '获得时间', type: 'datetime' },
-                { key: 'granted_manually', label: '手动授予', type: 'boolean' },
-                { key: 'seq', label: '序号', type: 'number' },
-                { key: 'actions', label: '操作', type: 'actions' }
-            ],
-            authTokens: [
-                { key: 'id', label: 'ID', type: 'number' },
-                { key: 'client_ip', label: 'IP地址', type: 'text' },
-                { key: 'user_agent', label: '用户代理', type: 'text' },
-                { key: 'created_at', label: '创建时间', type: 'datetime' },
-                { key: 'seen_at', label: '最后使用', type: 'datetime' }
-            ],
-            bookmarks: [
-                { key: 'name', label: '书签名称', type: 'text' },
-                { key: 'bookmarkable_type', label: '类型', type: 'text' },
-                { key: 'created_at', label: '创建时间', type: 'datetime' },
-                { key: 'reminder_at', label: '提醒时间', type: 'datetime' },
-                { key: 'actions', label: '操作', type: 'actions' }
-            ],
-            flags: [
-                { key: 'id', label: 'ID', type: 'number' },
-                { key: 'post_id', label: '帖子ID', type: 'number' },
-                { key: 'flag_type', label: '举报类型', type: 'text' },
-                { key: 'created_at', label: '举报时间', type: 'datetime' },
-                { key: 'targets_topic', label: '针对主题', type: 'boolean' },
-                { key: 'actions', label: '操作', type: 'actions' }
-            ],
-            queuedPosts: [
-                { key: 'id', label: 'ID', type: 'number' },
-                { key: 'verdict', label: '审核结果', type: 'text' },
-                { key: 'category_id', label: '分类ID', type: 'number' },
-                { key: 'topic_id', label: '主题ID', type: 'number' }
-            ]
-        };
-
-        return columns[tabName] || [];
-    }
-
-    /**
-     * 格式化表格值
-     */
-    formatTableValue(value, type, row = null, tabName = null) {
-        if (value === null || value === undefined || value === '') {
-            return '<span class="text-gray-400">-</span>';
+      case 'date':
+        try {
+          return new Date(value).toLocaleDateString('zh-CN');
+        } catch {
+          return value;
         }
-
-        switch (type) {
-            case 'datetime':
-                try {
-                    return new Date(value).toLocaleString('zh-CN');
-                } catch {
-                    return value;
-                }
-            case 'date':
-                try {
-                    return new Date(value).toLocaleDateString('zh-CN');
-                } catch {
-                    return value;
-                }
-            case 'boolean':
-                return value ? '<span class="text-green-600">是</span>' : '<span class="text-gray-400">否</span>';
-            case 'number':
-                return (typeof value === 'number' && !isNaN(value)) ? value.toLocaleString() : (value || 0);
-            case 'text':
-                if (typeof value === 'string' && value.length > 50) {
-                    return `<span title="${value.replace(/"/g, '&quot;')}">${value.substring(0, 50)}...</span>`;
-                }
-                return value;
-            case 'actions':
-                return this.generateActionButtons(row, tabName);
-            default:
-                return value;
+      case 'boolean':
+        return value ? '<span class="text-green-600">是</span>' : '<span class="text-gray-400">否</span>';
+      case 'number':
+        return (typeof value === 'number' && !isNaN(value)) ? value.toLocaleString() : (value || 0);
+      case 'topic_title':
+        // 特殊处理主题标题，添加链接图标
+        if (tabName === 'userArchive' && row && row.url) {
+          const urlMatch = row.url.match(/\/t\/topic\/(\d+)/);
+          if (urlMatch) {
+            const topicId = urlMatch[1];
+            return `
+              <div class="flex items-center gap-2">
+                <span>${value}</span>
+                <a href="https://linux.do/t/topic/${topicId}" target="_blank"
+                   class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+                   title="在新标签页打开">
+                    <i class="fas fa-external-link-alt text-xs"></i>
+                </a>
+              </div>
+            `;
+          }
         }
+        // 兼容旧格式
+        else if (tabName === 'userArchive' && row && row.topic_id) {
+          return `
+            <div class="flex items-center gap-2">
+              <span>${value}</span>
+              <a href="https://linux.do/t/topic/${row.topic_id}" target="_blank"
+                 class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+                 title="在新标签页打开">
+                  <i class="fas fa-external-link-alt text-xs"></i>
+              </a>
+            </div>
+          `;
+        }
+        return value;
+      case 'text':
+        if (typeof value === 'string' && value.length > 50) {
+          return `<span title="${value.replace(/"/g, '&quot;')}">${value.substring(0, 50)}...</span>`;
+        }
+        return value;
+      case 'actions':
+        return this.generateActionButtons(row, tabName);
+      default:
+        return value;
     }
+  }
 
-    /**
-     * 生成操作按钮
-     */
-    generateActionButtons(row, tabName) {
-        const buttons = [];
+  /**
+   * 生成操作按钮
+   */
+  generateActionButtons(row, tabName) {
+    // Enhanced debug logging
+    console.log('%c🔗 Action Buttons Debug', 'background: #4CAF50; color: white; padding: 2px 8px; border-radius: 3px;', {
+      tabName: tabName,
+      url: row?.url,
+      topic_title: row?.topic_title,
+      fullRow: row
+    });
 
-        switch (tabName) {
-            case 'userArchive':
-                // 主题链接
-                if (row.topic_id) {
-                    buttons.push(`
-                        <a href="https://linux.do/t/topic/${row.topic_id}" target="_blank"
-                           class="inline-flex items-center px-2 py-1 text-xs font-medium text-blue-600 bg-blue-100 rounded-md hover:bg-blue-200 transition-colors duration-200">
-                            <i class="fas fa-external-link-alt mr-1"></i>
-                            查看主题
-                        </a>
-                    `);
-                }
-                // 如果有帖子ID，添加帖子链接
-                if (row.post_id && row.post_number) {
-                    buttons.push(`
+    const buttons = [];
+
+    switch (tabName) {
+      case 'userArchive':
+        // 从URL中提取topic_id和post_number
+        // URL格式: https://linux.do/t/topic/640656/12
+        if (row.url) {
+          const urlMatch = row.url.match(/\/t\/topic\/(\d+)(?:\/(\d+))?/);
+          if (urlMatch) {
+            const topicId = urlMatch[1];
+            const postNumber = urlMatch[2];
+
+            console.log('Extracted from URL:', { topicId, postNumber });
+
+            // 总是添加主题链接
+            buttons.push(`
+              <a href="https://linux.do/t/topic/${topicId}" target="_blank"
+                 class="inline-flex items-center px-3 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition-colors duration-200"
+                 title="打开主题: ${row.topic_title || ''}">
+                  <i class="fas fa-external-link-alt"></i>
+              </a>
+            `);
+
+            // 如果有post_number，添加具体帖子链接
+            if (postNumber) {
+              buttons.push(`
+                <a href="${row.url}" target="_blank"
+                   class="inline-flex items-center px-3 py-1 text-xs font-medium text-white bg-green-600 rounded hover:bg-green-700 transition-colors duration-200"
+                   title="打开具体帖子">
+                    <i class="fas fa-link"></i>
+                </a>
+              `);
+            }
+          }
+        }
+        // 兼容旧数据格式（如果有topic_id字段）
+        else if (row.topic_id) {
+          console.log('Using topic_id field:', row.topic_id);
+          buttons.push(`
+            <a href="https://linux.do/t/topic/${row.topic_id}" target="_blank"
+               class="inline-flex items-center px-3 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition-colors duration-200"
+               title="在新标签页打开主题">
+                <i class="fas fa-external-link-alt"></i>
+            </a>
+          `);
+
+          if (row.post_id && row.post_number) {
+            buttons.push(`
+              <a href="https://linux.do/t/topic/${row.topic_id}/${row.post_number}" target="_blank"
+                 class="inline-flex items-center px-3 py-1 text-xs font-medium text-white bg-green-600 rounded hover:bg-green-700 transition-colors duration-200"
+                 title="在新标签页打开帖子">
+                  <i class="fas fa-link"></i>
+              </a>
+            `);
+          }
+        }
+        break;
+
+      case 'likes':
+        // 点赞的帖子链接 - 总是显示
+        if (row.topic_id && row.post_number) {
+          buttons.push(`
                         <a href="https://linux.do/t/topic/${row.topic_id}/${row.post_number}" target="_blank"
-                           class="inline-flex items-center px-2 py-1 text-xs font-medium text-green-600 bg-green-100 rounded-md hover:bg-green-200 transition-colors duration-200 ml-1">
-                            <i class="fas fa-link mr-1"></i>
-                            查看帖子
+                           class="inline-flex items-center px-3 py-1 text-xs font-medium text-white bg-red-600 rounded hover:bg-red-700 transition-colors duration-200"
+                           title="在新标签页打开帖子">
+                            <i class="fas fa-external-link-alt"></i>
                         </a>
                     `);
-                }
-                break;
-
-            case 'likes':
-                // 点赞的帖子链接
-                if (row.topic_id && row.post_number) {
-                    buttons.push(`
-                        <a href="https://linux.do/t/topic/${row.topic_id}/${row.post_number}" target="_blank"
-                           class="inline-flex items-center px-2 py-1 text-xs font-medium text-red-600 bg-red-100 rounded-md hover:bg-red-200 transition-colors duration-200">
-                            <i class="fas fa-heart mr-1"></i>
-                            查看帖子
-                        </a>
-                    `);
-                } else if (row.topic_id) {
-                    buttons.push(`
+        } else if (row.topic_id) {
+          buttons.push(`
                         <a href="https://linux.do/t/topic/${row.topic_id}" target="_blank"
-                           class="inline-flex items-center px-2 py-1 text-xs font-medium text-red-600 bg-red-100 rounded-md hover:bg-red-200 transition-colors duration-200">
-                            <i class="fas fa-external-link-alt mr-1"></i>
-                            查看主题
+                           class="inline-flex items-center px-3 py-1 text-xs font-medium text-white bg-red-600 rounded hover:bg-red-700 transition-colors duration-200"
+                           title="在新标签页打开主题">
+                            <i class="fas fa-external-link-alt"></i>
                         </a>
                     `);
-                }
-                break;
+        }
+        break;
 
-            case 'flags':
-                // 举报的帖子链接
-                if (row.post_id && row.topic_id) {
-                    buttons.push(`
+      case 'flags':
+        // 举报的帖子链接
+        if (row.post_id && row.topic_id) {
+          buttons.push(`
                         <a href="https://linux.do/p/${row.post_id}" target="_blank"
                            class="inline-flex items-center px-2 py-1 text-xs font-medium text-orange-600 bg-orange-100 rounded-md hover:bg-orange-200 transition-colors duration-200">
                             <i class="fas fa-flag mr-1"></i>
                             查看帖子
                         </a>
                     `);
-                }
-                break;
+        }
+        break;
 
-            case 'userBadges':
-                // 徽章信息链接
-                if (row.badge_id) {
-                    buttons.push(`
+      case 'userBadges':
+        // 徽章信息链接
+        if (row.badge_id) {
+          buttons.push(`
                         <a href="https://linux.do/badges/${row.badge_id}" target="_blank"
                            class="inline-flex items-center px-2 py-1 text-xs font-medium text-yellow-600 bg-yellow-100 rounded-md hover:bg-yellow-200 transition-colors duration-200">
                             <i class="fas fa-medal mr-1"></i>
                             查看徽章
                         </a>
                     `);
-                }
-                break;
+        }
+        break;
 
-            case 'bookmarks':
-                // 书签链接
-                if (row.bookmarkable_type === 'Post' && row.bookmarkable_id) {
-                    buttons.push(`
+      case 'bookmarks':
+        // 书签链接
+        if (row.bookmarkable_type === 'Post' && row.bookmarkable_id) {
+          buttons.push(`
                         <a href="https://linux.do/p/${row.bookmarkable_id}" target="_blank"
                            class="inline-flex items-center px-2 py-1 text-xs font-medium text-purple-600 bg-purple-100 rounded-md hover:bg-purple-200 transition-colors duration-200">
                             <i class="fas fa-bookmark mr-1"></i>
                             查看帖子
                         </a>
                     `);
-                } else if (row.bookmarkable_type === 'Topic' && row.bookmarkable_id) {
-                    buttons.push(`
+        } else if (row.bookmarkable_type === 'Topic' && row.bookmarkable_id) {
+          buttons.push(`
                         <a href="https://linux.do/t/topic/${row.bookmarkable_id}" target="_blank"
                            class="inline-flex items-center px-2 py-1 text-xs font-medium text-purple-600 bg-purple-100 rounded-md hover:bg-purple-200 transition-colors duration-200">
                             <i class="fas fa-external-link-alt mr-1"></i>
                             查看主题
                         </a>
                     `);
-                }
-                break;
+        }
+        break;
 
-            default:
-                // 通用的用户主页链接（如果有用户ID）
-                if (row.user_id) {
-                    buttons.push(`
+      default:
+        // 通用的用户主页链接（如果有用户ID）
+        if (row.user_id) {
+          buttons.push(`
                         <a href="https://linux.do/u/user/${row.user_id}" target="_blank"
                            class="inline-flex items-center px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors duration-200">
                             <i class="fas fa-user mr-1"></i>
                             查看用户
                         </a>
                     `);
-                }
         }
-
-        return buttons.length > 0 ?
-            `<div class="flex flex-wrap gap-1">${buttons.join('')}</div>` :
-            '<span class="text-gray-400">-</span>';
     }
 
-    /**
-     * 更新产品预览区域
-     * 显示用户的真实数据而不是演示数据
-     */
-    updateProductPreview(analysisData) {
-        console.log('🎨 更新产品预览区域');
+    const result = buttons.length > 0 ?
+      `<div class="flex flex-wrap gap-1">${buttons.join('')}</div>` :
+      '<span class="text-gray-400">-</span>';
 
-        const previewContent = document.getElementById('previewContent');
-        if (!previewContent) {
-            console.warn('预览区域未找到');
-            return;
+    console.log(`Returning ${buttons.length} buttons for ${tabName}:`, result);
+    return result;
+  }
+
+  /**
+   * 更新产品预览区域
+   * 显示用户的真实数据而不是演示数据
+   */
+  updateProductPreview(analysisData) {
+    console.log('🎨 更新产品预览区域');
+
+    const previewContent = document.getElementById('previewContent');
+    if (!previewContent) {
+      console.warn('预览区域未找到');
+      return;
+    }
+
+    try {
+      const summary = analysisData.summary || {};
+      const user = summary.user || {};
+
+      // 使用现有的用户信息格式化逻辑
+      const formatValue = (value, type = 'text') => {
+        if (value === null || value === undefined || value === '') return '未知';
+        switch (type) {
+          case 'date':
+            try {
+              return new Date(value).toLocaleDateString('zh-CN');
+            } catch {
+              return value;
+            }
+          case 'time':
+            return Math.round(value / 3600) + ' 小时';
+          case 'boolean':
+            return value ? '是' : '否';
+          default:
+            return value;
         }
+      };
 
-        try {
-            const summary = analysisData.summary || {};
-            const user = summary.user || {};
-
-            // 使用现有的用户信息格式化逻辑
-            const formatValue = (value, type = 'text') => {
-                if (value === null || value === undefined || value === '') return '未知';
-                switch (type) {
-                    case 'date':
-                        try {
-                            return new Date(value).toLocaleDateString('zh-CN');
-                        } catch {
-                            return value;
-                        }
-                    case 'time':
-                        return Math.round(value / 3600) + ' 小时';
-                    case 'boolean':
-                        return value ? '是' : '否';
-                    default:
-                        return value;
-                }
-            };
-
-            // 构建用户信息预览（类似于用户数据概览）
-            const previewHtml = `
+      // 构建用户信息预览（类似于用户数据概览）
+      const previewHtml = `
                 <!-- 真实数据导航栏 -->
                 <div class="flex justify-between items-center mb-6">
                     <div class="flex items-center space-x-3">
@@ -2715,22 +2822,22 @@ class UIManager {
                 </div>
             `;
 
-            // 更新预览内容
-            previewContent.innerHTML = previewHtml;
+      // 更新预览内容
+      previewContent.innerHTML = previewHtml;
 
-            // 添加平滑过渡效果
-            previewContent.style.opacity = '0';
-            setTimeout(() => {
-                previewContent.style.transition = 'opacity 0.5s ease-in-out';
-                previewContent.style.opacity = '1';
-            }, 100);
+      // 添加平滑过渡效果
+      previewContent.style.opacity = '0';
+      setTimeout(() => {
+        previewContent.style.transition = 'opacity 0.5s ease-in-out';
+        previewContent.style.opacity = '1';
+      }, 100);
 
-            console.log('✅ 预览区域更新完成');
+      console.log('✅ 预览区域更新完成');
 
-        } catch (error) {
-            console.error('❌ 预览更新失败:', error);
-            // 如果出错，显示错误信息而不是崩溃
-            previewContent.innerHTML = `
+    } catch (error) {
+      console.error('❌ 预览更新失败:', error);
+      // 如果出错，显示错误信息而不是崩溃
+      previewContent.innerHTML = `
                 <div class="bg-red-50 border border-red-200 rounded-xl p-4">
                     <div class="text-center">
                         <i class="fas fa-exclamation-triangle text-red-500 text-2xl mb-2"></i>
@@ -2739,161 +2846,161 @@ class UIManager {
                     </div>
                 </div>
             `;
-        }
+    }
+  }
+
+  /**
+   * 渲染完整分析结果 - 增强版
+   */
+  renderAnalysisResults(analysisData) {
+    console.log('🎨 渲染完整分析结果');
+
+    // 保存当前数据
+    this.currentTabData = analysisData.detailedData;
+
+    // 更新产品预览区域（如果存在）
+    this.updateProductPreview(analysisData);
+
+    // 渲染增强的用户信息卡片
+    if (this.renderEnhancedUserInfo) {
+      this.renderEnhancedUserInfo(analysisData);
+    } else {
+      this.renderUserInfo(analysisData.summary.user);
     }
 
-    /**
-     * 渲染完整分析结果 - 增强版
-     */
-    renderAnalysisResults(analysisData) {
-        console.log('🎨 渲染完整分析结果');
-
-        // 保存当前数据
-        this.currentTabData = analysisData.detailedData;
-
-        // 更新产品预览区域（如果存在）
-        this.updateProductPreview(analysisData);
-
-        // 渲染增强的用户信息卡片
-        if (this.renderEnhancedUserInfo) {
-            this.renderEnhancedUserInfo(analysisData);
-        } else {
-            this.renderUserInfo(analysisData.summary.user);
-        }
-
-        // 渲染数据完整性评估
-        if (this.renderEnhancedDataCompleteness) {
-            this.renderEnhancedDataCompleteness(analysisData);
-        } else {
-            this.renderDataCompleteness(analysisData.summary.dataCompleteness);
-        }
-
-        // 渲染摘要卡片
-        this.renderSummaryCards(analysisData.summary);
-
-        // 渲染分类数据
-        this.renderCategoryData(analysisData.categoryData);
-
-        // 渲染徽章统计
-        this.renderBadgeStats(analysisData.badgeStats);
-
-        // 渲染徽章详细分析
-        if (analysisData.badgeDetailedAnalysis) {
-            this.renderBadgeDetailedAnalysis(analysisData.badgeDetailedAnalysis);
-        }
-
-        // 渲染用户权限和设置
-        if (analysisData.userPermissionsAndSettings) {
-            this.renderUserPermissionsAndSettings(analysisData.userPermissionsAndSettings);
-        }
-
-        // 渲染设备登录历史
-        if (analysisData.deviceLoginHistory) {
-            this.renderDeviceLoginHistory(analysisData.deviceLoginHistory);
-        }
-
-        // 渲染新增的分析部分
-        this.renderAuthTokensAnalysis(analysisData.authTokensAnalysis);
-        this.renderBookmarksAnalysis(analysisData.bookmarksAnalysis);
-        this.renderFlagsAnalysis(analysisData.flagsAnalysis);
-
-        // 初始化数据表格标签
-        this.initializeDataTableTabs(analysisData.detailedData);
-
-        // 更新标签计数
-        this.updateTabCounts(analysisData.detailedData);
-
-        // 渲染默认标签内容
-        this.renderTabContent(this.activeTab);
-
-        // 显示分析结果区域
-        this.showAnalysisResults();
-        this.showExportButton();
+    // 渲染数据完整性评估
+    if (this.renderEnhancedDataCompleteness) {
+      this.renderEnhancedDataCompleteness(analysisData);
+    } else {
+      this.renderDataCompleteness(analysisData.summary.dataCompleteness);
     }
 
-    /**
-     * 初始化数据表格标签
-     */
-    initializeDataTableTabs(detailedData) {
-        const tabs = [
-            { name: 'userArchive', label: '帖子主题', icon: 'fas fa-comment' },
-            { name: 'visits', label: '访问记录', icon: 'fas fa-eye' },
-            { name: 'likes', label: '点赞记录', icon: 'fas fa-heart' },
-            { name: 'userBadges', label: '徽章记录', icon: 'fas fa-trophy' },
-            { name: 'authTokens', label: '认证令牌', icon: 'fas fa-key' },
-            { name: 'bookmarks', label: '书签记录', icon: 'fas fa-bookmark' },
-            { name: 'flags', label: '举报记录', icon: 'fas fa-flag' },
-            { name: 'queuedPosts', label: '队列帖子', icon: 'fas fa-hourglass' }
-        ];
+    // 渲染摘要卡片
+    this.renderSummaryCards(analysisData.summary);
 
-        // 生成标签按钮HTML
-        const tabButtons = tabs.map(tab => {
-            const count = detailedData[tab.name]?.length || 0;
-            const activeClass = tab.name === this.activeTab ? 'active' : '';
-            return `
+    // 渲染分类数据
+    this.renderCategoryData(analysisData.categoryData);
+
+    // 渲染徽章统计
+    this.renderBadgeStats(analysisData.badgeStats);
+
+    // 渲染徽章详细分析
+    if (analysisData.badgeDetailedAnalysis) {
+      this.renderBadgeDetailedAnalysis(analysisData.badgeDetailedAnalysis);
+    }
+
+    // 渲染用户权限和设置
+    if (analysisData.userPermissionsAndSettings) {
+      this.renderUserPermissionsAndSettings(analysisData.userPermissionsAndSettings);
+    }
+
+    // 渲染设备登录历史
+    if (analysisData.deviceLoginHistory) {
+      this.renderDeviceLoginHistory(analysisData.deviceLoginHistory);
+    }
+
+    // 渲染新增的分析部分
+    this.renderAuthTokensAnalysis(analysisData.authTokensAnalysis);
+    this.renderBookmarksAnalysis(analysisData.bookmarksAnalysis);
+    this.renderFlagsAnalysis(analysisData.flagsAnalysis);
+
+    // 初始化数据表格标签
+    this.initializeDataTableTabs(analysisData.detailedData);
+
+    // 更新标签计数
+    this.updateTabCounts(analysisData.detailedData);
+
+    // 渲染默认标签内容
+    this.renderTabContent(this.activeTab);
+
+    // 显示分析结果区域
+    this.showAnalysisResults();
+    this.showExportButton();
+  }
+
+  /**
+   * 初始化数据表格标签
+   */
+  initializeDataTableTabs(detailedData) {
+    const tabs = [
+      { name: 'userArchive', label: '帖子主题', icon: 'fas fa-comment' },
+      { name: 'visits', label: '访问记录', icon: 'fas fa-eye' },
+      { name: 'likes', label: '点赞记录', icon: 'fas fa-heart' },
+      { name: 'userBadges', label: '徽章记录', icon: 'fas fa-trophy' },
+      { name: 'authTokens', label: '认证令牌', icon: 'fas fa-key' },
+      { name: 'bookmarks', label: '书签记录', icon: 'fas fa-bookmark' },
+      { name: 'flags', label: '举报记录', icon: 'fas fa-flag' },
+      { name: 'queuedPosts', label: '队列帖子', icon: 'fas fa-hourglass' }
+    ];
+
+    // 生成标签按钮HTML
+    const tabButtons = tabs.map(tab => {
+      const count = detailedData[tab.name]?.length || 0;
+      const activeClass = tab.name === this.activeTab ? 'active' : '';
+      return `
                 <button class="tab-button ${activeClass}" data-tab="${tab.name}">
                     <i class="${tab.icon} mr-1"></i>
                     ${tab.label}
                     <span class="ml-1 text-xs opacity-75" id="${tab.name}Count">(${count})</span>
                 </button>
             `;
-        }).join('');
+    }).join('');
 
-        // 插入到DOM
-        $('#dataTableTabs').html(tabButtons);
+    // 插入到DOM
+    $('#dataTableTabs').html(tabButtons);
 
-        // 设置默认活动标签
-        if (!this.activeTab || !detailedData[this.activeTab]) {
-            // 找到第一个有数据的标签
-            for (const tab of tabs) {
-                if (detailedData[tab.name] && detailedData[tab.name].length > 0) {
-                    this.activeTab = tab.name;
-                    break;
-                }
-            }
+    // 设置默认活动标签
+    if (!this.activeTab || !detailedData[this.activeTab]) {
+      // 找到第一个有数据的标签
+      for (const tab of tabs) {
+        if (detailedData[tab.name] && detailedData[tab.name].length > 0) {
+          this.activeTab = tab.name;
+          break;
         }
+      }
     }
+  }
 
-    /**
-     * 渲染已存储数据列表 - 带分页功能
-     */
-    renderStoredDataList(analyses) {
-        const listContainer = $('#storedDataList');
-        const section = $('#storedDataSection');
+  /**
+   * 渲染已存储数据列表 - 带分页功能
+   */
+  renderStoredDataList(analyses) {
+    const listContainer = $('#storedDataList');
+    const section = $('#storedDataSection');
 
-        if (!analyses || analyses.length === 0) {
-            listContainer.html(`
+    if (!analyses || analyses.length === 0) {
+      listContainer.html(`
                 <div class="text-center py-8 text-gray-500">
                     <div class="text-4xl mb-4">📭</div>
                     <p>暂无存储的数据</p>
                 </div>
             `);
-        } else {
-            // 初始化分页参数
-            if (!this.storedDataPagination) {
-                this.storedDataPagination = {
-                    currentPage: 1,
-                    pageSize: 5,
-                    totalItems: analyses.length
-                };
-            }
+    } else {
+      // 初始化分页参数
+      if (!this.storedDataPagination) {
+        this.storedDataPagination = {
+          currentPage: 1,
+          pageSize: 5,
+          totalItems: analyses.length
+        };
+      }
 
-            this.storedDataPagination.totalItems = analyses.length;
-            const totalPages = Math.ceil(analyses.length / this.storedDataPagination.pageSize);
-            const startIndex = (this.storedDataPagination.currentPage - 1) * this.storedDataPagination.pageSize;
-            const endIndex = Math.min(startIndex + this.storedDataPagination.pageSize, analyses.length);
-            const currentPageData = analyses.slice(startIndex, endIndex);
+      this.storedDataPagination.totalItems = analyses.length;
+      const totalPages = Math.ceil(analyses.length / this.storedDataPagination.pageSize);
+      const startIndex = (this.storedDataPagination.currentPage - 1) * this.storedDataPagination.pageSize;
+      const endIndex = Math.min(startIndex + this.storedDataPagination.pageSize, analyses.length);
+      const currentPageData = analyses.slice(startIndex, endIndex);
 
-            // 生成列表HTML
-            const listHTML = currentPageData.map(analysis => {
-                const timestamp = new Date(analysis.timestamp).toLocaleString('zh-CN');
-                const username = analysis.summary?.user?.username || '未知用户';
-                const posts = analysis.summary?.totalPosts || 0;
-                const badges = analysis.summary?.totalBadges || 0;
-                const visits = analysis.summary?.totalVisits || 0;
-                const likes = analysis.summary?.totalLikes || 0;
+      // 生成列表HTML
+      const listHTML = currentPageData.map(analysis => {
+        const timestamp = new Date(analysis.timestamp).toLocaleString('zh-CN');
+        const username = analysis.summary?.user?.username || '未知用户';
+        const posts = analysis.summary?.totalPosts || 0;
+        const badges = analysis.summary?.totalBadges || 0;
+        const visits = analysis.summary?.totalVisits || 0;
+        const likes = analysis.summary?.totalLikes || 0;
 
-                return `
+        return `
                     <div class="stored-data-item bg-white/90 rounded-xl p-4 border border-gray-200
                                 hover:bg-white hover:shadow-lg transition-all duration-200 cursor-pointer"
                          data-analysis-id="${analysis.id}"
@@ -2943,10 +3050,10 @@ class UIManager {
                         </div>
                     </div>
                 `;
-            }).join('');
+      }).join('');
 
-            // 生成分页控件HTML
-            const paginationHTML = totalPages > 1 ? `
+      // 生成分页控件HTML
+      const paginationHTML = totalPages > 1 ? `
                 <div class="flex items-center justify-between mt-6 px-2">
                     <div class="text-sm text-gray-600">
                         显示 ${startIndex + 1} - ${endIndex} 项，共 ${analyses.length} 项
@@ -2975,274 +3082,274 @@ class UIManager {
                 </div>
             ` : '';
 
-            // 组合HTML
-            const fullHTML = `
+      // 组合HTML
+      const fullHTML = `
                 <div class="space-y-4">
                     ${listHTML}
                 </div>
                 ${paginationHTML}
             `;
 
-            listContainer.html(fullHTML);
-        }
-
-        section.removeClass('hidden');
+      listContainer.html(fullHTML);
     }
 
-    /**
-     * 生成页码按钮
-     */
-    generatePageNumbers(currentPage, totalPages) {
-        let pages = [];
-        const maxVisible = 5;
+    section.removeClass('hidden');
+  }
 
-        if (totalPages <= maxVisible) {
-            for (let i = 1; i <= totalPages; i++) {
-                pages.push(i);
-            }
-        } else {
-            if (currentPage <= 3) {
-                pages = [1, 2, 3, 4, '...', totalPages];
-            } else if (currentPage >= totalPages - 2) {
-                pages = [1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
-            } else {
-                pages = [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages];
-            }
-        }
+  /**
+   * 生成页码按钮
+   */
+  generatePageNumbers(currentPage, totalPages) {
+    let pages = [];
+    const maxVisible = 5;
 
-        return pages.map(page => {
-            if (page === '...') {
-                return `<span class="px-3 py-1 text-gray-400">...</span>`;
-            }
-            const isActive = page === currentPage;
-            return `
+    if (totalPages <= maxVisible) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        pages = [1, 2, 3, 4, '...', totalPages];
+      } else if (currentPage >= totalPages - 2) {
+        pages = [1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+      } else {
+        pages = [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages];
+      }
+    }
+
+    return pages.map(page => {
+      if (page === '...') {
+        return `<span class="px-3 py-1 text-gray-400">...</span>`;
+      }
+      const isActive = page === currentPage;
+      return `
                 <button onclick="window.uiManager.goToStoredDataPage(${page})"
                         class="px-3 py-1 rounded-lg transition-all duration-200
                                ${isActive
-                                   ? 'bg-blue-500 text-white font-semibold'
-                                   : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50'}">
+          ? 'bg-blue-500 text-white font-semibold'
+          : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50'}">
                     ${page}
                 </button>
             `;
-        }).join('');
+    }).join('');
+  }
+
+  /**
+   * 切换已存储数据页面
+   */
+  changeStoredDataPage(direction) {
+    if (!this.storedDataPagination) return;
+
+    const newPage = this.storedDataPagination.currentPage + direction;
+    const totalPages = Math.ceil(this.storedDataPagination.totalItems / this.storedDataPagination.pageSize);
+
+    if (newPage >= 1 && newPage <= totalPages) {
+      this.storedDataPagination.currentPage = newPage;
+      window.app?.loadStoredData();
+    }
+  }
+
+  /**
+   * 跳转到指定页
+   */
+  goToStoredDataPage(page) {
+    if (!this.storedDataPagination) return;
+
+    this.storedDataPagination.currentPage = page;
+    window.app?.loadStoredData();
+  }
+
+  // ==== 保持原有的基础功能 ====
+
+  /**
+   * 设置拖拽上传
+   */
+  setupDragAndDrop() {
+    const uploadArea = $('#uploadArea');
+
+    uploadArea.on('dragover', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      uploadArea.addClass('drag-over');
+    });
+
+    uploadArea.on('dragleave', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      uploadArea.removeClass('drag-over');
+    });
+
+    uploadArea.on('drop', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      uploadArea.removeClass('drag-over');
+
+      const files = e.originalEvent.dataTransfer.files;
+      if (files.length > 0) {
+        window.app?.processFile(files[0]);
+      }
+    });
+
+    console.log('拖拽上传设置完成');
+  }
+
+  /**
+   * 处理键盘快捷键
+   */
+  handleKeyboardShortcuts(e) {
+    // Ctrl/Cmd + O: 打开文件
+    if ((e.ctrlKey || e.metaKey) && e.key === 'o') {
+      e.preventDefault();
+      $('#fileInput').click();
     }
 
-    /**
-     * 切换已存储数据页面
-     */
-    changeStoredDataPage(direction) {
-        if (!this.storedDataPagination) return;
-
-        const newPage = this.storedDataPagination.currentPage + direction;
-        const totalPages = Math.ceil(this.storedDataPagination.totalItems / this.storedDataPagination.pageSize);
-
-        if (newPage >= 1 && newPage <= totalPages) {
-            this.storedDataPagination.currentPage = newPage;
-            window.app?.loadStoredData();
-        }
+    // Ctrl/Cmd + E: 导出数据
+    if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+      e.preventDefault();
+      window.app?.exportCurrentAnalysis();
     }
 
-    /**
-     * 跳转到指定页
-     */
-    goToStoredDataPage(page) {
-        if (!this.storedDataPagination) return;
+    // Escape: 关闭模态框或覆盖层
+    if (e.key === 'Escape') {
+      this.hideLoading();
+      this.hideAllToasts();
+    }
+  }
 
-        this.storedDataPagination.currentPage = page;
-        window.app?.loadStoredData();
+  /**
+   * 显示进度条
+   */
+  showProgress(percent = 0, text = '处理中...') {
+    this.progressContainer.removeClass('hidden');
+    this.progressBar.css('width', `${percent}%`);
+    this.progressText.text(text);
+
+    if (percent > 0) {
+      this.progressBar.addClass('progress-bar-animated');
+    }
+  }
+
+  /**
+   * 隐藏进度条
+   */
+  hideProgress() {
+    this.progressContainer.addClass('hidden');
+    this.progressBar.removeClass('progress-bar-animated');
+  }
+
+  /**
+   * 更新进度
+   */
+  updateProgress(percent, text) {
+    this.progressBar.css('width', `${percent}%`);
+    if (text) {
+      this.progressText.text(text);
+    }
+  }
+
+  /**
+   * 显示状态消息
+   */
+  showStatus(message, type = 'info', duration = 5000) {
+    this.statusContainer.removeClass('hidden');
+
+    // 移除之前的样式类
+    this.statusMessage.removeClass('bg-green-100 text-green-800 border-green-200');
+    this.statusMessage.removeClass('bg-red-100 text-red-800 border-red-200');
+    this.statusMessage.removeClass('bg-blue-100 text-blue-800 border-blue-200');
+    this.statusMessage.removeClass('bg-yellow-100 text-yellow-800 border-yellow-200');
+
+    // 应用新的样式类
+    switch (type) {
+      case 'success':
+        this.statusMessage.addClass('bg-green-100 text-green-800 border-green-200');
+        break;
+      case 'error':
+        this.statusMessage.addClass('bg-red-100 text-red-800 border-red-200');
+        break;
+      case 'warning':
+        this.statusMessage.addClass('bg-yellow-100 text-yellow-800 border-yellow-200');
+        break;
+      default:
+        this.statusMessage.addClass('bg-blue-100 text-blue-800 border-blue-200');
     }
 
-    // ==== 保持原有的基础功能 ====
+    this.statusMessage.text(message);
 
-    /**
-     * 设置拖拽上传
-     */
-    setupDragAndDrop() {
-        const uploadArea = $('#uploadArea');
-
-        uploadArea.on('dragover', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            uploadArea.addClass('drag-over');
-        });
-
-        uploadArea.on('dragleave', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            uploadArea.removeClass('drag-over');
-        });
-
-        uploadArea.on('drop', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            uploadArea.removeClass('drag-over');
-
-            const files = e.originalEvent.dataTransfer.files;
-            if (files.length > 0) {
-                window.app?.processFile(files[0]);
-            }
-        });
-
-        console.log('拖拽上传设置完成');
+    // 自动隐藏
+    if (duration > 0) {
+      setTimeout(() => {
+        this.hideStatus();
+      }, duration);
     }
+  }
 
-    /**
-     * 处理键盘快捷键
-     */
-    handleKeyboardShortcuts(e) {
-        // Ctrl/Cmd + O: 打开文件
-        if ((e.ctrlKey || e.metaKey) && e.key === 'o') {
-            e.preventDefault();
-            $('#fileInput').click();
-        }
+  /**
+   * 隐藏状态消息
+   */
+  hideStatus() {
+    this.statusContainer.addClass('hidden');
+  }
 
-        // Ctrl/Cmd + E: 导出数据
-        if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
-            e.preventDefault();
-            window.app?.exportCurrentAnalysis();
-        }
+  /**
+   * 显示加载覆盖层
+   */
+  showLoading(text = '处理中...') {
+    this.loadingOverlay.find('span').text(text);
+    this.loadingOverlay.removeClass('hidden');
+  }
 
-        // Escape: 关闭模态框或覆盖层
-        if (e.key === 'Escape') {
-            this.hideLoading();
-            this.hideAllToasts();
-        }
+  /**
+   * 隐藏加载覆盖层
+   */
+  hideLoading() {
+    this.loadingOverlay.addClass('hidden');
+  }
+
+  /**
+   * 显示Toast通知
+   */
+  showToast(message, type = 'info', duration = 4000) {
+    const toast = this.createToast(message, type);
+    this.toastContainer.append(toast);
+
+    // 触发入场动画
+    setTimeout(() => {
+      toast.addClass('toast-enter-active').removeClass('toast-enter');
+    }, 10);
+
+    // 自动移除
+    setTimeout(() => {
+      this.removeToast(toast);
+    }, duration);
+
+    this.toastQueue.push(toast);
+
+    // 限制Toast数量
+    if (this.toastQueue.length > 3) {
+      this.removeToast(this.toastQueue.shift());
     }
+  }
 
-    /**
-     * 显示进度条
-     */
-    showProgress(percent = 0, text = '处理中...') {
-        this.progressContainer.removeClass('hidden');
-        this.progressBar.css('width', `${percent}%`);
-        this.progressText.text(text);
+  /**
+   * 创建Toast元素
+   */
+  createToast(message, type) {
+    const iconMap = {
+      success: '✅',
+      error: '❌',
+      warning: '⚠️',
+      info: 'ℹ️'
+    };
 
-        if (percent > 0) {
-            this.progressBar.addClass('progress-bar-animated');
-        }
-    }
+    const colorMap = {
+      success: 'bg-green-500',
+      error: 'bg-red-500',
+      warning: 'bg-yellow-500',
+      info: 'bg-blue-500'
+    };
 
-    /**
-     * 隐藏进度条
-     */
-    hideProgress() {
-        this.progressContainer.addClass('hidden');
-        this.progressBar.removeClass('progress-bar-animated');
-    }
-
-    /**
-     * 更新进度
-     */
-    updateProgress(percent, text) {
-        this.progressBar.css('width', `${percent}%`);
-        if (text) {
-            this.progressText.text(text);
-        }
-    }
-
-    /**
-     * 显示状态消息
-     */
-    showStatus(message, type = 'info', duration = 5000) {
-        this.statusContainer.removeClass('hidden');
-
-        // 移除之前的样式类
-        this.statusMessage.removeClass('bg-green-100 text-green-800 border-green-200');
-        this.statusMessage.removeClass('bg-red-100 text-red-800 border-red-200');
-        this.statusMessage.removeClass('bg-blue-100 text-blue-800 border-blue-200');
-        this.statusMessage.removeClass('bg-yellow-100 text-yellow-800 border-yellow-200');
-
-        // 应用新的样式类
-        switch (type) {
-            case 'success':
-                this.statusMessage.addClass('bg-green-100 text-green-800 border-green-200');
-                break;
-            case 'error':
-                this.statusMessage.addClass('bg-red-100 text-red-800 border-red-200');
-                break;
-            case 'warning':
-                this.statusMessage.addClass('bg-yellow-100 text-yellow-800 border-yellow-200');
-                break;
-            default:
-                this.statusMessage.addClass('bg-blue-100 text-blue-800 border-blue-200');
-        }
-
-        this.statusMessage.text(message);
-
-        // 自动隐藏
-        if (duration > 0) {
-            setTimeout(() => {
-                this.hideStatus();
-            }, duration);
-        }
-    }
-
-    /**
-     * 隐藏状态消息
-     */
-    hideStatus() {
-        this.statusContainer.addClass('hidden');
-    }
-
-    /**
-     * 显示加载覆盖层
-     */
-    showLoading(text = '处理中...') {
-        this.loadingOverlay.find('span').text(text);
-        this.loadingOverlay.removeClass('hidden');
-    }
-
-    /**
-     * 隐藏加载覆盖层
-     */
-    hideLoading() {
-        this.loadingOverlay.addClass('hidden');
-    }
-
-    /**
-     * 显示Toast通知
-     */
-    showToast(message, type = 'info', duration = 4000) {
-        const toast = this.createToast(message, type);
-        this.toastContainer.append(toast);
-
-        // 触发入场动画
-        setTimeout(() => {
-            toast.addClass('toast-enter-active').removeClass('toast-enter');
-        }, 10);
-
-        // 自动移除
-        setTimeout(() => {
-            this.removeToast(toast);
-        }, duration);
-
-        this.toastQueue.push(toast);
-
-        // 限制Toast数量
-        if (this.toastQueue.length > 3) {
-            this.removeToast(this.toastQueue.shift());
-        }
-    }
-
-    /**
-     * 创建Toast元素
-     */
-    createToast(message, type) {
-        const iconMap = {
-            success: '✅',
-            error: '❌',
-            warning: '⚠️',
-            info: 'ℹ️'
-        };
-
-        const colorMap = {
-            success: 'bg-green-500',
-            error: 'bg-red-500',
-            warning: 'bg-yellow-500',
-            info: 'bg-blue-500'
-        };
-
-        const toast = $(`
+    const toast = $(`
             <div class="toast-enter ${colorMap[type]} text-white px-6 py-4 rounded-lg shadow-lg mb-2 max-w-sm">
                 <div class="flex items-center">
                     <span class="text-xl mr-3">${iconMap[type]}</span>
@@ -3252,137 +3359,137 @@ class UIManager {
             </div>
         `);
 
-        return toast;
+    return toast;
+  }
+
+  /**
+   * 移除Toast
+   */
+  removeToast(toast) {
+    if (toast && toast.length) {
+      toast.addClass('toast-exit-active').removeClass('toast-enter-active');
+      setTimeout(() => {
+        toast.remove();
+      }, 300);
+
+      // 从队列中移除
+      const index = this.toastQueue.indexOf(toast);
+      if (index > -1) {
+        this.toastQueue.splice(index, 1);
+      }
     }
+  }
 
-    /**
-     * 移除Toast
-     */
-    removeToast(toast) {
-        if (toast && toast.length) {
-            toast.addClass('toast-exit-active').removeClass('toast-enter-active');
-            setTimeout(() => {
-                toast.remove();
-            }, 300);
+  /**
+   * 隐藏所有Toast
+   */
+  hideAllToasts() {
+    this.toastQueue.forEach(toast => this.removeToast(toast));
+    this.toastQueue = [];
+  }
 
-            // 从队列中移除
-            const index = this.toastQueue.indexOf(toast);
-            if (index > -1) {
-                this.toastQueue.splice(index, 1);
-            }
-        }
+  /**
+   * 显示确认对话框
+   */
+  showConfirmDialog(title, message, onConfirm, onCancel) {
+    if (confirm(`${title}\n\n${message}`)) {
+      if (onConfirm) onConfirm();
+    } else {
+      if (onCancel) onCancel();
     }
+  }
 
-    /**
-     * 隐藏所有Toast
-     */
-    hideAllToasts() {
-        this.toastQueue.forEach(toast => this.removeToast(toast));
-        this.toastQueue = [];
-    }
+  /**
+   * 显示分析结果
+   */
+  showAnalysisResults() {
+    const section = $('#analysisSection');
+    section.removeClass('hidden');
 
-    /**
-     * 显示确认对话框
-     */
-    showConfirmDialog(title, message, onConfirm, onCancel) {
-        if (confirm(`${title}\n\n${message}`)) {
-            if (onConfirm) onConfirm();
-        } else {
-            if (onCancel) onCancel();
-        }
-    }
+    // 滚动到结果区域
+    $('html, body').animate({
+      scrollTop: section.offset().top - 50
+    }, 800);
+  }
 
-    /**
-     * 显示分析结果
-     */
-    showAnalysisResults() {
-        const section = $('#analysisSection');
-        section.removeClass('hidden');
+  /**
+   * 隐藏分析结果
+   */
+  hideAnalysisResults() {
+    $('#analysisSection').addClass('hidden');
+  }
 
-        // 滚动到结果区域
-        $('html, body').animate({
-            scrollTop: section.offset().top - 50
-        }, 800);
-    }
+  /**
+   * 显示导出按钮
+   */
+  showExportButton() {
+    $('#exportBtn').removeClass('hidden');
+  }
 
-    /**
-     * 隐藏分析结果
-     */
-    hideAnalysisResults() {
-        $('#analysisSection').addClass('hidden');
-    }
+  /**
+   * 隐藏导出按钮
+   */
+  hideExportButton() {
+    $('#exportBtn').addClass('hidden');
+  }
 
-    /**
-     * 显示导出按钮
-     */
-    showExportButton() {
-        $('#exportBtn').removeClass('hidden');
-    }
+  /**
+   * 重置UI状态
+   */
+  resetUI() {
+    this.hideProgress();
+    this.hideStatus();
+    this.hideLoading();
+    this.hideAnalysisResults();
+    this.hideExportButton();
+    this.hideAllToasts();
+    $('#storedDataSection').addClass('hidden');
+    this.currentTabData = null;
+    // 初始化为'overview'标签
+    this.activeTab = 'overview';
+    this.resetPagination();
+  }
 
-    /**
-     * 隐藏导出按钮
-     */
-    hideExportButton() {
-        $('#exportBtn').addClass('hidden');
-    }
+  /**
+   * 获取UI状态
+   */
+  getUIState() {
+    return {
+      progressVisible: !this.progressContainer.hasClass('hidden'),
+      statusVisible: !this.statusContainer.hasClass('hidden'),
+      loadingVisible: !this.loadingOverlay.hasClass('hidden'),
+      analysisVisible: !$('#analysisSection').hasClass('hidden'),
+      exportButtonVisible: !$('#exportBtn').hasClass('hidden'),
+      storedDataVisible: !$('#storedDataSection').hasClass('hidden'),
+      toastCount: this.toastQueue.length,
+      activeTab: this.activeTab
+    };
+  }
 
-    /**
-     * 重置UI状态
-     */
-    resetUI() {
-        this.hideProgress();
-        this.hideStatus();
-        this.hideLoading();
-        this.hideAnalysisResults();
-        this.hideExportButton();
-        this.hideAllToasts();
-        $('#storedDataSection').addClass('hidden');
-        this.currentTabData = null;
-        // 初始化为'overview'标签
-        this.activeTab = 'overview';
-        this.resetPagination();
-    }
+  /**
+   * 设置主题（兼容性方法）
+   */
+  setAppTheme(theme = 'apple') {
+    // 调用新的主题设置方法
+    this.setTheme(theme, true);
+  }
 
-    /**
-     * 获取UI状态
-     */
-    getUIState() {
-        return {
-            progressVisible: !this.progressContainer.hasClass('hidden'),
-            statusVisible: !this.statusContainer.hasClass('hidden'),
-            loadingVisible: !this.loadingOverlay.hasClass('hidden'),
-            analysisVisible: !$('#analysisSection').hasClass('hidden'),
-            exportButtonVisible: !$('#exportBtn').hasClass('hidden'),
-            storedDataVisible: !$('#storedDataSection').hasClass('hidden'),
-            toastCount: this.toastQueue.length,
-            activeTab: this.activeTab
-        };
-    }
+  /**
+   * 获取当前主题
+   */
+  getTheme() {
+    return localStorage.getItem('app-theme') || 'apple';
+  }
 
-    /**
-     * 设置主题（兼容性方法）
-     */
-    setAppTheme(theme = 'apple') {
-        // 调用新的主题设置方法
-        this.setTheme(theme, true);
-    }
+  /**
+   * 渲染增强的用户信息卡片
+   */
+  renderEnhancedUserInfo(analysisData) {
+    const user = analysisData.summary.user;
+    const prefs = analysisData.detailedData.preferences || {};
 
-    /**
-     * 获取当前主题
-     */
-    getTheme() {
-        return localStorage.getItem('app-theme') || 'apple';
-    }
-
-    /**
-     * 渲染增强的用户信息卡片
-     */
-    renderEnhancedUserInfo(analysisData) {
-        const user = analysisData.summary.user;
-        const prefs = analysisData.detailedData.preferences || {};
-
-        // 基本信息部分
-        const basicInfoHTML = `
+    // 基本信息部分
+    const basicInfoHTML = `
             <div class="flex items-start space-x-6">
                 <!-- 头像 -->
                 <div class="flex-shrink-0">
@@ -3424,21 +3531,21 @@ class UIManager {
             </div>
         `;
 
-        // 统计数据卡片
-        const statsCards = [
-            { icon: 'fa-edit', label: '发帖数', value: user.post_count || 0, color: 'blue' },
-            { icon: 'fa-heart', label: '获赞数', value: user.likes_received || 0, color: 'red' },
-            { icon: 'fa-thumbs-up', label: '送赞数', value: user.likes_given || 0, color: 'pink' },
-            { icon: 'fa-medal', label: '徽章数', value: user.badge_count || 0, color: 'yellow' },
-            { icon: 'fa-clock', label: '阅读时长', value: this.formatReadTime(user.time_read || 0), color: 'green' },
-            { icon: 'fa-calendar-check', label: '访问天数', value: user.days_visited || 0, color: 'purple' },
-            { icon: 'fa-eye', label: '主页访问', value: user.profile_view_count || 0, color: 'indigo' },
-            { icon: 'fa-users', label: '关注者', value: user.total_followers || 0, color: 'cyan' },
-            { icon: 'fa-user-plus', label: '关注中', value: user.total_following || 0, color: 'teal' },
-            { icon: 'fa-trophy', label: '积分', value: user.gamification_score || 0, color: 'orange' }
-        ];
+    // 统计数据卡片
+    const statsCards = [
+      { icon: 'fa-edit', label: '发帖数', value: user.post_count || 0, color: 'blue' },
+      { icon: 'fa-heart', label: '获赞数', value: user.likes_received || 0, color: 'red' },
+      { icon: 'fa-thumbs-up', label: '送赞数', value: user.likes_given || 0, color: 'pink' },
+      { icon: 'fa-medal', label: '徽章数', value: user.badge_count || 0, color: 'yellow' },
+      { icon: 'fa-clock', label: '阅读时长', value: this.formatReadTime(user.time_read || 0), color: 'green' },
+      { icon: 'fa-calendar-check', label: '访问天数', value: user.days_visited || 0, color: 'purple' },
+      { icon: 'fa-eye', label: '主页访问', value: user.profile_view_count || 0, color: 'indigo' },
+      { icon: 'fa-users', label: '关注者', value: user.total_followers || 0, color: 'cyan' },
+      { icon: 'fa-user-plus', label: '关注中', value: user.total_following || 0, color: 'teal' },
+      { icon: 'fa-trophy', label: '积分', value: user.gamification_score || 0, color: 'orange' }
+    ];
 
-        const statsHTML = statsCards.map(card => `
+    const statsHTML = statsCards.map(card => `
             <div class="bg-white/10 rounded-xl p-4 backdrop-blur-sm hover:bg-white/15 transition-all duration-200">
                 <div class="flex items-center justify-between mb-2">
                     <i class="fas ${card.icon} text-${card.color}-400"></i>
@@ -3448,19 +3555,19 @@ class UIManager {
             </div>
         `).join('');
 
-        // 权限和设置
-        const permissions = [
-            { key: 'admin', label: '管理员', icon: 'fa-user-shield' },
-            { key: 'moderator', label: '版主', icon: 'fa-user-tie' },
-            { key: 'can_send_private_messages', label: '私信', icon: 'fa-envelope' },
-            { key: 'can_edit', label: '编辑', icon: 'fa-edit' },
-            { key: 'can_upload_profile_header', label: '上传背景', icon: 'fa-image' },
-            { key: 'second_factor_enabled', label: '二次验证', icon: 'fa-shield-alt' }
-        ];
+    // 权限和设置
+    const permissions = [
+      { key: 'admin', label: '管理员', icon: 'fa-user-shield' },
+      { key: 'moderator', label: '版主', icon: 'fa-user-tie' },
+      { key: 'can_send_private_messages', label: '私信', icon: 'fa-envelope' },
+      { key: 'can_edit', label: '编辑', icon: 'fa-edit' },
+      { key: 'can_upload_profile_header', label: '上传背景', icon: 'fa-image' },
+      { key: 'second_factor_enabled', label: '二次验证', icon: 'fa-shield-alt' }
+    ];
 
-        const permissionsHTML = permissions.map(perm => {
-            const enabled = user[perm.key] || false;
-            return `
+    const permissionsHTML = permissions.map(perm => {
+      const enabled = user[perm.key] || false;
+      return `
                 <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg">
                     <div class="flex items-center space-x-3">
                         <i class="fas ${perm.icon} text-white/60"></i>
@@ -3471,25 +3578,25 @@ class UIManager {
                     </span>
                 </div>
             `;
-        }).join('');
+    }).join('');
 
-        // 更新DOM
-        $('#userBasicInfo').html(basicInfoHTML);
-        $('#userStatsGrid').html(statsHTML);
-        $('#userPermissions').html(permissionsHTML);
-    }
+    // 更新DOM
+    $('#userBasicInfo').html(basicInfoHTML);
+    $('#userStatsGrid').html(statsHTML);
+    $('#userPermissions').html(permissionsHTML);
+  }
 
-    /**
-     * 渲染增强的数据完整性评估
-     */
-    renderEnhancedDataCompleteness(analysisData) {
-        const files = analysisData.metadata?.fileList || [];
-        const totalPossibleFiles = 14; // 所有可能的文件数
-        const foundFiles = files.filter(f => f.isRequired || f.isOptional).length;
-        const completeness = Math.round((foundFiles / totalPossibleFiles) * 100);
+  /**
+   * 渲染增强的数据完整性评估
+   */
+  renderEnhancedDataCompleteness(analysisData) {
+    const files = analysisData.metadata?.fileList || [];
+    const totalPossibleFiles = 14; // 所有可能的文件数
+    const foundFiles = files.filter(f => f.isRequired || f.isOptional).length;
+    const completeness = Math.round((foundFiles / totalPossibleFiles) * 100);
 
-        // 进度条
-        const progressHTML = `
+    // 进度条
+    const progressHTML = `
             <div class="mb-4">
                 <div class="flex justify-between items-center mb-2">
                     <span class="text-white font-semibold">整体完整度</span>
@@ -3502,33 +3609,33 @@ class UIManager {
             </div>
         `;
 
-        // 文件列表
-        const requiredFiles = [
-            'preferences.json', 'user_archive.csv'
-        ];
+    // 文件列表
+    const requiredFiles = [
+      'preferences.json', 'user_archive.csv'
+    ];
 
-        const optionalFiles = [
-            'visits.csv', 'likes.csv', 'badges.csv', 'auth_tokens.csv',
-            'auth_token_logs.csv', 'bookmarks.csv', 'category_preferences.csv',
-            'flags.csv', 'queued_posts.csv', 'user_badges.csv'
-        ];
+    const optionalFiles = [
+      'visits.csv', 'likes.csv', 'badges.csv', 'auth_tokens.csv',
+      'auth_token_logs.csv', 'bookmarks.csv', 'category_preferences.csv',
+      'flags.csv', 'queued_posts.csv', 'user_badges.csv'
+    ];
 
-        const fileStatusHTML = `
+    const fileStatusHTML = `
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <h5 class="text-white/80 font-semibold mb-3 text-sm">必需文件</h5>
                     <div class="space-y-2">
                         ${requiredFiles.map(fileName => {
-                            const found = files.some(f => f.basename === fileName);
-                            return `
+      const found = files.some(f => f.basename === fileName);
+      return `
                                 <div class="flex items-center justify-between p-2 bg-white/5 rounded-lg">
                                     <span class="text-white/70 text-sm">${fileName}</span>
                                     ${found ?
-                                        '<i class="fas fa-check-circle text-green-400"></i>' :
-                                        '<i class="fas fa-times-circle text-red-400"></i>'}
+          '<i class="fas fa-check-circle text-green-400"></i>' :
+          '<i class="fas fa-times-circle text-red-400"></i>'}
                                 </div>
                             `;
-                        }).join('')}
+    }).join('')}
                     </div>
                 </div>
 
@@ -3536,46 +3643,46 @@ class UIManager {
                     <h5 class="text-white/80 font-semibold mb-3 text-sm">可选文件</h5>
                     <div class="space-y-2 max-h-48 overflow-y-auto">
                         ${optionalFiles.map(fileName => {
-                            const file = files.find(f => f.basename === fileName);
-                            const found = !!file;
-                            return `
+      const file = files.find(f => f.basename === fileName);
+      const found = !!file;
+      return `
                                 <div class="flex items-center justify-between p-2 bg-white/5 rounded-lg">
                                     <span class="text-white/70 text-sm">${fileName}</span>
                                     ${found ?
-                                        `<span class="text-green-400 text-xs">${this.formatFileSize(file.size)}</span>` :
-                                        '<i class="fas fa-minus-circle text-gray-500"></i>'}
+          `<span class="text-green-400 text-xs">${this.formatFileSize(file.size)}</span>` :
+          '<i class="fas fa-minus-circle text-gray-500"></i>'}
                                 </div>
                             `;
-                        }).join('')}
+    }).join('')}
                     </div>
                 </div>
             </div>
         `;
 
-        $('#completenessProgress').html(progressHTML);
-        $('#filesList').html(fileStatusHTML);
-    }
+    $('#completenessProgress').html(progressHTML);
+    $('#filesList').html(fileStatusHTML);
+  }
 
-    /**
-     * 格式化阅读时间
-     */
-    formatReadTime(seconds) {
-        const hours = Math.floor(seconds / 3600);
-        const days = Math.floor(hours / 24);
-        if (days > 0) {
-            return `${days}天${hours % 24}小时`;
-        }
-        return `${hours}小时`;
+  /**
+   * 格式化阅读时间
+   */
+  formatReadTime(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const days = Math.floor(hours / 24);
+    if (days > 0) {
+      return `${days}天${hours % 24}小时`;
     }
+    return `${hours}小时`;
+  }
 
-    /**
-     * 格式化文件大小
-     */
-    formatFileSize(bytes) {
-        if (bytes < 1024) return bytes + ' B';
-        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-        return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-    }
+  /**
+   * 格式化文件大小
+   */
+  formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
 }
 
 // 导出为全局变量
