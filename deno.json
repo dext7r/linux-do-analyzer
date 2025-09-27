@@ -9,6 +9,7 @@
     "type": "git",
     "url": "https://github.com/dext7r/linux-do-analyzer.git"
   },
+  "exports": "./main.ts",
   "keywords": [
     "linux.do",
     "data-analysis",
@@ -18,9 +19,9 @@
     "client-side"
   ],
   "tasks": {
-    "serve": "deno run --allow-net --allow-read jsr:@std/http/file-server --port=8080 .",
-    "dev": "deno run --allow-net --allow-read --watch jsr:@std/http/file-server --port=8080 .",
-    "preview": "deno run --allow-net --allow-read jsr:@std/http/file-server --port=3000 .",
+    "serve": "deno run --allow-net --allow-read main.ts --port=8080 .",
+    "dev": "deno run --allow-net --allow-read --watch main.ts --port=8080 .",
+    "preview": "deno run --allow-net --allow-read main.ts --port=3000 .",
     "lint": "deno lint js/ css/",
     "fmt": "deno fmt js/ css/ *.md *.json",
     "check": "deno check js/*.js",
@@ -30,8 +31,17 @@
   },
   "fmt": {
     "files": {
-      "include": ["js/", "css/", "*.md", "*.json"],
-      "exclude": ["dist/", ".temp/", "node_modules/"]
+      "include": [
+        "js/",
+        "css/",
+        "*.md",
+        "*.json"
+      ],
+      "exclude": [
+        "dist/",
+        ".temp/",
+        "node_modules/"
+      ]
     },
     "options": {
       "indentWidth": 4,
@@ -43,25 +53,40 @@
   },
   "lint": {
     "files": {
-      "include": ["js/", "css/"],
-      "exclude": ["dist/", ".temp/", "node_modules/"]
+      "include": [
+        "js/",
+        "css/"
+      ],
+      "exclude": [
+        "dist/",
+        ".temp/",
+        "node_modules/"
+      ]
     },
     "rules": {
-      "tags": ["recommended"],
-      "exclude": ["no-unused-vars"]
+      "tags": [
+        "recommended"
+      ],
+      "exclude": [
+        "no-unused-vars"
+      ]
     }
   },
   "compilerOptions": {
-    "allowJs": true,
-    "lib": ["dom", "dom.iterable", "dom.asynciterable", "deno.ns"],
-    "strict": false,
-    "target": "ES2022"
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "dom.asynciterable",
+      "deno.ns"
+    ],
+    "strict": false
   },
   "imports": {
     "@std/http": "jsr:@std/http@^1.0.0",
     "@std/path": "jsr:@std/path@^1.0.0",
     "@std/fs": "jsr:@std/fs@^1.0.0",
-    "@std/encoding": "jsr:@std/encoding@^1.0.0"
+    "@std/encoding": "jsr:@std/encoding@^1.0.0",
+    "@std/assert": "jsr:@std/assert@1"
   },
   "exclude": [
     "dist/",
