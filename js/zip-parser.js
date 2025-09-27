@@ -50,12 +50,20 @@ class ZipParser {
                 if (!fileObj.dir) {
                     console.log(`📄 提取文件: ${filename}`);
                     const content = await fileObj.async('text');
+
+                    // 获取文件名（去除路径）
+                    const basename = filename.split('/').pop();
+
+                    // 同时保存完整路径和基础文件名的映射
                     files[filename] = content;
+                    files[basename] = content;
+
                     fileList.push({
                         name: filename,
+                        basename: basename,
                         size: content.length,
-                        isRequired: this.supportedFiles.required.includes(filename),
-                        isOptional: this.supportedFiles.optional.includes(filename)
+                        isRequired: this.supportedFiles.required.includes(basename),
+                        isOptional: this.supportedFiles.optional.includes(basename)
                     });
                 }
             }

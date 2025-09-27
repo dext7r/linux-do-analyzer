@@ -3,7 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>使用帮助 - Linux.do 数据分析工具</title>
+
+    <!-- SEO Meta Tags -->
+    <title>使用帮助 - Linux.do 数据分析工具 | 详细使用指南</title>
+    <meta name="description" content="Linux.do 数据分析工具完整使用指南，包含数据导出、上传分析、功能介绍等详细教程。学会如何获取和分析您的论坛活动数据。">
+    <meta name="keywords" content="Linux.do使用教程,数据分析指南,论坛数据导出,使用帮助,操作说明,数据可视化教程">
+    <meta name="author" content="Linux.do Community">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="使用帮助 - Linux.do 数据分析工具">
+    <meta property="og:description" content="详细的使用指南，教您如何使用 Linux.do 数据分析工具">
+    <meta property="og:site_name" content="Linux.do Analyzer">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="使用帮助 - Linux.do 数据分析工具">
+    <meta name="twitter:description" content="详细的使用指南和操作教程">
 
     <!-- TailwindCSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -13,6 +30,86 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css">
+
+    <!-- 添加动画样式 -->
+    <style>
+        /* 淡入动画 */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInLeft {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes fadeInRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.4); }
+            50% { box-shadow: 0 0 40px rgba(99, 102, 241, 0.6); }
+        }
+
+        .animate-fade-in-up { animation: fadeInUp 0.8s ease-out; }
+        .animate-fade-in-left { animation: fadeInLeft 0.8s ease-out; }
+        .animate-fade-in-right { animation: fadeInRight 0.8s ease-out; }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+
+        /* 卡片悬停效果 */
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-hover:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        /* 渐变背景 */
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* 按钮效果 */
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        /* 滚动动画 */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.6s ease;
+        }
+
+        .scroll-reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
 </head>
 <body class="min-h-screen" style="background: var(--background-gradient)">
 
@@ -62,160 +159,195 @@
     <div class="container mx-auto px-4 py-8 max-w-7xl">
 
         <!-- Hero Header -->
-        <header class="text-center mb-16">
-            <div class="relative p-12 rounded-3xl shadow-2xl overflow-hidden" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+        <header class="text-center mb-16 animate-fade-in-up">
+            <div class="relative p-12 rounded-3xl shadow-2xl overflow-hidden card-hover" style="background: var(--card-bg); border: 1px solid var(--border-color);">
                 <!-- 背景装饰 -->
-                <div class="absolute inset-0 bg-gradient-to-br from-indigo-50/30 to-purple-50/30"></div>
+                <div class="absolute inset-0 bg-gradient-to-br from-indigo-50/30 via-purple-50/20 to-pink-50/30"></div>
+
+                <!-- 动态粒子背景 -->
+                <div class="absolute inset-0 overflow-hidden">
+                    <div class="absolute top-10 left-10 w-2 h-2 bg-indigo-400 rounded-full animate-float opacity-60"></div>
+                    <div class="absolute top-20 right-20 w-3 h-3 bg-purple-400 rounded-full animate-float opacity-40" style="animation-delay: 1s;"></div>
+                    <div class="absolute bottom-20 left-20 w-2 h-2 bg-pink-400 rounded-full animate-float opacity-50" style="animation-delay: 2s;"></div>
+                    <div class="absolute bottom-10 right-10 w-1.5 h-1.5 bg-indigo-300 rounded-full animate-float opacity-70" style="animation-delay: 0.5s;"></div>
+                </div>
 
                 <div class="relative z-10">
                     <!-- 现代化图标设计 -->
                     <div class="relative mb-8">
-                        <div class="w-24 h-24 mx-auto bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-600 rounded-3xl flex items-center justify-center shadow-2xl">
-                            <i class="fas fa-graduation-cap text-white text-3xl"></i>
+                        <div class="w-28 h-28 mx-auto bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-600 rounded-3xl flex items-center justify-center shadow-2xl animate-pulse-glow">
+                            <i class="fas fa-graduation-cap text-white text-4xl"></i>
                         </div>
                         <!-- 装饰性徽章 -->
-                        <div class="absolute -top-2 -right-2 w-8 h-8 bg-green-400 rounded-full flex items-center justify-center shadow-lg">
-                            <i class="fas fa-check text-white text-sm"></i>
+                        <div class="absolute -top-3 -right-3 w-10 h-10 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center shadow-xl animate-float">
+                            <i class="fas fa-check text-white text-lg"></i>
                         </div>
+                        <!-- 额外装饰 -->
+                        <div class="absolute -bottom-2 -left-2 w-6 h-6 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full animate-float opacity-80" style="animation-delay: 1.5s;"></div>
                     </div>
 
-                    <h1 class="text-5xl font-black mb-6 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    <h1 class="text-6xl font-black mb-8 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent leading-tight">
                         使用帮助
                     </h1>
-                    <p class="text-xl leading-relaxed max-w-3xl mx-auto" style="color: var(--text-secondary);">
-                        <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
+                    <p class="text-xl leading-relaxed max-w-4xl mx-auto mb-8" style="color: var(--text-secondary);">
+                        <i class="fas fa-lightbulb text-yellow-500 mr-3 text-2xl"></i>
                         从数据导出到报告生成，一站式指南助您轻松掌握所有功能
                     </p>
 
                     <!-- 统计信息 -->
-                    <div class="flex justify-center items-center space-x-8 mt-8">
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-indigo-600">3</div>
-                            <div class="text-sm" style="color: var(--text-secondary);">简单步骤</div>
+                    <div class="flex justify-center items-center space-x-12 mt-10">
+                        <div class="text-center group">
+                            <div class="text-3xl font-black text-indigo-600 mb-2 group-hover:scale-110 transition-transform duration-300">3</div>
+                            <div class="text-sm font-medium" style="color: var(--text-secondary);">简单步骤</div>
                         </div>
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-purple-600">8+</div>
-                            <div class="text-sm" style="color: var(--text-secondary);">分析维度</div>
+                        <div class="text-center group">
+                            <div class="text-3xl font-black text-purple-600 mb-2 group-hover:scale-110 transition-transform duration-300">8+</div>
+                            <div class="text-sm font-medium" style="color: var(--text-secondary);">分析维度</div>
                         </div>
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-pink-600">100%</div>
-                            <div class="text-sm" style="color: var(--text-secondary);">数据安全</div>
+                        <div class="text-center group">
+                            <div class="text-3xl font-black text-pink-600 mb-2 group-hover:scale-110 transition-transform duration-300">100%</div>
+                            <div class="text-sm font-medium" style="color: var(--text-secondary);">数据安全</div>
                         </div>
+                    </div>
+
+                    <!-- 快速行动按钮 -->
+                    <div class="mt-10">
+                        <a href="index.html" class="inline-flex items-center px-8 py-4 rounded-2xl text-white font-bold text-lg btn-primary shadow-xl">
+                            <i class="fas fa-rocket mr-3"></i>
+                            立即开始分析
+                        </a>
                     </div>
                 </div>
             </div>
         </header>
 
         <!-- 快速开始 - 现代化设计 -->
-        <section class="mb-16">
+        <section class="mb-16 scroll-reveal">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold mb-4" style="color: var(--text-color);">
-                    <i class="fas fa-rocket text-indigo-600 mr-3"></i>
+                <h2 class="text-4xl font-bold mb-6 gradient-text">
+                    <i class="fas fa-rocket text-indigo-600 mr-4 animate-float"></i>
                     快速开始
                 </h2>
-                <p class="text-lg" style="color: var(--text-secondary);">三个简单步骤，立即开始分析您的数据</p>
+                <p class="text-xl max-w-2xl mx-auto" style="color: var(--text-secondary);">
+                    三个简单步骤，立即开始分析您的数据
+                </p>
             </div>
 
             <div class="grid md:grid-cols-3 gap-8">
                 <!-- 步骤1 - 现代化卡片设计 -->
-                <div class="group">
-                    <div class="relative p-8 rounded-2xl transition-all duration-300 hover:shadow-xl hover:-translate-y-2" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                <div class="group animate-fade-in-left">
+                    <div class="relative p-8 rounded-3xl transition-all duration-500 hover:shadow-2xl hover:-translate-y-4 card-hover" style="background: var(--card-bg); border: 1px solid var(--border-color);">
                         <!-- 步骤指示器 -->
-                        <div class="absolute -top-4 left-6">
-                            <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                        <div class="absolute -top-5 left-8">
+                            <div class="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-black text-lg shadow-xl animate-pulse-glow">
                                 1
                             </div>
                         </div>
 
                         <!-- 图标区域 -->
-                        <div class="text-center mb-6">
-                            <div class="w-16 h-16 mx-auto bg-gradient-to-br from-indigo-500 to-blue-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                                <i class="fas fa-download text-white text-2xl"></i>
+                        <div class="text-center mb-8">
+                            <div class="w-20 h-20 mx-auto bg-gradient-to-br from-indigo-500 to-blue-600 rounded-3xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-500 shadow-xl">
+                                <i class="fas fa-download text-white text-3xl"></i>
                             </div>
-                            <h3 class="text-xl font-bold mb-3" style="color: var(--text-color);">获取数据</h3>
+                            <h3 class="text-2xl font-bold mb-4" style="color: var(--text-color);">获取数据</h3>
                         </div>
 
-                        <p class="text-base leading-relaxed text-center" style="color: var(--text-secondary);">
+                        <p class="text-base leading-relaxed text-center mb-6" style="color: var(--text-secondary);">
                             访问 Linux.do 个人设置页面，申请并下载您的个人数据档案
                         </p>
 
                         <!-- 操作链接 -->
-                        <div class="mt-6 text-center">
+                        <div class="text-center">
                             <a href="https://linux.do/my/preferences/account" target="_blank"
-                               class="inline-flex items-center text-indigo-600 hover:text-indigo-700 font-medium text-sm">
+                               class="inline-flex items-center px-6 py-3 rounded-xl text-white font-medium text-sm bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 transition-all duration-300 hover:-translate-y-1 shadow-lg">
                                 <i class="fas fa-external-link-alt mr-2"></i>
                                 前往论坛设置
                             </a>
                         </div>
+
+                        <!-- 装饰性元素 -->
+                        <div class="absolute top-4 right-4 w-3 h-3 bg-indigo-300 rounded-full animate-float opacity-50"></div>
+                        <div class="absolute bottom-4 left-4 w-2 h-2 bg-blue-300 rounded-full animate-float opacity-60" style="animation-delay: 1s;"></div>
                     </div>
                 </div>
 
                 <!-- 步骤2 -->
-                <div class="group">
-                    <div class="relative p-8 rounded-2xl transition-all duration-300 hover:shadow-xl hover:-translate-y-2" style="background: var(--card-bg); border: 1px solid var(--border-color);">
-                        <div class="absolute -top-4 left-6">
-                            <div class="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                <div class="group animate-fade-in-up" style="animation-delay: 0.2s;">
+                    <div class="relative p-8 rounded-3xl transition-all duration-500 hover:shadow-2xl hover:-translate-y-4 card-hover" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                        <div class="absolute -top-5 left-8">
+                            <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center text-white font-black text-lg shadow-xl animate-pulse-glow" style="animation-delay: 0.5s;">
                                 2
                             </div>
                         </div>
 
-                        <div class="text-center mb-6">
-                            <div class="w-16 h-16 mx-auto bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                                <i class="fas fa-upload text-white text-2xl"></i>
+                        <div class="text-center mb-8">
+                            <div class="w-20 h-20 mx-auto bg-gradient-to-br from-purple-500 to-pink-600 rounded-3xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-500 shadow-xl">
+                                <i class="fas fa-upload text-white text-3xl"></i>
                             </div>
-                            <h3 class="text-xl font-bold mb-3" style="color: var(--text-color);">上传分析</h3>
+                            <h3 class="text-2xl font-bold mb-4" style="color: var(--text-color);">上传分析</h3>
                         </div>
 
-                        <p class="text-base leading-relaxed text-center" style="color: var(--text-secondary);">
+                        <p class="text-base leading-relaxed text-center mb-6" style="color: var(--text-secondary);">
                             将下载的 ZIP 文件拖拽上传，系统自动解析并开始分析
                         </p>
 
-                        <div class="mt-6 text-center">
+                        <div class="text-center">
                             <a href="index.html"
-                               class="inline-flex items-center text-purple-600 hover:text-purple-700 font-medium text-sm">
+                               class="inline-flex items-center px-6 py-3 rounded-xl text-white font-medium text-sm bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 transition-all duration-300 hover:-translate-y-1 shadow-lg">
                                 <i class="fas fa-arrow-right mr-2"></i>
                                 开始上传
                             </a>
                         </div>
+
+                        <div class="absolute top-4 right-4 w-3 h-3 bg-purple-300 rounded-full animate-float opacity-50"></div>
+                        <div class="absolute bottom-4 left-4 w-2 h-2 bg-pink-300 rounded-full animate-float opacity-60" style="animation-delay: 1.5s;"></div>
                     </div>
                 </div>
 
                 <!-- 步骤3 -->
-                <div class="group">
-                    <div class="relative p-8 rounded-2xl transition-all duration-300 hover:shadow-xl hover:-translate-y-2" style="background: var(--card-bg); border: 1px solid var(--border-color);">
-                        <div class="absolute -top-4 left-6">
-                            <div class="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                <div class="group animate-fade-in-right" style="animation-delay: 0.4s;">
+                    <div class="relative p-8 rounded-3xl transition-all duration-500 hover:shadow-2xl hover:-translate-y-4 card-hover" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                        <div class="absolute -top-5 left-8">
+                            <div class="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center text-white font-black text-lg shadow-xl animate-pulse-glow" style="animation-delay: 1s;">
                                 3
                             </div>
                         </div>
 
-                        <div class="text-center mb-6">
-                            <div class="w-16 h-16 mx-auto bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                                <i class="fas fa-chart-bar text-white text-2xl"></i>
+                        <div class="text-center mb-8">
+                            <div class="w-20 h-20 mx-auto bg-gradient-to-br from-green-500 to-emerald-600 rounded-3xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-12 transition-transform duration-500 shadow-xl">
+                                <i class="fas fa-chart-bar text-white text-3xl"></i>
                             </div>
-                            <h3 class="text-xl font-bold mb-3" style="color: var(--text-color);">查看报告</h3>
+                            <h3 class="text-2xl font-bold mb-4" style="color: var(--text-color);">查看报告</h3>
                         </div>
 
-                        <p class="text-base leading-relaxed text-center" style="color: var(--text-secondary);">
+                        <p class="text-base leading-relaxed text-center mb-6" style="color: var(--text-secondary);">
                             自动生成包含图表、统计和深度洞察的专业分析报告
                         </p>
 
-                        <div class="mt-6 text-center">
-                            <span class="inline-flex items-center text-green-600 font-medium text-sm">
+                        <div class="text-center">
+                            <span class="inline-flex items-center px-6 py-3 rounded-xl text-white font-medium text-sm bg-gradient-to-r from-green-500 to-emerald-600 shadow-lg">
                                 <i class="fas fa-magic mr-2"></i>
                                 智能生成
                             </span>
                         </div>
+
+                        <div class="absolute top-4 right-4 w-3 h-3 bg-green-300 rounded-full animate-float opacity-50"></div>
+                        <div class="absolute bottom-4 left-4 w-2 h-2 bg-emerald-300 rounded-full animate-float opacity-60" style="animation-delay: 2s;"></div>
                     </div>
                 </div>
+            </div>
+
+            <!-- 连接线装饰 -->
+            <div class="hidden md:block relative -mt-8">
+                <div class="absolute top-0 left-1/3 w-1/3 h-px bg-gradient-to-r from-indigo-300 via-purple-300 to-green-300 opacity-30"></div>
             </div>
         </section>
 
         <!-- 详细步骤 -->
-        <section class="mb-8">
-            <div class="p-8 rounded-2xl" style="background: var(--card-bg); border: 1px solid var(--border-color);">
-                <h2 class="text-2xl font-bold mb-6 flex items-center" style="color: var(--text-color);">
-                    <i class="fas fa-list-ol text-green-500 mr-3"></i>
+        <section class="mb-8 scroll-reveal">
+            <div class="p-8 rounded-3xl card-hover" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                <h2 class="text-3xl font-bold mb-8 flex items-center" style="color: var(--text-color);">
+                    <i class="fas fa-list-ol text-green-500 mr-4 animate-float"></i>
                     详细操作步骤
                 </h2>
 
@@ -346,10 +478,10 @@
         </section>
 
         <!-- 功能介绍 -->
-        <section class="mb-8">
-            <div class="p-8 rounded-2xl" style="background: var(--card-bg); border: 1px solid var(--border-color);">
-                <h2 class="text-2xl font-bold mb-6 flex items-center" style="color: var(--text-color);">
-                    <i class="fas fa-star text-yellow-500 mr-3"></i>
+        <section class="mb-8 scroll-reveal">
+            <div class="p-8 rounded-3xl card-hover" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                <h2 class="text-3xl font-bold mb-8 flex items-center" style="color: var(--text-color);">
+                    <i class="fas fa-star text-yellow-500 mr-4 animate-float"></i>
                     功能特性介绍
                 </h2>
 
@@ -414,10 +546,10 @@
         </section>
 
         <!-- 数据管理 -->
-        <section class="mb-8">
-            <div class="p-8 rounded-2xl" style="background: var(--card-bg); border: 1px solid var(--border-color);">
-                <h2 class="text-2xl font-bold mb-6 flex items-center" style="color: var(--text-color);">
-                    <i class="fas fa-database text-blue-500 mr-3"></i>
+        <section class="mb-8 scroll-reveal">
+            <div class="p-8 rounded-3xl card-hover" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                <h2 class="text-3xl font-bold mb-8 flex items-center" style="color: var(--text-color);">
+                    <i class="fas fa-database text-blue-500 mr-4 animate-float"></i>
                     数据管理功能
                 </h2>
 
@@ -456,10 +588,10 @@
         </section>
 
         <!-- 常见问题 -->
-        <section class="mb-8">
-            <div class="p-8 rounded-2xl" style="background: var(--card-bg); border: 1px solid var(--border-color);">
-                <h2 class="text-2xl font-bold mb-6 flex items-center" style="color: var(--text-color);">
-                    <i class="fas fa-question-circle text-orange-500 mr-3"></i>
+        <section class="mb-8 scroll-reveal">
+            <div class="p-8 rounded-3xl card-hover" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                <h2 class="text-3xl font-bold mb-8 flex items-center" style="color: var(--text-color);">
+                    <i class="fas fa-question-circle text-orange-500 mr-4 animate-float"></i>
                     常见问题解答
                 </h2>
 
@@ -505,10 +637,10 @@
         </section>
 
         <!-- 键盘快捷键 -->
-        <section class="mb-8">
-            <div class="p-8 rounded-2xl" style="background: var(--card-bg); border: 1px solid var(--border-color);">
-                <h2 class="text-2xl font-bold mb-6 flex items-center" style="color: var(--text-color);">
-                    <i class="fas fa-keyboard text-purple-500 mr-3"></i>
+        <section class="mb-8 scroll-reveal">
+            <div class="p-8 rounded-3xl card-hover" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                <h2 class="text-3xl font-bold mb-8 flex items-center" style="color: var(--text-color);">
+                    <i class="fas fa-keyboard text-purple-500 mr-4 animate-float"></i>
                     键盘快捷键
                 </h2>
 
@@ -545,10 +677,10 @@
         </section>
 
         <!-- 技术支持 -->
-        <section class="mb-8">
-            <div class="p-8 rounded-2xl" style="background: var(--card-bg); border: 1px solid var(--border-color);">
-                <h2 class="text-2xl font-bold mb-6 flex items-center" style="color: var(--text-color);">
-                    <i class="fas fa-life-ring text-red-500 mr-3"></i>
+        <section class="mb-8 scroll-reveal">
+            <div class="p-8 rounded-3xl card-hover" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                <h2 class="text-3xl font-bold mb-8 flex items-center" style="color: var(--text-color);">
+                    <i class="fas fa-life-ring text-red-500 mr-4 animate-float"></i>
                     技术支持
                 </h2>
 
@@ -643,9 +775,180 @@
             }
         }
 
-        // 初始化主题管理器
+        // 滚动动画管理器
+        class ScrollAnimationManager {
+            constructor() {
+                this.observer = null;
+                this.init();
+            }
+
+            init() {
+                this.setupIntersectionObserver();
+                this.observeElements();
+            }
+
+            setupIntersectionObserver() {
+                const options = {
+                    root: null,
+                    rootMargin: '0px 0px -100px 0px',
+                    threshold: 0.1
+                };
+
+                this.observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                        }
+                    });
+                }, options);
+            }
+
+            observeElements() {
+                const elements = document.querySelectorAll('.scroll-reveal');
+                elements.forEach(element => {
+                    this.observer.observe(element);
+                });
+            }
+        }
+
+        // 导航栏滚动效果
+        class NavigationManager {
+            constructor() {
+                this.nav = document.querySelector('nav');
+                this.init();
+            }
+
+            init() {
+                window.addEventListener('scroll', () => {
+                    this.handleScroll();
+                });
+            }
+
+            handleScroll() {
+                const scrollY = window.scrollY;
+                if (scrollY > 50) {
+                    this.nav.style.backdropFilter = 'blur(20px)';
+                    this.nav.style.background = 'var(--card-bg)';
+                    this.nav.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.1)';
+                } else {
+                    this.nav.style.backdropFilter = 'blur(10px)';
+                    this.nav.style.background = 'var(--card-bg)';
+                    this.nav.style.boxShadow = 'none';
+                }
+            }
+        }
+
+        // 页面加载动画
+        class PageLoadAnimator {
+            constructor() {
+                this.init();
+            }
+
+            init() {
+                // 页面加载完成后添加动画
+                window.addEventListener('load', () => {
+                    this.animatePageLoad();
+                });
+            }
+
+            animatePageLoad() {
+                // 给所有主要区块添加延迟动画
+                const sections = document.querySelectorAll('section');
+                sections.forEach((section, index) => {
+                    section.style.animationDelay = `${index * 0.1}s`;
+                    section.classList.add('scroll-reveal');
+                });
+            }
+        }
+
+        // 键盘快捷键管理
+        class KeyboardShortcuts {
+            constructor() {
+                this.init();
+            }
+
+            init() {
+                document.addEventListener('keydown', (e) => {
+                    this.handleKeydown(e);
+                });
+            }
+
+            handleKeydown(e) {
+                // Ctrl/Cmd + / 显示快捷键帮助
+                if ((e.ctrlKey || e.metaKey) && e.key === '/') {
+                    e.preventDefault();
+                    this.showShortcutsModal();
+                }
+
+                // Esc 键关闭模态框
+                if (e.key === 'Escape') {
+                    this.closeModals();
+                }
+            }
+
+            showShortcutsModal() {
+                // 快捷键帮助模态框
+                const modal = document.createElement('div');
+                modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+                modal.innerHTML = `
+                    <div class="bg-white rounded-2xl p-8 max-w-md mx-4 shadow-2xl" style="background: var(--card-bg);">
+                        <h3 class="text-2xl font-bold mb-6" style="color: var(--text-color);">
+                            <i class="fas fa-keyboard mr-2"></i>
+                            键盘快捷键
+                        </h3>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span style="color: var(--text-secondary);">显示快捷键</span>
+                                <kbd class="px-3 py-1 rounded text-sm" style="background: var(--primary-color); color: white;">Ctrl + /</kbd>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span style="color: var(--text-secondary);">关闭弹窗</span>
+                                <kbd class="px-3 py-1 rounded text-sm" style="background: var(--primary-color); color: white;">Esc</kbd>
+                            </div>
+                        </div>
+                        <button onclick="this.parentElement.parentElement.remove()"
+                                class="mt-6 w-full py-2 px-4 rounded-lg text-white font-medium btn-primary">
+                            关闭
+                        </button>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            }
+
+            closeModals() {
+                const modals = document.querySelectorAll('.fixed.inset-0');
+                modals.forEach(modal => modal.remove());
+            }
+        }
+
+        // 初始化所有管理器
         document.addEventListener('DOMContentLoaded', () => {
             new ThemeManager();
+            new ScrollAnimationManager();
+            new NavigationManager();
+            new PageLoadAnimator();
+            new KeyboardShortcuts();
+
+            // 平滑滚动支持
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+
+            // 添加页面加载完成的淡入效果
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 0.5s ease-in-out';
+            setTimeout(() => {
+                document.body.style.opacity = '1';
+            }, 100);
         });
     </script>
 

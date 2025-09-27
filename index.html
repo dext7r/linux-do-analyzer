@@ -3,7 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Linux.do 论坛数据分析工具</title>
+
+    <!-- SEO Meta Tags -->
+    <title>Linux.do 论坛数据分析工具 - 专业的论坛数据可视化分析平台</title>
+    <meta name="description" content="Linux.do 论坛专业数据分析工具，提供个人活动数据可视化分析、帖子统计、点赞趋势、徽章成就等多维度数据洞察。100%本地处理，保护隐私安全。">
+    <meta name="keywords" content="Linux.do,论坛数据分析,数据可视化,个人数据导出,论坛统计,活动分析,数据洞察,隐私保护,前端分析工具">
+    <meta name="author" content="Linux.do Community">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="zh-CN">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Linux.do 论坛数据分析工具">
+    <meta property="og:description" content="专业的 Linux.do 论坛数据可视化分析平台，支持个人数据导出分析，100%本地处理保护隐私">
+    <meta property="og:url" content="">
+    <meta property="og:site_name" content="Linux.do Analyzer">
+    <meta property="og:locale" content="zh_CN">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Linux.do 论坛数据分析工具">
+    <meta name="twitter:description" content="专业的论坛数据可视化分析平台，支持多维度数据洞察">
+
+    <!-- Additional SEO -->
+    <meta name="theme-color" content="#6366f1">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="canonical" href="">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
 
     <!-- TailwindCSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -184,7 +212,7 @@
                     </p>
 
                     <!-- 产品预览图片 -->
-                    <div class="relative max-w-4xl mx-auto mb-12">
+                    <div id="productPreview" class="relative max-w-4xl mx-auto mb-12">
                         <div class="relative rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-slate-100 to-slate-200 p-8">
                             <!-- 模拟浏览器窗口 -->
                             <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
@@ -196,154 +224,73 @@
                                         <div class="w-3 h-3 bg-green-400 rounded-full"></div>
                                     </div>
                                     <div class="flex-1 bg-white rounded-lg px-3 py-1 mx-8">
-                                        <span class="text-sm text-gray-500">🔒 linux.do-analyzer.com</span>
+                                        <span id="previewUrl" class="text-sm text-gray-500">🔒 正在加载...</span>
                                     </div>
                                 </div>
 
-                                <!-- 模拟产品界面 -->
-                                <div class="p-6 bg-gradient-to-br from-indigo-50 to-purple-50">
+                                <!-- 动态内容区域 -->
+                                <div id="previewContent" class="p-6 bg-gradient-to-br from-indigo-50 to-purple-50">
+                                    <!-- 默认演示内容会在这里，数据上传后会被替换 -->
                                     <!-- 模拟导航栏 -->
                                     <div class="flex justify-between items-center mb-6">
                                         <div class="flex items-center space-x-3">
                                             <div class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
                                                 <i class="fas fa-chart-bar text-white text-sm"></i>
                                             </div>
-                                            <div class="text-sm font-semibold text-gray-700">Linux.do Analyzer</div>
+                                            <a href="index.html" class="text-sm font-semibold text-gray-700 hover:text-indigo-600 transition-colors cursor-pointer">Linux.do Analyzer</a>
                                         </div>
                                         <div class="flex items-center space-x-2">
                                             <div class="w-4 h-4 bg-green-400 rounded-full"></div>
-                                            <div class="text-xs text-gray-600">已连接</div>
+                                            <div class="text-xs text-gray-600">演示数据</div>
                                         </div>
                                     </div>
 
                                     <!-- 模拟统计卡片 -->
-                                    <div class="grid grid-cols-4 gap-3 mb-6">
-                                        <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-500">
-                                            <div class="flex items-center justify-between">
-                                                <div>
-                                                    <div class="text-xs text-blue-600 font-medium mb-1">总帖数</div>
-                                                    <div class="text-lg font-bold text-blue-800">2,847</div>
-                                                    <div class="text-xs text-blue-500 flex items-center">
-                                                        <i class="fas fa-arrow-up text-xs mr-1"></i> +12.5%
-                                                    </div>
-                                                </div>
-                                                <div class="w-6 h-6 bg-blue-500 rounded-lg flex items-center justify-center">
-                                                    <i class="fas fa-file-alt text-white text-xs"></i>
-                                                </div>
+                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                                        <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-blue-500">
+                                            <div class="text-xs text-blue-600 font-medium mb-1">总帖数</div>
+                                            <div class="text-lg font-bold text-blue-800">2,847</div>
+                                            <div class="text-xs text-blue-500 flex items-center">
+                                                <i class="fas fa-arrow-up text-xs mr-1"></i> 演示
                                             </div>
                                         </div>
-                                        <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-green-500">
-                                            <div class="flex items-center justify-between">
-                                                <div>
-                                                    <div class="text-xs text-green-600 font-medium mb-1">获赞数</div>
-                                                    <div class="text-lg font-bold text-green-800">15,692</div>
-                                                    <div class="text-xs text-green-500 flex items-center">
-                                                        <i class="fas fa-arrow-up text-xs mr-1"></i> +8.3%
-                                                    </div>
-                                                </div>
-                                                <div class="w-6 h-6 bg-green-500 rounded-lg flex items-center justify-center">
-                                                    <i class="fas fa-heart text-white text-xs"></i>
-                                                </div>
+                                        <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-green-500">
+                                            <div class="text-xs text-green-600 font-medium mb-1">获赞数</div>
+                                            <div class="text-lg font-bold text-green-800">15,692</div>
+                                            <div class="text-xs text-green-500 flex items-center">
+                                                <i class="fas fa-arrow-up text-xs mr-1"></i> 演示
                                             </div>
                                         </div>
-                                        <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-purple-500">
-                                            <div class="flex items-center justify-between">
-                                                <div>
-                                                    <div class="text-xs text-purple-600 font-medium mb-1">活跃天数</div>
-                                                    <div class="text-lg font-bold text-purple-800">342</div>
-                                                    <div class="text-xs text-purple-500 flex items-center">
-                                                        <i class="fas fa-arrow-up text-xs mr-1"></i> +2.1%
-                                                    </div>
-                                                </div>
-                                                <div class="w-6 h-6 bg-purple-500 rounded-lg flex items-center justify-center">
-                                                    <i class="fas fa-calendar-check text-white text-xs"></i>
-                                                </div>
+                                        <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-purple-500">
+                                            <div class="text-xs text-purple-600 font-medium mb-1">活跃天数</div>
+                                            <div class="text-lg font-bold text-purple-800">342</div>
+                                            <div class="text-xs text-purple-500 flex items-center">
+                                                <i class="fas fa-arrow-up text-xs mr-1"></i> 演示
                                             </div>
                                         </div>
-                                        <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-orange-500">
-                                            <div class="flex items-center justify-between">
-                                                <div>
-                                                    <div class="text-xs text-orange-600 font-medium mb-1">徽章数</div>
-                                                    <div class="text-lg font-bold text-orange-800">28</div>
-                                                    <div class="text-xs text-orange-500 flex items-center">
-                                                        <i class="fas fa-plus text-xs mr-1"></i> +3 本月
-                                                    </div>
-                                                </div>
-                                                <div class="w-6 h-6 bg-orange-500 rounded-lg flex items-center justify-center">
-                                                    <i class="fas fa-medal text-white text-xs"></i>
-                                                </div>
+                                        <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-orange-500">
+                                            <div class="text-xs text-orange-600 font-medium mb-1">徽章数</div>
+                                            <div class="text-lg font-bold text-orange-800">28</div>
+                                            <div class="text-xs text-orange-500 flex items-center">
+                                                <i class="fas fa-plus text-xs mr-1"></i> 演示
                                             </div>
                                         </div>
                                     </div>
 
-                                    <!-- 模拟图表区域 -->
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <div class="bg-white p-4 rounded-xl shadow-sm">
-                                            <div class="flex items-center justify-between mb-3">
-                                                <div class="text-sm font-semibold text-gray-700">发帖趋势</div>
-                                                <i class="fas fa-chart-line text-indigo-500 text-sm"></i>
+                                    <!-- 提示信息 -->
+                                    <div class="bg-white p-4 rounded-xl shadow-sm border border-dashed border-gray-300">
+                                        <div class="text-center">
+                                            <div class="text-sm text-gray-600 mb-2">
+                                                <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                                                这是演示界面，上传您的数据文件后将显示真实分析结果
                                             </div>
-                                            <div class="h-20 relative">
-                                                <svg class="w-full h-full" viewBox="0 0 100 60">
-                                                    <defs>
-                                                        <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                                                            <stop offset="0%" style="stop-color:#6366F1;stop-opacity:0.3" />
-                                                            <stop offset="100%" style="stop-color:#6366F1;stop-opacity:0" />
-                                                        </linearGradient>
-                                                    </defs>
-                                                    <polygon
-                                                        fill="url(#chartGradient)"
-                                                        points="0,60 0,45 15,40 30,35 45,30 60,20 75,15 90,10 100,8 100,60"
-                                                    />
-                                                    <polyline
-                                                        fill="none"
-                                                        stroke="#6366F1"
-                                                        stroke-width="2"
-                                                        points="0,45 15,40 30,35 45,30 60,20 75,15 90,10 100,8"
-                                                    />
-                                                    <circle cx="100" cy="8" r="2" fill="#6366F1"/>
-                                                </svg>
-                                            </div>
-                                        </div>
-                                        <div class="bg-white p-4 rounded-xl shadow-sm">
-                                            <div class="flex items-center justify-between mb-3">
-                                                <div class="text-sm font-semibold text-gray-700">设备分布</div>
-                                                <i class="fas fa-mobile-alt text-purple-500 text-sm"></i>
-                                            </div>
-                                            <div class="h-20 flex items-center justify-between">
-                                                <svg class="w-16 h-16" viewBox="0 0 42 42">
-                                                    <circle cx="21" cy="21" r="15.915"
-                                                        fill="transparent" stroke="#E5E7EB" stroke-width="3"/>
-                                                    <circle cx="21" cy="21" r="15.915"
-                                                        fill="transparent" stroke="#6366F1" stroke-width="3"
-                                                        stroke-dasharray="60 40" stroke-dashoffset="25"/>
-                                                    <circle cx="21" cy="21" r="15.915"
-                                                        fill="transparent" stroke="#10B981" stroke-width="3"
-                                                        stroke-dasharray="30 70" stroke-dashoffset="35"/>
-                                                </svg>
-                                                <div class="text-xs space-y-1">
-                                                    <div class="flex items-center">
-                                                        <div class="w-2 h-2 bg-indigo-500 rounded-full mr-2"></div>
-                                                        <span class="text-gray-600">桌面 60%</span>
-                                                    </div>
-                                                    <div class="flex items-center">
-                                                        <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                                                        <span class="text-gray-600">移动 40%</span>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            <div class="text-xs text-gray-500">支持 Linux.do 论坛导出的 ZIP 数据包</div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- 装饰元素 -->
-                        <div class="absolute -top-4 -left-4 w-8 h-8 bg-indigo-400 rounded-full opacity-60"></div>
-                        <div class="absolute -bottom-4 -right-4 w-12 h-12 bg-purple-400 rounded-full opacity-40"></div>
-                        <div class="absolute top-1/4 -right-8 w-6 h-6 bg-pink-400 rounded-full opacity-50"></div>
                     </div>
-                </div>
 
                 <!-- 核心特性卡片 - 重新设计 -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
@@ -1366,6 +1313,18 @@
     <script src="js/chart-renderer.js"></script>
     <script src="js/ui-manager.js"></script>
     <script src="js/app.js"></script>
+
+    <!-- 动态更新预览URL -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const previewUrl = document.getElementById('previewUrl');
+            if (previewUrl) {
+                // 获取当前页面的完整URL
+                const currentUrl = window.location.href;
+                previewUrl.textContent = `🔒 ${currentUrl}`;
+            }
+        });
+    </script>
 
 </body>
 </html>

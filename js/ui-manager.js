@@ -1361,7 +1361,7 @@ class UIManager {
             case 'boolean':
                 return value ? '<span class="text-green-600">是</span>' : '<span class="text-gray-400">否</span>';
             case 'number':
-                return typeof value === 'number' ? value.toLocaleString() : value;
+                return (typeof value === 'number' && !isNaN(value)) ? value.toLocaleString() : (value || 0);
             case 'text':
                 if (typeof value === 'string' && value.length > 50) {
                     return `<span title="${value.replace(/"/g, '&quot;')}">${value.substring(0, 50)}...</span>`;
@@ -1491,6 +1491,148 @@ class UIManager {
     }
 
     /**
+     * 更新产品预览区域
+     * 显示用户的真实数据而不是演示数据
+     */
+    updateProductPreview(analysisData) {
+        console.log('🎨 更新产品预览区域');
+
+        const previewContent = document.getElementById('previewContent');
+        if (!previewContent) {
+            console.warn('预览区域未找到');
+            return;
+        }
+
+        try {
+            const summary = analysisData.summary || {};
+            const user = summary.user || {};
+
+            // 使用现有的用户信息格式化逻辑
+            const formatValue = (value, type = 'text') => {
+                if (value === null || value === undefined || value === '') return '未知';
+                switch (type) {
+                    case 'date':
+                        try {
+                            return new Date(value).toLocaleDateString('zh-CN');
+                        } catch {
+                            return value;
+                        }
+                    case 'time':
+                        return Math.round(value / 3600) + ' 小时';
+                    case 'boolean':
+                        return value ? '是' : '否';
+                    default:
+                        return value;
+                }
+            };
+
+            // 构建用户信息预览（类似于用户数据概览）
+            const previewHtml = `
+                <!-- 真实数据导航栏 -->
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-chart-bar text-white text-sm"></i>
+                        </div>
+                        <div class="text-sm font-semibold text-gray-700"><a href="index.html" class="hover:text-indigo-600 transition-colors">Linux.do Analyzer</a></div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-4 h-4 bg-blue-500 rounded-full animate-pulse"></div>
+                        <div class="text-xs text-gray-600">${formatValue(user.username)}</div>
+                    </div>
+                </div>
+
+                <!-- 用户信息预览卡片 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-500">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="text-xs text-blue-600 font-medium">👤 用户信息</div>
+                            <i class="fas fa-user text-blue-500"></i>
+                        </div>
+                        <div class="text-sm space-y-1">
+                            <div><span class="font-medium">用户名:</span> ${formatValue(user.username)}</div>
+                            <div><span class="font-medium">显示名:</span> ${formatValue(user.name)}</div>
+                            <div><span class="font-medium">信任等级:</span> TL${formatValue(user.trust_level)}</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-green-500">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="text-xs text-green-600 font-medium">📊 活动数据</div>
+                            <i class="fas fa-chart-line text-green-500"></i>
+                        </div>
+                        <div class="text-sm space-y-1">
+                            <div><span class="font-medium">发帖数:</span> ${formatValue(user.post_count)}</div>
+                            <div><span class="font-medium">点赞收到:</span> ${formatValue(user.likes_received)}</div>
+                            <div><span class="font-medium">阅读帖子:</span> ${formatValue(user.posts_read_count)}</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-purple-500">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="text-xs text-purple-600 font-medium">⏱️ 时间统计</div>
+                            <i class="fas fa-clock text-purple-500"></i>
+                        </div>
+                        <div class="text-sm space-y-1">
+                            <div><span class="font-medium">加入时间:</span> ${formatValue(user.created_at, 'date')}</div>
+                            <div><span class="font-medium">阅读时间:</span> ${formatValue(user.time_read, 'time')}</div>
+                            <div><span class="font-medium">访问天数:</span> ${formatValue(user.days_visited)}</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-orange-500">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="text-xs text-orange-600 font-medium">🏆 数据完整性</div>
+                            <i class="fas fa-database text-orange-500"></i>
+                        </div>
+                        <div class="text-sm space-y-1">
+                            <div><span class="font-medium">评分:</span> ${summary.dataCompleteness?.score || 0}%</div>
+                            <div><span class="font-medium">文件数:</span> ${summary.dataCompleteness?.available?.length || 0}</div>
+                            <div class="text-xs text-green-600 font-medium">✅ 真实数据已加载</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 提示信息 -->
+                <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-xl border border-blue-200">
+                    <div class="text-center">
+                        <div class="text-sm text-blue-700 mb-1">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            您的数据已成功加载并分析！
+                        </div>
+                        <div class="text-xs text-blue-600">滚动下方查看完整的分析报告</div>
+                    </div>
+                </div>
+            `;
+
+            // 更新预览内容
+            previewContent.innerHTML = previewHtml;
+
+            // 添加平滑过渡效果
+            previewContent.style.opacity = '0';
+            setTimeout(() => {
+                previewContent.style.transition = 'opacity 0.5s ease-in-out';
+                previewContent.style.opacity = '1';
+            }, 100);
+
+            console.log('✅ 预览区域更新完成');
+
+        } catch (error) {
+            console.error('❌ 预览更新失败:', error);
+            // 如果出错，显示错误信息而不是崩溃
+            previewContent.innerHTML = `
+                <div class="bg-red-50 border border-red-200 rounded-xl p-4">
+                    <div class="text-center">
+                        <i class="fas fa-exclamation-triangle text-red-500 text-2xl mb-2"></i>
+                        <div class="text-sm text-red-600">预览更新失败</div>
+                        <div class="text-xs text-red-500 mt-1">请检查数据格式</div>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    /**
      * 渲染完整分析结果
      */
     renderAnalysisResults(analysisData) {
@@ -1498,6 +1640,9 @@ class UIManager {
 
         // 保存当前数据
         this.currentTabData = analysisData.detailedData;
+
+        // 更新产品预览区域（如果存在）
+        this.updateProductPreview(analysisData);
 
         // 渲染各个部分
         this.renderUserInfo(analysisData.summary.user);

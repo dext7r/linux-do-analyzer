@@ -273,7 +273,16 @@ class DataAnalyzer {
      */
     getDataCompleteness() {
         const expectedFiles = ['preferences', 'userArchive', 'visits', 'likes', 'userBadges', 'badges', 'users'];
-        const availableFiles = expectedFiles.filter(file => this.data[file] && this.data[file].length > 0);
+
+        const availableFiles = expectedFiles.filter(file => {
+            if (file === 'preferences') {
+                // preferences 是对象，检查是否存在且非空
+                return this.data[file] && Object.keys(this.data[file]).length > 0;
+            } else {
+                // 其他文件是数组，检查是否存在且有数据
+                return this.data[file] && this.data[file].length > 0;
+            }
+        });
 
         return {
             score: Math.round((availableFiles.length / expectedFiles.length) * 100),
