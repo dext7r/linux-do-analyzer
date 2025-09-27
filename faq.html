@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>常见问题 - Linux.do 数据分析工具</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+    <style>
+        .faq-item {
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+        }
+        .faq-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border-color: var(--primary-color);
+        }
+        .faq-question {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .faq-question:hover {
+            color: var(--primary-color);
+        }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .faq-answer.expanded {
+            max-height: 500px;
+        }
+        .faq-icon {
+            transition: transform 0.3s ease;
+        }
+        .faq-icon.rotated {
+            transform: rotate(180deg);
+        }
+        .search-highlight {
+            background: linear-gradient(120deg, var(--primary-color) 0%, transparent 100%);
+            background-size: 100% 2px;
+            background-repeat: no-repeat;
+            background-position: 0 100%;
+        }
+    </style>
+</head>
+<body class="min-h-full" style="background: var(--background-gradient); color: var(--text-color);">
+    <!-- 导航栏 -->
+    <nav class="sticky top-0 z-50 backdrop-blur-md border-b" style="background: var(--card-bg); border-color: var(--border-color);">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="flex items-center space-x-2 text-xl font-bold" style="color: var(--primary-color);">
+                        <span>📊</span>
+                        <span>Linux.do 数据分析</span>
+                    </a>
+                </div>
+
+                <div class="flex items-center space-x-6">
+                    <a href="index.html" class="nav-link transition-colors hover:opacity-75" style="color: var(--text-color);">
+                        数据分析
+                    </a>
+                    <a href="help.html" class="nav-link transition-colors hover:opacity-75" style="color: var(--text-color);">
+                        使用帮助
+                    </a>
+                    <a href="about.html" class="nav-link transition-colors hover:opacity-75" style="color: var(--text-color);">
+                        关于我们
+                    </a>
+                    <a href="faq.html" class="nav-link current transition-colors" style="color: var(--primary-color); font-weight: 600;">
+                        常见问题
+                    </a>
+                    <a href="privacy.html" class="nav-link transition-colors hover:opacity-75" style="color: var(--text-color);">
+                        隐私政策
+                    </a>
+
+                    <!-- 主题切换器 -->
+                    <div class="relative">
+                        <select id="themeSelector" class="appearance-none rounded-lg px-3 py-2 text-sm border focus:outline-none focus:ring-2 transition-all"
+                                style="background: var(--card-bg); color: var(--text-color); border-color: var(--border-color); --tw-ring-color: var(--primary-color);">
+                            <option value="apple">简洁</option>
+                            <option value="xiaomi">现代</option>
+                            <option value="huawei">商务</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Hero Header -->
+        <div class="text-center mb-16">
+            <div class="relative p-12 rounded-3xl shadow-2xl overflow-hidden" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                <!-- 背景装饰 -->
+                <div class="absolute inset-0 bg-gradient-to-br from-orange-50/30 to-red-50/30"></div>
+
+                <div class="relative z-10">
+                    <!-- 现代化图标设计 -->
+                    <div class="relative mb-8">
+                        <div class="w-24 h-24 mx-auto bg-gradient-to-br from-orange-500 via-red-600 to-pink-600 rounded-3xl flex items-center justify-center shadow-2xl">
+                            <i class="fas fa-question-circle text-white text-3xl"></i>
+                        </div>
+                        <!-- 帮助徽章 -->
+                        <div class="absolute -top-2 -right-2 w-8 h-8 bg-blue-400 rounded-full flex items-center justify-center shadow-lg">
+                            <i class="fas fa-lightbulb text-white text-sm"></i>
+                        </div>
+                    </div>
+
+                    <h1 class="text-5xl font-black mb-6 bg-gradient-to-r from-orange-600 via-red-600 to-pink-600 bg-clip-text text-transparent">
+                        常见问题
+                    </h1>
+                    <p class="text-xl leading-relaxed max-w-3xl mx-auto mb-8" style="color: var(--text-secondary);">
+                        <i class="fas fa-search text-orange-500 mr-2"></i>
+                        快速找到您需要的答案，解决使用过程中的各种疑问
+                    </p>
+
+                    <!-- 快速统计 -->
+                    <div class="flex justify-center items-center space-x-8">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-orange-600">15+</div>
+                            <div class="text-sm" style="color: var(--text-secondary);">常见问题</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-red-600">5</div>
+                            <div class="text-sm" style="color: var(--text-secondary);">分类导航</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-pink-600">24/7</div>
+                            <div class="text-sm" style="color: var(--text-secondary);">在线帮助</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 搜索和分类区域 - 现代化设计 -->
+        <div class="mb-12">
+            <!-- 搜索框 -->
+            <div class="mb-8">
+                <div class="relative max-w-2xl mx-auto">
+                    <input type="text" id="searchInput" placeholder="🔍 搜索问题..."
+                           class="w-full px-8 py-5 rounded-2xl border-2 focus:outline-none focus:ring-4 transition-all text-lg shadow-lg"
+                           style="background: var(--card-bg); color: var(--text-color); border-color: var(--border-color); --tw-ring-color: var(--primary-color);">
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-6">
+                        <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ 分类 - 现代化设计 -->
+            <div class="flex justify-center">
+                <div class="flex flex-wrap gap-3 p-2 rounded-2xl" style="background: var(--surface-secondary);">
+                    <button class="faq-category-btn active px-6 py-3 rounded-xl transition-all font-medium shadow-lg"
+                            style="background: var(--primary-color); color: white;" data-category="all">
+                        <i class="fas fa-list mr-2"></i>全部问题
+                    </button>
+                    <button class="faq-category-btn px-6 py-3 rounded-xl transition-all font-medium hover:shadow-md"
+                            style="color: var(--text-color);" data-category="basic">
+                        <i class="fas fa-play-circle mr-2"></i>基础使用
+                    </button>
+                    <button class="faq-category-btn px-6 py-3 rounded-xl transition-all font-medium hover:shadow-md"
+                            style="color: var(--text-color);" data-category="data">
+                        <i class="fas fa-database mr-2"></i>数据相关
+                    </button>
+                    <button class="faq-category-btn px-6 py-3 rounded-xl transition-all font-medium hover:shadow-md"
+                            style="color: var(--text-color);" data-category="technical">
+                        <i class="fas fa-cog mr-2"></i>技术问题
+                    </button>
+                    <button class="faq-category-btn px-6 py-3 rounded-xl transition-all font-medium hover:shadow-md"
+                            style="color: var(--text-color);" data-category="privacy">
+                        <i class="fas fa-shield-alt mr-2"></i>隐私安全
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ 列表 -->
+        <div class="space-y-4" id="faqList">
+            <!-- 基础使用 -->
+            <div class="faq-item p-6" data-category="basic">
+                <div class="faq-question flex justify-between items-center">
+                    <h3 class="text-lg font-semibold">如何开始使用这个工具？</h3>
+                    <svg class="faq-icon w-6 h-6 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+                <div class="faq-answer mt-4 pt-4 border-t" style="border-color: var(--border-color);">
+                    <p class="text-sm leading-relaxed opacity-90">
+                        1. 访问 Linux.do 论坛，登录您的账户<br>
+                        2. 进入个人设置页面，找到数据导出功能<br>
+                        3. 下载个人数据包（ZIP 格式）<br>
+                        4. 在本工具中点击"选择文件"，上传您的数据包<br>
+                        5. 等待解析完成，开始查看您的数据分析结果
+                    </p>
+                </div>
+            </div>
+
+            <div class="faq-item p-6" data-category="basic">
+                <div class="faq-question flex justify-between items-center">
+                    <h3 class="text-lg font-semibold">支持哪些文件格式？</h3>
+                    <svg class="faq-icon w-6 h-6 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+                <div class="faq-answer mt-4 pt-4 border-t" style="border-color: var(--border-color);">
+                    <p class="text-sm leading-relaxed opacity-90">
+                        目前支持 Linux.do 论坛导出的 ZIP 格式数据包。数据包内应包含：<br>
+                        • 用户信息文件（JSON 格式）<br>
+                        • 帖子数据文件<br>
+                        • 评论/回复数据文件<br>
+                        • 其他活动记录文件
+                    </p>
+                </div>
+            </div>
+
+            <div class="faq-item p-6" data-category="basic">
+                <div class="faq-question flex justify-between items-center">
+                    <h3 class="text-lg font-semibold">如何切换主题样式？</h3>
+                    <svg class="faq-icon w-6 h-6 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+                <div class="faq-answer mt-4 pt-4 border-t" style="border-color: var(--border-color);">
+                    <p class="text-sm leading-relaxed opacity-90">
+                        在页面右上角找到主题选择器，提供三种主题风格：<br>
+                        • <strong>简洁</strong>：清爽简约的苹果风格<br>
+                        • <strong>现代</strong>：活力时尚的小米风格<br>
+                        • <strong>商务</strong>：专业稳重的华为风格<br>
+                        您的主题选择会自动保存在浏览器中。
+                    </p>
+                </div>
+            </div>
+
+            <!-- 数据相关 -->
+            <div class="faq-item p-6" data-category="data">
+                <div class="faq-question flex justify-between items-center">
+                    <h3 class="text-lg font-semibold">数据包很大，处理需要多长时间？</h3>
+                    <svg class="faq-icon w-6 h-6 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+                <div class="faq-answer mt-4 pt-4 border-t" style="border-color: var(--border-color);">
+                    <p class="text-sm leading-relaxed opacity-90">
+                        处理时间取决于数据包大小和您的设备性能：<br>
+                        • 小型数据包（&lt;10MB）：通常 10-30 秒<br>
+                        • 中型数据包（10-50MB）：通常 30-120 秒<br>
+                        • 大型数据包（&gt;50MB）：可能需要 2-5 分钟<br>
+                        所有处理都在您的浏览器中进行，不会上传到服务器。
+                    </p>
+                </div>
+            </div>
+
+            <div class="faq-item p-6" data-category="data">
+                <div class="faq-question flex justify-between items-center">
+                    <h3 class="text-lg font-semibold">可以分析哪些数据维度？</h3>
+                    <svg class="faq-icon w-6 h-6 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+                <div class="faq-answer mt-4 pt-4 border-t" style="border-color: var(--border-color);">
+                    <p class="text-sm leading-relaxed opacity-90">
+                        工具提供多维度数据分析：<br>
+                        • <strong>活动统计</strong>：发帖数量、回复数量、点赞收到等<br>
+                        • <strong>时间分析</strong>：活跃时段、发帖频率变化趋势<br>
+                        • <strong>内容分析</strong>：热门话题、常用词汇、内容分类<br>
+                        • <strong>社交网络</strong>：互动对象、影响力分析<br>
+                        • <strong>成长轨迹</strong>：等级变化、声誉增长
+                    </p>
+                </div>
+            </div>
+
+            <div class="faq-item p-6" data-category="data">
+                <div class="faq-question flex justify-between items-center">
+                    <h3 class="text-lg font-semibold">数据处理失败怎么办？</h3>
+                    <svg class="faq-icon w-6 h-6 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+                <div class="faq-answer mt-4 pt-4 border-t" style="border-color: var(--border-color);">
+                    <p class="text-sm leading-relaxed opacity-90">
+                        如果遇到处理失败，请尝试以下步骤：<br>
+                        1. 确认数据包是从 Linux.do 正确导出的<br>
+                        2. 检查数据包是否完整，未损坏<br>
+                        3. 清理浏览器缓存后重新尝试<br>
+                        4. 尝试使用其他现代浏览器（Chrome、Firefox、Safari）<br>
+                        5. 确保设备有足够的内存空间
+                    </p>
+                </div>
+            </div>
+
+            <!-- 技术问题 -->
+            <div class="faq-item p-6" data-category="technical">
+                <div class="faq-question flex justify-between items-center">
+                    <h3 class="text-lg font-semibold">支持哪些浏览器？</h3>
+                    <svg class="faq-icon w-6 h-6 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+                <div class="faq-answer mt-4 pt-4 border-t" style="border-color: var(--border-color);">
+                    <p class="text-sm leading-relaxed opacity-90">
+                        支持所有现代浏览器：<br>
+                        • <strong>推荐</strong>：Chrome 88+、Firefox 85+、Safari 14+<br>
+                        • <strong>兼容</strong>：Edge 88+、Opera 74+<br>
+                        • <strong>移动端</strong>：iOS Safari、Android Chrome<br>
+                        注意：IE 浏览器不受支持，请使用现代浏览器获得最佳体验。
+                    </p>
+                </div>
+            </div>
+
+            <div class="faq-item p-6" data-category="technical">
+                <div class="faq-question flex justify-between items-center">
+                    <h3 class="text-lg font-semibold">移动设备上可以正常使用吗？</h3>
+                    <svg class="faq-icon w-6 h-6 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+                <div class="faq-answer mt-4 pt-4 border-t" style="border-color: var(--border-color);">
+                    <p class="text-sm leading-relaxed opacity-90">
+                        完全支持移动设备：<br>
+                        • 响应式设计，自动适配屏幕尺寸<br>
+                        • 触摸友好的交互界面<br>
+                        • 优化的移动端文件选择体验<br>
+                        • 可以通过云盘应用上传数据文件<br>
+                        建议使用 WiFi 网络处理大型数据包。
+                    </p>
+                </div>
+            </div>
+
+            <div class="faq-item p-6" data-category="technical">
+                <div class="faq-question flex justify-between items-center">
+                    <h3 class="text-lg font-semibold">为什么图表显示不正常？</h3>
+                    <svg class="faq-icon w-6 h-6 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+                <div class="faq-answer mt-4 pt-4 border-t" style="border-color: var(--border-color);">
+                    <p class="text-sm leading-relaxed opacity-90">
+                        图表显示问题可能的原因：<br>
+                        • 网络连接不稳定，CDN 资源加载失败<br>
+                        • 浏览器禁用了 JavaScript<br>
+                        • 广告拦截器阻止了图表库加载<br>
+                        • 浏览器版本过旧，不支持现代 Web 技术<br>
+                        请尝试刷新页面或使用其他网络环境。
+                    </p>
+                </div>
+            </div>
+
+            <!-- 隐私安全 -->
+            <div class="faq-item p-6" data-category="privacy">
+                <div class="faq-question flex justify-between items-center">
+                    <h3 class="text-lg font-semibold">我的数据会被上传到服务器吗？</h3>
+                    <svg class="faq-icon w-6 h-6 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+                <div class="faq-answer mt-4 pt-4 border-t" style="border-color: var(--border-color);">
+                    <p class="text-sm leading-relaxed opacity-90">
+                        <strong>绝对不会！</strong>这是我们的核心承诺：<br>
+                        • 100% 客户端处理，所有数据都在您的浏览器中处理<br>
+                        • 没有任何数据上传到我们的服务器<br>
+                        • 没有网络请求发送您的个人信息<br>
+                        • 可以在完全离线的环境下使用<br>
+                        • 开源代码，可以验证我们的承诺
+                    </p>
+                </div>
+            </div>
+
+            <div class="faq-item p-6" data-category="privacy">
+                <div class="faq-question flex justify-between items-center">
+                    <h3 class="text-lg font-semibold">分析结果会被保存在哪里？</h3>
+                    <svg class="faq-icon w-6 h-6 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+                <div class="faq-answer mt-4 pt-4 border-t" style="border-color: var(--border-color);">
+                    <p class="text-sm leading-relaxed opacity-90">
+                        分析结果仅保存在您的设备上：<br>
+                        • 使用浏览器的 IndexedDB 本地存储<br>
+                        • 数据不会离开您的设备<br>
+                        • 清理浏览器数据时会被删除<br>
+                        • 其他人无法访问您的分析结果<br>
+                        • 可以随时手动清除所有数据
+                    </p>
+                </div>
+            </div>
+
+            <div class="faq-item p-6" data-category="privacy">
+                <div class="faq-question flex justify-between items-center">
+                    <h3 class="text-lg font-semibold">如何确保数据安全？</h3>
+                    <svg class="faq-icon w-6 h-6 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+                <div class="faq-answer mt-4 pt-4 border-t" style="border-color: var(--border-color);">
+                    <p class="text-sm leading-relaxed opacity-90">
+                        我们采用多重安全措施：<br>
+                        • HTTPS 加密传输（仅用于加载页面资源）<br>
+                        • 开源代码，接受社区监督<br>
+                        • 无需注册或登录<br>
+                        • 不收集任何个人标识信息<br>
+                        • 不使用 Cookie 或追踪技术<br>
+                        • 定期安全审计和更新
+                    </p>
+                </div>
+            </div>
+
+            <!-- 其他问题 -->
+            <div class="faq-item p-6" data-category="basic">
+                <div class="faq-question flex justify-between items-center">
+                    <h3 class="text-lg font-semibold">如何导出分析报告？</h3>
+                    <svg class="faq-icon w-6 h-6 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+                <div class="faq-answer mt-4 pt-4 border-t" style="border-color: var(--border-color);">
+                    <p class="text-sm leading-relaxed opacity-90">
+                        提供多种导出选项：<br>
+                        • <strong>PDF 报告</strong>：完整的分析报告，包含所有图表<br>
+                        • <strong>图片导出</strong>：单独保存图表为 PNG 格式<br>
+                        • <strong>数据导出</strong>：CSV 格式的原始数据<br>
+                        • <strong>打印友好</strong>：优化的打印版本<br>
+                        所有导出都在客户端完成，数据不会上传。
+                    </p>
+                </div>
+            </div>
+
+            <div class="faq-item p-6" data-category="technical">
+                <div class="faq-question flex justify-between items-center">
+                    <h3 class="text-lg font-semibold">遇到 Bug 如何反馈？</h3>
+                    <svg class="faq-icon w-6 h-6 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+                <div class="faq-answer mt-4 pt-4 border-t" style="border-color: var(--border-color);">
+                    <p class="text-sm leading-relaxed opacity-90">
+                        我们非常重视用户反馈：<br>
+                        • 在 GitHub 提交 Issue：<a href="https://github.com/dext7r/linux-do-analyzer/issues" class="search-highlight" target="_blank">issues 页面</a><br>
+                        • 发送邮件到技术支持邮箱<br>
+                        • 在 Linux.do 论坛私信开发者<br>
+                        • 提供详细的错误信息和复现步骤<br>
+                        我们会在 48 小时内回复您的问题。
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 联系我们 -->
+        <div class="mt-12 p-8 rounded-xl text-center" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+            <h3 class="text-xl font-semibold mb-4" style="color: var(--text-color);">
+                没找到答案？
+            </h3>
+            <p class="mb-6 opacity-75" style="color: var(--text-color);">
+                如果您的问题没有在上面找到答案，欢迎联系我们
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="https://github.com/dext7r/linux-do-analyzer/issues"
+                   target="_blank"
+                   class="px-6 py-3 rounded-lg font-medium transition-all text-white"
+                   style="background: var(--primary-color);">
+                    GitHub Issues
+                </a>
+                <a href="help.html"
+                   class="px-6 py-3 rounded-lg font-medium transition-all border"
+                   style="color: var(--text-color); border-color: var(--border-color);">
+                    查看使用帮助
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="mt-16 py-8 border-t" style="border-color: var(--border-color);">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <p class="opacity-60" style="color: var(--text-color);">
+                    © 2025 Linux.do 数据分析工具 | 开源项目 | 隐私优先
+                </p>
+                <div class="mt-4 flex justify-center space-x-6">
+                    <a href="privacy.html" class="opacity-60 hover:opacity-100 transition-opacity" style="color: var(--text-color);">
+                        隐私政策
+                    </a>
+                    <a href="https://github.com/dext7r/linux-do-analyzer" target="_blank"
+                       class="opacity-60 hover:opacity-100 transition-opacity" style="color: var(--text-color);">
+                        GitHub
+                    </a>
+                    <a href="https://linux.do" target="_blank"
+                       class="opacity-60 hover:opacity-100 transition-opacity" style="color: var(--text-color);">
+                        Linux.do
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 主题管理
+        class ThemeManager {
+            constructor() {
+                this.currentTheme = localStorage.getItem('app-theme') || 'apple';
+                this.init();
+            }
+
+            init() {
+                this.applyTheme(this.currentTheme);
+                this.setupThemeSelector();
+            }
+
+            applyTheme(theme) {
+                document.documentElement.removeAttribute('data-theme');
+                if (theme !== 'apple') {
+                    document.documentElement.setAttribute('data-theme', theme);
+                }
+                const selector = document.getElementById('themeSelector');
+                if (selector) {
+                    selector.value = theme;
+                }
+                localStorage.setItem('app-theme', theme);
+            }
+
+            setupThemeSelector() {
+                const selector = document.getElementById('themeSelector');
+                if (selector) {
+                    selector.addEventListener('change', (e) => {
+                        this.applyTheme(e.target.value);
+                    });
+                }
+            }
+        }
+
+        // FAQ 功能管理
+        class FAQManager {
+            constructor() {
+                this.init();
+            }
+
+            init() {
+                this.setupToggle();
+                this.setupSearch();
+                this.setupCategories();
+            }
+
+            setupToggle() {
+                document.querySelectorAll('.faq-question').forEach(question => {
+                    question.addEventListener('click', () => {
+                        const item = question.closest('.faq-item');
+                        const answer = item.querySelector('.faq-answer');
+                        const icon = question.querySelector('.faq-icon');
+
+                        answer.classList.toggle('expanded');
+                        icon.classList.toggle('rotated');
+                    });
+                });
+            }
+
+            setupSearch() {
+                const searchInput = document.getElementById('searchInput');
+                const faqItems = document.querySelectorAll('.faq-item');
+
+                searchInput.addEventListener('input', (e) => {
+                    const query = e.target.value.toLowerCase();
+
+                    faqItems.forEach(item => {
+                        const question = item.querySelector('.faq-question h3').textContent.toLowerCase();
+                        const answer = item.querySelector('.faq-answer p').textContent.toLowerCase();
+
+                        if (question.includes(query) || answer.includes(query)) {
+                            item.style.display = 'block';
+                            if (query) {
+                                // 展开搜索结果
+                                const answer = item.querySelector('.faq-answer');
+                                const icon = item.querySelector('.faq-icon');
+                                answer.classList.add('expanded');
+                                icon.classList.add('rotated');
+                            }
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            }
+
+            setupCategories() {
+                const categoryBtns = document.querySelectorAll('.faq-category-btn');
+                const faqItems = document.querySelectorAll('.faq-item');
+
+                categoryBtns.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        // 更新按钮状态
+                        categoryBtns.forEach(b => {
+                            b.classList.remove('active');
+                            b.style.background = 'transparent';
+                            b.style.color = 'var(--text-color)';
+                        });
+
+                        btn.classList.add('active');
+                        btn.style.background = 'var(--primary-color)';
+                        btn.style.color = 'white';
+
+                        // 过滤 FAQ 项目
+                        const category = btn.dataset.category;
+                        faqItems.forEach(item => {
+                            if (category === 'all' || item.dataset.category === category) {
+                                item.style.display = 'block';
+                            } else {
+                                item.style.display = 'none';
+                            }
+                        });
+                    });
+                });
+            }
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            new ThemeManager();
+            new FAQManager();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>使用帮助 - Linux.do 数据分析工具</title>
+
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- FontAwesome -->
+    <script src="https://kit.fontawesome.com/2c3e4a5a0e.js" crossorigin="anonymous"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="min-h-screen" style="background: var(--background-gradient)">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 backdrop-blur-md border-b" style="background: var(--card-bg); border-color: var(--border-color);">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="flex items-center space-x-2 text-xl font-bold" style="color: var(--primary-color);">
+                        <span>📊</span>
+                        <span>Linux.do 数据分析</span>
+                    </a>
+                </div>
+
+                <div class="flex items-center space-x-6">
+                    <a href="index.html" class="nav-link transition-colors hover:opacity-75" style="color: var(--text-color);">
+                        数据分析
+                    </a>
+                    <a href="help.html" class="nav-link current transition-colors" style="color: var(--primary-color); font-weight: 600;">
+                        使用帮助
+                    </a>
+                    <a href="about.html" class="nav-link transition-colors hover:opacity-75" style="color: var(--text-color);">
+                        关于我们
+                    </a>
+                    <a href="faq.html" class="nav-link transition-colors hover:opacity-75" style="color: var(--text-color);">
+                        常见问题
+                    </a>
+                    <a href="privacy.html" class="nav-link transition-colors hover:opacity-75" style="color: var(--text-color);">
+                        隐私政策
+                    </a>
+
+                    <!-- 主题切换器 -->
+                    <div class="relative">
+                        <select id="themeSelector" class="appearance-none rounded-lg px-3 py-2 text-sm border focus:outline-none focus:ring-2 transition-all"
+                                style="background: var(--card-bg); color: var(--text-color); border-color: var(--border-color); --tw-ring-color: var(--primary-color);">
+                            <option value="apple">简洁</option>
+                            <option value="xiaomi">现代</option>
+                            <option value="huawei">商务</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+
+        <!-- Hero Header -->
+        <header class="text-center mb-16">
+            <div class="relative p-12 rounded-3xl shadow-2xl overflow-hidden" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                <!-- 背景装饰 -->
+                <div class="absolute inset-0 bg-gradient-to-br from-indigo-50/30 to-purple-50/30"></div>
+
+                <div class="relative z-10">
+                    <!-- 现代化图标设计 -->
+                    <div class="relative mb-8">
+                        <div class="w-24 h-24 mx-auto bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-600 rounded-3xl flex items-center justify-center shadow-2xl">
+                            <i class="fas fa-graduation-cap text-white text-3xl"></i>
+                        </div>
+                        <!-- 装饰性徽章 -->
+                        <div class="absolute -top-2 -right-2 w-8 h-8 bg-green-400 rounded-full flex items-center justify-center shadow-lg">
+                            <i class="fas fa-check text-white text-sm"></i>
+                        </div>
+                    </div>
+
+                    <h1 class="text-5xl font-black mb-6 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                        使用帮助
+                    </h1>
+                    <p class="text-xl leading-relaxed max-w-3xl mx-auto" style="color: var(--text-secondary);">
+                        <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
+                        从数据导出到报告生成，一站式指南助您轻松掌握所有功能
+                    </p>
+
+                    <!-- 统计信息 -->
+                    <div class="flex justify-center items-center space-x-8 mt-8">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-indigo-600">3</div>
+                            <div class="text-sm" style="color: var(--text-secondary);">简单步骤</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-purple-600">8+</div>
+                            <div class="text-sm" style="color: var(--text-secondary);">分析维度</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-pink-600">100%</div>
+                            <div class="text-sm" style="color: var(--text-secondary);">数据安全</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 快速开始 - 现代化设计 -->
+        <section class="mb-16">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-4" style="color: var(--text-color);">
+                    <i class="fas fa-rocket text-indigo-600 mr-3"></i>
+                    快速开始
+                </h2>
+                <p class="text-lg" style="color: var(--text-secondary);">三个简单步骤，立即开始分析您的数据</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- 步骤1 - 现代化卡片设计 -->
+                <div class="group">
+                    <div class="relative p-8 rounded-2xl transition-all duration-300 hover:shadow-xl hover:-translate-y-2" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                        <!-- 步骤指示器 -->
+                        <div class="absolute -top-4 left-6">
+                            <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                                1
+                            </div>
+                        </div>
+
+                        <!-- 图标区域 -->
+                        <div class="text-center mb-6">
+                            <div class="w-16 h-16 mx-auto bg-gradient-to-br from-indigo-500 to-blue-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                                <i class="fas fa-download text-white text-2xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3" style="color: var(--text-color);">获取数据</h3>
+                        </div>
+
+                        <p class="text-base leading-relaxed text-center" style="color: var(--text-secondary);">
+                            访问 Linux.do 个人设置页面，申请并下载您的个人数据档案
+                        </p>
+
+                        <!-- 操作链接 -->
+                        <div class="mt-6 text-center">
+                            <a href="https://linux.do/my/preferences/account" target="_blank"
+                               class="inline-flex items-center text-indigo-600 hover:text-indigo-700 font-medium text-sm">
+                                <i class="fas fa-external-link-alt mr-2"></i>
+                                前往论坛设置
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步骤2 -->
+                <div class="group">
+                    <div class="relative p-8 rounded-2xl transition-all duration-300 hover:shadow-xl hover:-translate-y-2" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                        <div class="absolute -top-4 left-6">
+                            <div class="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                                2
+                            </div>
+                        </div>
+
+                        <div class="text-center mb-6">
+                            <div class="w-16 h-16 mx-auto bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                                <i class="fas fa-upload text-white text-2xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3" style="color: var(--text-color);">上传分析</h3>
+                        </div>
+
+                        <p class="text-base leading-relaxed text-center" style="color: var(--text-secondary);">
+                            将下载的 ZIP 文件拖拽上传，系统自动解析并开始分析
+                        </p>
+
+                        <div class="mt-6 text-center">
+                            <a href="index.html"
+                               class="inline-flex items-center text-purple-600 hover:text-purple-700 font-medium text-sm">
+                                <i class="fas fa-arrow-right mr-2"></i>
+                                开始上传
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步骤3 -->
+                <div class="group">
+                    <div class="relative p-8 rounded-2xl transition-all duration-300 hover:shadow-xl hover:-translate-y-2" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                        <div class="absolute -top-4 left-6">
+                            <div class="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                                3
+                            </div>
+                        </div>
+
+                        <div class="text-center mb-6">
+                            <div class="w-16 h-16 mx-auto bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                                <i class="fas fa-chart-bar text-white text-2xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3" style="color: var(--text-color);">查看报告</h3>
+                        </div>
+
+                        <p class="text-base leading-relaxed text-center" style="color: var(--text-secondary);">
+                            自动生成包含图表、统计和深度洞察的专业分析报告
+                        </p>
+
+                        <div class="mt-6 text-center">
+                            <span class="inline-flex items-center text-green-600 font-medium text-sm">
+                                <i class="fas fa-magic mr-2"></i>
+                                智能生成
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 详细步骤 -->
+        <section class="mb-8">
+            <div class="p-8 rounded-2xl" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                <h2 class="text-2xl font-bold mb-6 flex items-center" style="color: var(--text-color);">
+                    <i class="fas fa-list-ol text-green-500 mr-3"></i>
+                    详细操作步骤
+                </h2>
+
+                <div class="space-y-8">
+                    <!-- 步骤1 -->
+                    <div class="border-l-4 pl-6" style="border-color: var(--primary-color);">
+                        <h3 class="text-xl font-semibold mb-3" style="color: var(--text-color);">
+                            第一步：导出论坛数据
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="flex items-start">
+                                <i class="fas fa-chevron-right mt-1 mr-3" style="color: var(--primary-color);"></i>
+                                <div>
+                                    <p style="color: var(--text-secondary);">登录您的 Linux.do 账户</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <i class="fas fa-chevron-right mt-1 mr-3" style="color: var(--primary-color);"></i>
+                                <div>
+                                    <p style="color: var(--text-secondary);">
+                                        访问个人设置页面：
+                                        <a href="https://linux.do/my/preferences/account" target="_blank"
+                                           class="font-medium hover:opacity-70 transition-opacity" style="color: var(--primary-color);">
+                                            linux.do/my/preferences/account
+                                        </a>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <i class="fas fa-chevron-right mt-1 mr-3" style="color: var(--primary-color);"></i>
+                                <div>
+                                    <p style="color: var(--text-secondary);">滚动到页面底部，找到"下载我的档案"部分</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <i class="fas fa-chevron-right mt-1 mr-3" style="color: var(--primary-color);"></i>
+                                <div>
+                                    <p style="color: var(--text-secondary);">点击"请求下载"按钮，等待邮件通知</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <i class="fas fa-chevron-right mt-1 mr-3" style="color: var(--primary-color);"></i>
+                                <div>
+                                    <p style="color: var(--text-secondary);">从邮件中下载 ZIP 数据包（通常几分钟内收到）</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 p-4 rounded-lg border-l-4 border-orange-500" style="background: var(--surface-secondary);">
+                            <p class="text-sm" style="color: var(--text-secondary);">
+                                <i class="fas fa-exclamation-triangle text-orange-500 mr-2"></i>
+                                <strong>注意：</strong>请确保下载的 ZIP 文件大小不超过 10MB
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 步骤2 -->
+                    <div class="border-l-4 pl-6" style="border-color: var(--primary-color);">
+                        <h3 class="text-xl font-semibold mb-3" style="color: var(--text-color);">
+                            第二步：上传数据文件
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="flex items-start">
+                                <i class="fas fa-chevron-right mt-1 mr-3" style="color: var(--primary-color);"></i>
+                                <div>
+                                    <p style="color: var(--text-secondary);">返回数据分析工具主页</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <i class="fas fa-chevron-right mt-1 mr-3" style="color: var(--primary-color);"></i>
+                                <div>
+                                    <p style="color: var(--text-secondary);">
+                                        <strong>方式一：</strong>直接将 ZIP 文件拖拽到上传区域
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <i class="fas fa-chevron-right mt-1 mr-3" style="color: var(--primary-color);"></i>
+                                <div>
+                                    <p style="color: var(--text-secondary);">
+                                        <strong>方式二：</strong>点击上传区域或"选择文件"按钮，选择 ZIP 文件
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <i class="fas fa-chevron-right mt-1 mr-3" style="color: var(--primary-color);"></i>
+                                <div>
+                                    <p style="color: var(--text-secondary);">工具将自动开始解析和分析您的数据</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 步骤3 -->
+                    <div class="border-l-4 pl-6" style="border-color: var(--primary-color);">
+                        <h3 class="text-xl font-semibold mb-3" style="color: var(--text-color);">
+                            第三步：查看分析结果
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="flex items-start">
+                                <i class="fas fa-chevron-right mt-1 mr-3" style="color: var(--primary-color);"></i>
+                                <div>
+                                    <p style="color: var(--text-secondary);">分析完成后，页面会自动显示结果</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <i class="fas fa-chevron-right mt-1 mr-3" style="color: var(--primary-color);"></i>
+                                <div>
+                                    <p style="color: var(--text-secondary);">查看用户信息概览和数据统计卡片</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <i class="fas fa-chevron-right mt-1 mr-3" style="color: var(--primary-color);"></i>
+                                <div>
+                                    <p style="color: var(--text-secondary);">浏览各种可视化图表（访问趋势、徽章时间线等）</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <i class="fas fa-chevron-right mt-1 mr-3" style="color: var(--primary-color);"></i>
+                                <div>
+                                    <p style="color: var(--text-secondary);">查看详细数据表格，支持搜索和分页</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 功能介绍 -->
+        <section class="mb-8">
+            <div class="p-8 rounded-2xl" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                <h2 class="text-2xl font-bold mb-6 flex items-center" style="color: var(--text-color);">
+                    <i class="fas fa-star text-yellow-500 mr-3"></i>
+                    功能特性介绍
+                </h2>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div class="p-4 rounded-lg" style="background: var(--surface-secondary);">
+                            <h3 class="font-semibold mb-2 flex items-center" style="color: var(--text-color);">
+                                <i class="fas fa-chart-bar text-blue-500 mr-2"></i>
+                                多维度数据分析
+                            </h3>
+                            <ul class="text-sm space-y-1">
+                                <li style="color: var(--text-secondary);">• 用户活跃度和发帖统计</li>
+                                <li style="color: var(--text-secondary);">• 点赞互动分析</li>
+                                <li style="color: var(--text-secondary);">• 徽章成就追踪</li>
+                                <li style="color: var(--text-secondary);">• 设备使用情况</li>
+                            </ul>
+                        </div>
+
+                        <div class="p-4 rounded-lg" style="background: var(--surface-secondary);">
+                            <h3 class="font-semibold mb-2 flex items-center" style="color: var(--text-color);">
+                                <i class="fas fa-chart-line text-green-500 mr-2"></i>
+                                可视化图表
+                            </h3>
+                            <ul class="text-sm space-y-1">
+                                <li style="color: var(--text-secondary);">• 访问趋势线图</li>
+                                <li style="color: var(--text-secondary);">• 徽章获得时间线</li>
+                                <li style="color: var(--text-secondary);">• 设备使用饼图</li>
+                                <li style="color: var(--text-secondary);">• 发帖活动热力图</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="p-4 rounded-lg" style="background: var(--surface-secondary);">
+                            <h3 class="font-semibold mb-2 flex items-center" style="color: var(--text-color);">
+                                <i class="fas fa-table text-purple-500 mr-2"></i>
+                                详细数据表格
+                            </h3>
+                            <ul class="text-sm space-y-1">
+                                <li style="color: var(--text-secondary);">• 发帖记录详情</li>
+                                <li style="color: var(--text-secondary);">• 访问记录查询</li>
+                                <li style="color: var(--text-secondary);">• 点赞历史记录</li>
+                                <li style="color: var(--text-secondary);">• 支持搜索和分页</li>
+                            </ul>
+                        </div>
+
+                        <div class="p-4 rounded-lg" style="background: var(--surface-secondary);">
+                            <h3 class="font-semibold mb-2 flex items-center" style="color: var(--text-color);">
+                                <i class="fas fa-palette text-orange-500 mr-2"></i>
+                                主题切换
+                            </h3>
+                            <ul class="text-sm space-y-1">
+                                <li style="color: var(--text-secondary);">• 简洁主题（默认）</li>
+                                <li style="color: var(--text-secondary);">• 现代主题</li>
+                                <li style="color: var(--text-secondary);">• 商务主题</li>
+                                <li style="color: var(--text-secondary);">• 设置自动保存</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 数据管理 -->
+        <section class="mb-8">
+            <div class="p-8 rounded-2xl" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                <h2 class="text-2xl font-bold mb-6 flex items-center" style="color: var(--text-color);">
+                    <i class="fas fa-database text-blue-500 mr-3"></i>
+                    数据管理功能
+                </h2>
+
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="p-4 rounded-lg border-l-4 border-blue-500" style="background: var(--surface-secondary);">
+                        <h3 class="font-semibold mb-2 flex items-center" style="color: var(--text-color);">
+                            <i class="fas fa-eye text-blue-500 mr-2"></i>
+                            查看已存储数据
+                        </h3>
+                        <p class="text-sm" style="color: var(--text-secondary);">
+                            查看之前分析过的数据记录，快速重新加载分析结果
+                        </p>
+                    </div>
+
+                    <div class="p-4 rounded-lg border-l-4 border-green-500" style="background: var(--surface-secondary);">
+                        <h3 class="font-semibold mb-2 flex items-center" style="color: var(--text-color);">
+                            <i class="fas fa-download text-green-500 mr-2"></i>
+                            导出分析数据
+                        </h3>
+                        <p class="text-sm" style="color: var(--text-secondary);">
+                            将分析结果导出为 JSON 格式，便于备份和分享
+                        </p>
+                    </div>
+
+                    <div class="p-4 rounded-lg border-l-4 border-red-500" style="background: var(--surface-secondary);">
+                        <h3 class="font-semibold mb-2 flex items-center" style="color: var(--text-color);">
+                            <i class="fas fa-trash-alt text-red-500 mr-2"></i>
+                            清空所有数据
+                        </h3>
+                        <p class="text-sm" style="color: var(--text-secondary);">
+                            一键清除所有本地存储的分析数据，保护隐私
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 常见问题 -->
+        <section class="mb-8">
+            <div class="p-8 rounded-2xl" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                <h2 class="text-2xl font-bold mb-6 flex items-center" style="color: var(--text-color);">
+                    <i class="fas fa-question-circle text-orange-500 mr-3"></i>
+                    常见问题解答
+                </h2>
+
+                <div class="space-y-4">
+                    <div class="p-4 rounded-lg border-l-4 border-blue-500" style="background: var(--surface-secondary);">
+                        <h3 class="font-semibold mb-2" style="color: var(--text-color);">
+                            Q: 我的数据安全吗？
+                        </h3>
+                        <p class="text-sm" style="color: var(--text-secondary);">
+                            A: 完全安全。所有数据分析都在您的浏览器本地进行，不会上传到任何服务器。详情请查看我们的
+                            <a href="privacy.html" class="font-medium hover:opacity-70 transition-opacity" style="color: var(--primary-color);">隐私政策</a>。
+                        </p>
+                    </div>
+
+                    <div class="p-4 rounded-lg border-l-4 border-green-500" style="background: var(--surface-secondary);">
+                        <h3 class="font-semibold mb-2" style="color: var(--text-color);">
+                            Q: 支持哪些数据文件？
+                        </h3>
+                        <p class="text-sm" style="color: var(--text-secondary);">
+                            A: 支持 Linux.do 导出的所有数据文件，包括发帖记录、访问记录、点赞记录、徽章记录等。必需文件：user_archive.csv 和 preferences.json。
+                        </p>
+                    </div>
+
+                    <div class="p-4 rounded-lg border-l-4 border-orange-500" style="background: var(--surface-secondary);">
+                        <h3 class="font-semibold mb-2" style="color: var(--text-color);">
+                            Q: 文件大小有限制吗？
+                        </h3>
+                        <p class="text-sm" style="color: var(--text-secondary);">
+                            A: 是的，ZIP 文件大小限制为 10MB。如果您的文件过大，请联系 Linux.do 管理员或删除部分不必要的数据。
+                        </p>
+                    </div>
+
+                    <div class="p-4 rounded-lg border-l-4 border-purple-500" style="background: var(--surface-secondary);">
+                        <h3 class="font-semibold mb-2" style="color: var(--text-color);">
+                            Q: 可以离线使用吗？
+                        </h3>
+                        <p class="text-sm" style="color: var(--text-secondary);">
+                            A: 是的，除了首次加载页面需要网络，所有分析功能都可以在离线状态下使用。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 键盘快捷键 -->
+        <section class="mb-8">
+            <div class="p-8 rounded-2xl" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                <h2 class="text-2xl font-bold mb-6 flex items-center" style="color: var(--text-color);">
+                    <i class="fas fa-keyboard text-purple-500 mr-3"></i>
+                    键盘快捷键
+                </h2>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="p-4 rounded-lg" style="background: var(--surface-secondary);">
+                        <h3 class="font-semibold mb-3" style="color: var(--text-color);">文件操作</h3>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex items-center justify-between">
+                                <span style="color: var(--text-secondary);">打开文件</span>
+                                <kbd class="px-2 py-1 rounded text-xs" style="background: var(--primary-color); color: white;">Ctrl + O</kbd>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span style="color: var(--text-secondary);">导出数据</span>
+                                <kbd class="px-2 py-1 rounded text-xs" style="background: var(--primary-color); color: white;">Ctrl + E</kbd>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 rounded-lg" style="background: var(--surface-secondary);">
+                        <h3 class="font-semibold mb-3" style="color: var(--text-color);">界面操作</h3>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex items-center justify-between">
+                                <span style="color: var(--text-secondary);">关闭弹窗</span>
+                                <kbd class="px-2 py-1 rounded text-xs" style="background: var(--primary-color); color: white;">Esc</kbd>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span style="color: var(--text-secondary);">搜索数据</span>
+                                <kbd class="px-2 py-1 rounded text-xs" style="background: var(--primary-color); color: white;">Ctrl + F</kbd>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 技术支持 -->
+        <section class="mb-8">
+            <div class="p-8 rounded-2xl" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                <h2 class="text-2xl font-bold mb-6 flex items-center" style="color: var(--text-color);">
+                    <i class="fas fa-life-ring text-red-500 mr-3"></i>
+                    技术支持
+                </h2>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="p-4 rounded-lg" style="background: var(--surface-secondary);">
+                        <h3 class="font-semibold mb-2" style="color: var(--text-color);">遇到问题？</h3>
+                        <p class="text-sm mb-3" style="color: var(--text-secondary);">
+                            如果您在使用过程中遇到任何问题，请通过以下方式获取帮助：
+                        </p>
+                        <a href="https://github.com/dext7r/linux-do-analyzer/issues"
+                           target="_blank"
+                           class="inline-flex items-center text-sm hover:opacity-70 transition-opacity"
+                           style="color: var(--primary-color);">
+                            <i class="fab fa-github mr-2"></i>
+                            提交 GitHub Issue
+                        </a>
+                    </div>
+
+                    <div class="p-4 rounded-lg" style="background: var(--surface-secondary);">
+                        <h3 class="font-semibold mb-2" style="color: var(--text-color);">功能建议</h3>
+                        <p class="text-sm mb-3" style="color: var(--text-secondary);">
+                            我们欢迎您的功能建议和改进意见：
+                        </p>
+                        <a href="https://linux.do/"
+                           target="_blank"
+                           class="inline-flex items-center text-sm hover:opacity-70 transition-opacity"
+                           style="color: var(--primary-color);">
+                            <i class="fas fa-users mr-2"></i>
+                            Linux.do 社区讨论
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center py-8" style="color: var(--text-muted);">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-center gap-4 flex-wrap text-sm">
+                <a href="privacy.html" class="hover:opacity-70 transition-opacity" style="color: var(--text-muted);">
+                    <i class="fas fa-shield-alt mr-1"></i>
+                    隐私政策
+                </a>
+                <span>|</span>
+                <a href="about.html" class="hover:opacity-70 transition-opacity" style="color: var(--text-muted);">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    关于我们
+                </a>
+                <span>|</span>
+                <span class="flex items-center gap-2">
+                    <i class="fas fa-heart text-red-500"></i>
+                    为 Linux.do 社区服务
+                </span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 主题管理
+        class ThemeManager {
+            constructor() {
+                this.currentTheme = localStorage.getItem('app-theme') || 'apple';
+                this.init();
+            }
+
+            init() {
+                this.applyTheme(this.currentTheme);
+                this.setupThemeSelector();
+            }
+
+            applyTheme(theme) {
+                document.documentElement.removeAttribute('data-theme');
+                if (theme !== 'apple') {
+                    document.documentElement.setAttribute('data-theme', theme);
+                }
+                const selector = document.getElementById('themeSelector');
+                if (selector) {
+                    selector.value = theme;
+                }
+                localStorage.setItem('app-theme', theme);
+            }
+
+            setupThemeSelector() {
+                const selector = document.getElementById('themeSelector');
+                if (selector) {
+                    selector.addEventListener('change', (e) => {
+                        this.applyTheme(e.target.value);
+                    });
+                }
+            }
+        }
+
+        // 初始化主题管理器
+        document.addEventListener('DOMContentLoaded', () => {
+            new ThemeManager();
+        });
+    </script>
+
+</body>
+</html>

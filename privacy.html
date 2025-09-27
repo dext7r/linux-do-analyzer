@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>隐私政策 - Linux.do 数据分析工具</title>
+
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- FontAwesome -->
+    <script src="https://kit.fontawesome.com/2c3e4a5a0e.js" crossorigin="anonymous"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="min-h-screen" style="background: var(--background-gradient)">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 backdrop-blur-md border-b" style="background: var(--card-bg); border-color: var(--border-color);">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="flex items-center space-x-2 text-xl font-bold" style="color: var(--primary-color);">
+                        <span>📊</span>
+                        <span>Linux.do 数据分析</span>
+                    </a>
+                </div>
+
+                <div class="flex items-center space-x-6">
+                    <a href="index.html" class="nav-link transition-colors hover:opacity-75" style="color: var(--text-color);">
+                        数据分析
+                    </a>
+                    <a href="help.html" class="nav-link transition-colors hover:opacity-75" style="color: var(--text-color);">
+                        使用帮助
+                    </a>
+                    <a href="about.html" class="nav-link transition-colors hover:opacity-75" style="color: var(--text-color);">
+                        关于我们
+                    </a>
+                    <a href="faq.html" class="nav-link transition-colors hover:opacity-75" style="color: var(--text-color);">
+                        常见问题
+                    </a>
+                    <a href="privacy.html" class="nav-link current transition-colors" style="color: var(--primary-color); font-weight: 600;">
+                        隐私政策
+                    </a>
+
+                    <!-- 主题切换器 -->
+                    <div class="relative">
+                        <select id="themeSelector" class="appearance-none rounded-lg px-3 py-2 text-sm border focus:outline-none focus:ring-2 transition-all"
+                                style="background: var(--card-bg); color: var(--text-color); border-color: var(--border-color); --tw-ring-color: var(--primary-color);">
+                            <option value="apple">简洁</option>
+                            <option value="xiaomi">现代</option>
+                            <option value="huawei">商务</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+
+        <!-- Header -->
+        <header class="text-center mb-12">
+            <div class="p-8 rounded-3xl shadow-lg" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                <div class="w-16 h-16 mx-auto mb-6 rounded-2xl flex items-center justify-center" style="background: var(--primary-color);">
+                    <i class="fas fa-shield-alt text-white text-2xl"></i>
+                </div>
+                <h1 class="text-4xl font-bold mb-4" style="color: var(--text-color);">隐私政策</h1>
+                <p class="text-lg leading-relaxed" style="color: var(--text-secondary);">
+                    我们致力于保护您的隐私，确保您的数据安全
+                </p>
+                <div class="text-sm mt-4 px-4 py-2 rounded-full inline-block" style="background: var(--surface-secondary); color: var(--text-muted);">
+                    最后更新：2025年9月27日
+                </div>
+            </div>
+        </header>
+
+        <!-- Content -->
+        <div class="space-y-8">
+
+            <!-- 核心原则 -->
+            <section class="p-8 rounded-2xl" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                <h2 class="text-2xl font-bold mb-6 flex items-center" style="color: var(--text-color);">
+                    <i class="fas fa-heart text-red-500 mr-3"></i>
+                    核心隐私原则
+                </h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="p-4 rounded-lg" style="background: var(--surface-secondary);">
+                        <h3 class="font-semibold mb-2 flex items-center" style="color: var(--text-color);">
+                            <i class="fas fa-laptop text-blue-500 mr-2"></i>
+                            100% 本地处理
+                        </h3>
+                        <p class="text-sm" style="color: var(--text-secondary);">
+                            所有数据分析完全在您的浏览器中进行，不会上传到任何服务器
+                        </p>
+                    </div>
+                    <div class="p-4 rounded-lg" style="background: var(--surface-secondary);">
+                        <h3 class="font-semibold mb-2 flex items-center" style="color: var(--text-color);">
+                            <i class="fas fa-times-circle text-red-500 mr-2"></i>
+                            零数据收集
+                        </h3>
+                        <p class="text-sm" style="color: var(--text-secondary);">
+                            我们不收集、存储或传输任何个人数据或分析结果
+                        </p>
+                    </div>
+                    <div class="p-4 rounded-lg" style="background: var(--surface-secondary);">
+                        <h3 class="font-semibold mb-2 flex items-center" style="color: var(--text-color);">
+                            <i class="fas fa-wifi-slash text-orange-500 mr-2"></i>
+                            离线可用
+                        </h3>
+                        <p class="text-sm" style="color: var(--text-secondary);">
+                            除了加载页面，其他所有功能都可以在断网状态下使用
+                        </p>
+                    </div>
+                    <div class="p-4 rounded-lg" style="background: var(--surface-secondary);">
+                        <h3 class="font-semibold mb-2 flex items-center" style="color: var(--text-color);">
+                            <i class="fas fa-code text-green-500 mr-2"></i>
+                            开源透明
+                        </h3>
+                        <p class="text-sm" style="color: var(--text-secondary);">
+                            所有源代码公开，您可以审查和验证我们的隐私承诺
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 数据处理说明 -->
+            <section class="p-8 rounded-2xl" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                <h2 class="text-2xl font-bold mb-6 flex items-center" style="color: var(--text-color);">
+                    <i class="fas fa-cogs text-blue-500 mr-3"></i>
+                    数据处理说明
+                </h2>
+
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3" style="color: var(--text-color);">您上传的数据文件</h3>
+                        <ul class="space-y-2">
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                                <span style="color: var(--text-secondary);">仅在浏览器内存中临时处理，不会保存到设备存储</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                                <span style="color: var(--text-secondary);">关闭浏览器标签页后，所有数据自动清除</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                                <span style="color: var(--text-secondary);">不会通过网络传输到任何外部服务器</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3" style="color: var(--text-color);">分析结果</h3>
+                        <ul class="space-y-2">
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                                <span style="color: var(--text-secondary);">可选择保存到浏览器本地存储 (IndexedDB)</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                                <span style="color: var(--text-secondary);">仅您自己可以访问，其他网站无法读取</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                                <span style="color: var(--text-secondary);">可随时清除所有本地存储的数据</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 技术保障 -->
+            <section class="p-8 rounded-2xl" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                <h2 class="text-2xl font-bold mb-6 flex items-center" style="color: var(--text-color);">
+                    <i class="fas fa-lock text-yellow-500 mr-3"></i>
+                    技术安全保障
+                </h2>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3" style="color: var(--text-color);">浏览器安全沙盒</h3>
+                        <p class="text-sm mb-3" style="color: var(--text-secondary);">
+                            利用现代浏览器的安全沙盒环境，确保代码运行的安全性
+                        </p>
+                        <ul class="space-y-1 text-sm">
+                            <li class="flex items-center">
+                                <i class="fas fa-shield-check text-green-500 mr-2"></i>
+                                <span style="color: var(--text-secondary);">同源策略保护</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-shield-check text-green-500 mr-2"></i>
+                                <span style="color: var(--text-secondary);">内容安全策略 (CSP)</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3" style="color: var(--text-color);">文件处理安全</h3>
+                        <p class="text-sm mb-3" style="color: var(--text-secondary);">
+                            严格的文件类型验证和大小限制，防止恶意文件上传
+                        </p>
+                        <ul class="space-y-1 text-sm">
+                            <li class="flex items-center">
+                                <i class="fas fa-shield-check text-green-500 mr-2"></i>
+                                <span style="color: var(--text-secondary);">仅接受 .zip 格式文件</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-shield-check text-green-500 mr-2"></i>
+                                <span style="color: var(--text-secondary);">10MB 文件大小限制</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 第三方服务 -->
+            <section class="p-8 rounded-2xl" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                <h2 class="text-2xl font-bold mb-6 flex items-center" style="color: var(--text-color);">
+                    <i class="fas fa-cloud text-purple-500 mr-3"></i>
+                    第三方服务说明
+                </h2>
+
+                <div class="space-y-4">
+                    <div class="p-4 rounded-lg" style="background: var(--surface-secondary);">
+                        <h3 class="font-semibold mb-2" style="color: var(--text-color);">CDN 服务</h3>
+                        <p class="text-sm" style="color: var(--text-secondary);">
+                            我们使用以下 CDN 服务加载必要的库文件，这些服务可能会记录访问日志：
+                        </p>
+                        <ul class="mt-2 text-sm space-y-1">
+                            <li style="color: var(--text-muted);">• TailwindCSS (cdn.tailwindcss.com)</li>
+                            <li style="color: var(--text-muted);">• Chart.js (cdn.jsdelivr.net)</li>
+                            <li style="color: var(--text-muted);">• jQuery (code.jquery.com)</li>
+                            <li style="color: var(--text-muted);">• FontAwesome (kit.fontawesome.com)</li>
+                            <li style="color: var(--text-muted);">• JSZip (cdnjs.cloudflare.com)</li>
+                        </ul>
+                    </div>
+
+                    <div class="p-4 rounded-lg border-l-4 border-blue-500" style="background: var(--surface-secondary);">
+                        <p class="text-sm" style="color: var(--text-secondary);">
+                            <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                            <strong>重要说明：</strong>这些 CDN 服务仅用于加载页面资源，不会接触到您的分析数据。
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 您的权利 -->
+            <section class="p-8 rounded-2xl" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                <h2 class="text-2xl font-bold mb-6 flex items-center" style="color: var(--text-color);">
+                    <i class="fas fa-user-shield text-green-500 mr-3"></i>
+                    您的数据权利
+                </h2>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div class="p-3 rounded-lg" style="background: var(--surface-secondary);">
+                            <h3 class="font-semibold flex items-center mb-2" style="color: var(--text-color);">
+                                <i class="fas fa-eye text-blue-500 mr-2"></i>
+                                查看权
+                            </h3>
+                            <p class="text-sm" style="color: var(--text-secondary);">
+                                您可以随时查看本地存储的分析数据
+                            </p>
+                        </div>
+
+                        <div class="p-3 rounded-lg" style="background: var(--surface-secondary);">
+                            <h3 class="font-semibold flex items-center mb-2" style="color: var(--text-color);">
+                                <i class="fas fa-download text-green-500 mr-2"></i>
+                                导出权
+                            </h3>
+                            <p class="text-sm" style="color: var(--text-secondary);">
+                                您可以导出所有分析数据为 JSON 格式
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="p-3 rounded-lg" style="background: var(--surface-secondary);">
+                            <h3 class="font-semibold flex items-center mb-2" style="color: var(--text-color);">
+                                <i class="fas fa-eraser text-orange-500 mr-2"></i>
+                                删除权
+                            </h3>
+                            <p class="text-sm" style="color: var(--text-secondary);">
+                                您可以一键清除所有本地存储的数据
+                            </p>
+                        </div>
+
+                        <div class="p-3 rounded-lg" style="background: var(--surface-secondary);">
+                            <h3 class="font-semibold flex items-center mb-2" style="color: var(--text-color);">
+                                <i class="fas fa-shield-alt text-purple-500 mr-2"></i>
+                                控制权
+                            </h3>
+                            <p class="text-sm" style="color: var(--text-secondary);">
+                                您完全控制数据的处理和存储方式
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 联系我们 -->
+            <section class="p-8 rounded-2xl" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                <h2 class="text-2xl font-bold mb-6 flex items-center" style="color: var(--text-color);">
+                    <i class="fas fa-envelope text-blue-500 mr-3"></i>
+                    联系我们
+                </h2>
+
+                <div class="space-y-4">
+                    <p style="color: var(--text-secondary);">
+                        如果您对本隐私政策有任何疑问或建议，请通过以下方式联系我们：
+                    </p>
+
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="p-4 rounded-lg" style="background: var(--surface-secondary);">
+                            <h3 class="font-semibold mb-2" style="color: var(--text-color);">GitHub Issues</h3>
+                            <a href="https://github.com/dext7r/linux-do-analyzer/issues"
+                               class="text-sm hover:opacity-70 transition-opacity"
+                               style="color: var(--primary-color);" target="_blank">
+                                <i class="fab fa-github mr-2"></i>
+                                提交问题或建议
+                            </a>
+                        </div>
+
+                        <div class="p-4 rounded-lg" style="background: var(--surface-secondary);">
+                            <h3 class="font-semibold mb-2" style="color: var(--text-color);">Linux.do 社区</h3>
+                            <a href="https://linux.do/"
+                               class="text-sm hover:opacity-70 transition-opacity"
+                               style="color: var(--primary-color);" target="_blank">
+                                <i class="fas fa-users mr-2"></i>
+                                在社区中讨论
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center py-8" style="color: var(--text-muted);">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-center gap-4 flex-wrap text-sm">
+                <span class="flex items-center gap-2">
+                    <i class="fas fa-shield-alt text-green-500"></i>
+                    隐私优先
+                </span>
+                <span>|</span>
+                <span class="flex items-center gap-2">
+                    <i class="fas fa-code text-blue-500"></i>
+                    开源透明
+                </span>
+                <span>|</span>
+                <span class="flex items-center gap-2">
+                    <i class="fas fa-heart text-red-500"></i>
+                    为 Linux.do 社区服务
+                </span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 主题管理
+        class ThemeManager {
+            constructor() {
+                this.currentTheme = localStorage.getItem('app-theme') || 'apple';
+                this.init();
+            }
+
+            init() {
+                this.applyTheme(this.currentTheme);
+                this.setupThemeSelector();
+            }
+
+            applyTheme(theme) {
+                document.documentElement.removeAttribute('data-theme');
+                if (theme !== 'apple') {
+                    document.documentElement.setAttribute('data-theme', theme);
+                }
+                const selector = document.getElementById('themeSelector');
+                if (selector) {
+                    selector.value = theme;
+                }
+                localStorage.setItem('app-theme', theme);
+            }
+
+            setupThemeSelector() {
+                const selector = document.getElementById('themeSelector');
+                if (selector) {
+                    selector.addEventListener('change', (e) => {
+                        this.applyTheme(e.target.value);
+                    });
+                }
+            }
+        }
+
+        // 初始化主题管理器
+        document.addEventListener('DOMContentLoaded', () => {
+            new ThemeManager();
+        });
+    </script>
+
+</body>
+</html>

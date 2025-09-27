@@ -1,27 +1,74 @@
 {
-  "name": "linux-do-data-analyzer",
-  "version": "1.0.0",
-  "description": "Linux.do 论坛个人数据分析工具",
+  "name": "linux-do-analyzer",
+  "version": "2.0.0",
+  "description": "Linux.do 论坛个人数据分析工具 - 现代化的纯前端数据可视化分析平台",
   "author": "dext7r",
   "license": "MIT",
-  "exports": "./src/main.ts",
+  "homepage": "https://github.com/dext7r/linux-do-analyzer",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dext7r/linux-do-analyzer.git"
+  },
+  "keywords": [
+    "linux.do",
+    "data-analysis",
+    "forum-analytics",
+    "chart-visualization",
+    "privacy-first",
+    "client-side"
+  ],
   "tasks": {
-    "start": "deno run --allow-read --allow-write --allow-net src/main.ts",
-    "dev": "deno run --allow-read --allow-write --allow-net --watch src/main.ts",
-    "analyze": "deno run --allow-read --allow-write src/analyzer.ts",
-    "serve": "deno run --allow-read --allow-net --allow-write src/server.ts"
+    "serve": "deno run --allow-net --allow-read jsr:@std/http/file-server --port=8080 .",
+    "dev": "deno run --allow-net --allow-read --watch jsr:@std/http/file-server --port=8080 .",
+    "preview": "deno run --allow-net --allow-read jsr:@std/http/file-server --port=3000 .",
+    "lint": "deno lint js/ css/",
+    "fmt": "deno fmt js/ css/ *.md *.json",
+    "check": "deno check js/*.js",
+    "test": "deno test --allow-read --allow-write tests/",
+    "bundle": "deno bundle js/app.js dist/app.bundle.js",
+    "clean": "rm -rf dist/ .temp/"
+  },
+  "fmt": {
+    "files": {
+      "include": ["js/", "css/", "*.md", "*.json"],
+      "exclude": ["dist/", ".temp/", "node_modules/"]
+    },
+    "options": {
+      "indentWidth": 4,
+      "lineWidth": 100,
+      "semiColons": true,
+      "singleQuote": true,
+      "proseWrap": "preserve"
+    }
+  },
+  "lint": {
+    "files": {
+      "include": ["js/", "css/"],
+      "exclude": ["dist/", ".temp/", "node_modules/"]
+    },
+    "rules": {
+      "tags": ["recommended"],
+      "exclude": ["no-unused-vars"]
+    }
   },
   "compilerOptions": {
-    "strict": true,
-    "lib": ["dom", "deno.window"]
+    "allowJs": true,
+    "lib": ["dom", "dom.iterable", "dom.asynciterable", "deno.ns"],
+    "strict": false,
+    "target": "ES2022"
   },
   "imports": {
-    "@std/csv": "jsr:@std/csv@1.0.3",
-    "@std/datetime": "jsr:@std/datetime@0.224.5",
-    "@std/http": "jsr:@std/http@1.0.2",
-    "@std/path": "jsr:@std/path@1.0.2",
-    "@std/json": "jsr:@std/json@1.0.0",
-    "chart.js": "https://cdn.skypack.dev/chart.js@4.4.0",
-    "plotly": "https://cdn.skypack.dev/plotly.js-dist@2.26.0"
-  }
+    "@std/http": "jsr:@std/http@^1.0.0",
+    "@std/path": "jsr:@std/path@^1.0.0",
+    "@std/fs": "jsr:@std/fs@^1.0.0",
+    "@std/encoding": "jsr:@std/encoding@^1.0.0"
+  },
+  "exclude": [
+    "dist/",
+    ".temp/",
+    "node_modules/",
+    "*.zip",
+    ".git/",
+    ".DS_Store"
+  ]
 }
