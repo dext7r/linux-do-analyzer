@@ -60,28 +60,397 @@ class DataAnalyzer {
     getUserInfo() {
         const user = this.data.user || {};
         return {
+            // 基本身份信息
             id: user.id || 0,
             username: user.username || '未知用户',
             name: user.name || '',
             email: user.email || '',
             created_at: user.created_at || '',
+            last_seen_at: user.last_seen_at || '',
+            last_posted_at: user.last_posted_at || '',
+
+            // 头像信息
+            avatar_template: user.avatar_template || '',
+            custom_avatar_template: user.custom_avatar_template || '',
+
+            // 信任和权限
             trust_level: user.trust_level || 0,
             active: user.active || false,
             admin: user.admin || false,
             moderator: user.moderator || false,
-            avatar_template: user.avatar_template || '',
+            title: user.title || '',
+
+            // 个人资料
+            bio_raw: user.bio_raw || '',
+            bio_cooked: user.bio_cooked || '',
+            location: user.location || '',
+            birthdate: user.birthdate || '',
+            cakedate: user.cakedate || '',
+            locale: user.locale || '',
+
+            // 统计数据
             time_read: user.time_read || 0,
+            recent_time_read: user.recent_time_read || 0,
             days_visited: user.days_visited || 0,
             posts_read_count: user.posts_read_count || 0,
             likes_given: user.likes_given || 0,
             likes_received: user.likes_received || 0,
             topics_entered: user.topics_entered || 0,
             post_count: user.post_count || 0,
+            profile_view_count: user.profile_view_count || 0,
+            total_followers: user.total_followers || 0,
+            total_following: user.total_following || 0,
+            badge_count: user.badge_count || 0,
+            accepted_answers: user.accepted_answers || 0,
+            gamification_score: user.gamification_score || 0,
+
+            // 权限开关
             can_edit: user.can_edit || false,
             can_edit_username: user.can_edit_username || false,
             can_edit_email: user.can_edit_email || false,
-            can_edit_name: user.can_edit_name || false
+            can_edit_name: user.can_edit_name || false,
+            can_send_private_messages: user.can_send_private_messages || false,
+            can_upload_profile_header: user.can_upload_profile_header || false,
+            can_upload_user_card_background: user.can_upload_user_card_background || false,
+
+            // 隐私设置
+            can_see_following: user.can_see_following || false,
+            can_see_followers: user.can_see_followers || false,
+            can_see_network_tab: user.can_see_network_tab || false,
+
+            // 安全设置
+            second_factor_enabled: user.second_factor_enabled || false,
+            second_factor_backup_enabled: user.second_factor_backup_enabled || false,
+
+            // 分类设置
+            watched_category_ids: user.watched_category_ids || [],
+            muted_category_ids: user.muted_category_ids || [],
+            tracked_category_ids: user.tracked_category_ids || [],
+            sidebar_category_ids: user.sidebar_category_ids || [],
+            sidebar_tags: user.sidebar_tags || [],
+
+            // 其他用户设置
+            muted_usernames: user.muted_usernames || [],
+            ignored_usernames: user.ignored_usernames || [],
+            featured_user_badge_ids: user.featured_user_badge_ids || [],
+
+            // 邀请信息
+            invited_by: user.invited_by || null,
+
+            // 通知设置
+            user_notification_schedule: user.user_notification_schedule || {},
+
+            // 自定义字段
+            custom_fields: user.custom_fields || {},
+            user_fields: user.user_fields || {}
         };
+    }
+
+    /**
+     * 获取徽章详细分析
+     */
+    getBadgeDetailedAnalysis() {
+        const cacheKey = 'badgeDetailedAnalysis';
+        if (this.cache.has(cacheKey)) {
+            return this.cache.get(cacheKey);
+        }
+
+        const result = {
+            userBadges: [],
+            badgeTypes: {},
+            badgesByType: {},
+            totalBadges: 0,
+            uniqueBadges: 0,
+            badgeTimeline: []
+        };
+
+        // 处理徽章类型
+        if (this.data.badge_types) {
+            this.data.badge_types.forEach(type => {
+                result.badgeTypes[type.id] = {
+                    id: type.id,
+                    name: type.name,
+                    sort_order: type.sort_order
+                };
+                result.badgesByType[type.name] = [];
+            });
+        }
+
+        // 处理系统徽章定义
+        const badgeDefinitions = {};
+        if (this.data.badges) {
+            this.data.badges.forEach(badge => {
+                badgeDefinitions[badge.id] = {
+                    id: badge.id,
+                    name: badge.name,
+                    description: badge.description,
+                    grant_count: badge.grant_count,
+                    allow_title: badge.allow_title,
+                    multiple_grant: badge.multiple_grant,
+                    icon: badge.icon,
+                    image_url: badge.image_url,
+                    listable: badge.listable,
+                    enabled: badge.enabled,
+                    badge_type_id: badge.badge_type_id,
+                    system: badge.system,
+                    slug: badge.slug
+                };
+            });
+        }
+
+        // 处理用户获得的徽章
+        if (this.data.user_badges) {
+            this.data.user_badges.forEach(userBadge => {
+                const badgeDefinition = badgeDefinitions[userBadge.badge_id] || {};
+                const badgeTypeName = result.badgeTypes[badgeDefinition.badge_type_id]?.name || '未知类型';
+
+                const enrichedBadge = {
+                    id: userBadge.id,
+                    granted_at: userBadge.granted_at,
+                    created_at: userBadge.created_at,
+                    count: userBadge.count || 1,
+                    badge_id: userBadge.badge_id,
+                    user_id: userBadge.user_id,
+                    granted_by_id: userBadge.granted_by_id,
+                    // 从徽章定义中获取的信息
+                    name: badgeDefinition.name || '未知徽章',
+                    description: badgeDefinition.description || '',
+                    icon: badgeDefinition.icon || '',
+                    image_url: badgeDefinition.image_url || '',
+                    badge_type: badgeTypeName,
+                    allow_title: badgeDefinition.allow_title || false,
+                    multiple_grant: badgeDefinition.multiple_grant || false
+                };
+
+                result.userBadges.push(enrichedBadge);
+                result.badgesByType[badgeTypeName] = result.badgesByType[badgeTypeName] || [];
+                result.badgesByType[badgeTypeName].push(enrichedBadge);
+
+                // 构建时间线
+                if (userBadge.granted_at) {
+                    result.badgeTimeline.push({
+                        date: userBadge.granted_at,
+                        badge_name: enrichedBadge.name,
+                        badge_type: badgeTypeName,
+                        count: enrichedBadge.count
+                    });
+                }
+
+                result.totalBadges += enrichedBadge.count;
+            });
+
+            // 计算独特徽章数量
+            const uniqueBadgeIds = new Set(this.data.user_badges.map(b => b.badge_id));
+            result.uniqueBadges = uniqueBadgeIds.size;
+
+            // 按时间排序徽章时间线
+            result.badgeTimeline.sort((a, b) => new Date(a.date) - new Date(b.date));
+        }
+
+        this.cache.set(cacheKey, result);
+        return result;
+    }
+
+    /**
+     * 获取用户权限和设置详细分析
+     */
+    getUserPermissionsAndSettings() {
+        const cacheKey = 'userPermissionsAndSettings';
+        if (this.cache.has(cacheKey)) {
+            return this.cache.get(cacheKey);
+        }
+
+        const user = this.data.user || {};
+
+        const result = {
+            // 基本权限
+            permissions: {
+                admin: user.admin || false,
+                moderator: user.moderator || false,
+                trust_level: user.trust_level || 0,
+                can_edit: user.can_edit || false,
+                can_edit_email: user.can_edit_email || false,
+                can_edit_name: user.can_edit_name || false,
+                can_send_private_messages: user.can_send_private_messages || false,
+                can_upload_profile_header: user.can_upload_profile_header || false,
+                can_upload_user_card_background: user.can_upload_user_card_background || false
+            },
+
+            // 隐私设置
+            privacy: {
+                email_private: user.email_private || false,
+                profile_hidden: user.profile_hidden || false,
+                can_see_following: user.can_see_following !== false,
+                can_see_followers: user.can_see_followers !== false,
+                can_see_network_tab: user.can_see_network_tab !== false,
+                muted_usernames: (user.muted_usernames || []).length,
+                ignored_usernames: (user.ignored_usernames || []).length
+            },
+
+            // 通知设置
+            notifications: {
+                email_digests: user.email_digests || false,
+                email_private_messages: user.email_private_messages || false,
+                email_direct: user.email_direct || false,
+                email_always: user.email_always || false,
+                notification_schedule_enabled: user.user_notification_schedule?.enabled || false,
+                digest_after_minutes: user.digest_after_minutes || 0,
+                automatically_unpin_topics: user.automatically_unpin_topics || false,
+                homepage_id: user.homepage_id || null
+            },
+
+            // 个性化设置
+            preferences: {
+                locale: user.locale || 'zh_CN',
+                timezone: user.timezone || null,
+                theme_ids: user.theme_ids || [],
+                color_scheme_id: user.color_scheme_id || null,
+                text_size: user.text_size || 'normal',
+                text_size_seq: user.text_size_seq || 0,
+                title_count_mode: user.title_count_mode || 'notifications',
+                enable_quoting: user.enable_quoting !== false,
+                enable_defer: user.enable_defer !== false,
+                external_links_in_new_tab: user.external_links_in_new_tab !== false,
+                dynamic_favicon: user.dynamic_favicon !== false
+            },
+
+            // 分类偏好
+            categoryPreferences: {
+                watched_category_ids: user.watched_category_ids || [],
+                tracked_category_ids: user.tracked_category_ids || [],
+                muted_category_ids: user.muted_category_ids || [],
+                regular_category_ids: user.regular_category_ids || [],
+                sidebar_category_ids: user.sidebar_category_ids || [],
+                sidebar_tags: user.sidebar_tags || []
+            },
+
+            // 安全设置
+            security: {
+                second_factor_enabled: user.second_factor_enabled || false,
+                second_factor_backup_enabled: user.second_factor_backup_enabled || false,
+                active_auth_tokens: (user.user_auth_tokens || []).length,
+                last_password_change: user.last_password_change_at || null,
+                password_expires_at: user.password_expires_at || null
+            },
+
+            // 自定义字段
+            customFields: user.custom_fields || {},
+            userFields: user.user_fields || {}
+        };
+
+        this.cache.set(cacheKey, result);
+        return result;
+    }
+
+    /**
+     * 获取设备登录历史详细分析
+     */
+    getDeviceLoginHistory() {
+        const cacheKey = 'deviceLoginHistory';
+        if (this.cache.has(cacheKey)) {
+            return this.cache.get(cacheKey);
+        }
+
+        const user = this.data.user || {};
+        const authTokens = user.user_auth_tokens || [];
+
+        const result = {
+            totalDevices: authTokens.length,
+            activeDevices: 0,
+            recentDevices: [],
+            devicesByType: {},
+            loginTimeline: [],
+            deviceSummary: []
+        };
+
+        const now = new Date();
+        const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+        authTokens.forEach(token => {
+            const createdAt = new Date(token.created_at);
+            const seenAt = new Date(token.seen_at);
+            const isRecent = seenAt >= thirtyDaysAgo;
+
+            if (isRecent) {
+                result.activeDevices++;
+            }
+
+            // 设备类型分析（基于User-Agent或其他信息推断）
+            let deviceType = '未知设备';
+            let deviceName = token.client_ip || '未知IP';
+
+            if (token.user_agent) {
+                if (token.user_agent.includes('Mobile') || token.user_agent.includes('Android') || token.user_agent.includes('iPhone')) {
+                    deviceType = '移动设备';
+                } else if (token.user_agent.includes('Chrome')) {
+                    deviceType = 'Chrome浏览器';
+                } else if (token.user_agent.includes('Firefox')) {
+                    deviceType = 'Firefox浏览器';
+                } else if (token.user_agent.includes('Safari')) {
+                    deviceType = 'Safari浏览器';
+                } else if (token.user_agent.includes('Edge')) {
+                    deviceType = 'Edge浏览器';
+                } else {
+                    deviceType = '桌面浏览器';
+                }
+            }
+
+            // 设备类型统计
+            if (!result.devicesByType[deviceType]) {
+                result.devicesByType[deviceType] = {
+                    count: 0,
+                    lastSeen: seenAt,
+                    devices: []
+                };
+            }
+            result.devicesByType[deviceType].count++;
+
+            if (seenAt > result.devicesByType[deviceType].lastSeen) {
+                result.devicesByType[deviceType].lastSeen = seenAt;
+            }
+
+            // 最近活跃设备
+            if (isRecent) {
+                result.recentDevices.push({
+                    id: token.id,
+                    ip: token.client_ip,
+                    userAgent: token.user_agent || '未知',
+                    createdAt: createdAt,
+                    seenAt: seenAt,
+                    deviceType: deviceType,
+                    isActive: true
+                });
+            }
+
+            // 登录时间线
+            result.loginTimeline.push({
+                date: createdAt,
+                type: 'login',
+                ip: token.client_ip,
+                deviceType: deviceType,
+                userAgent: token.user_agent
+            });
+
+            // 设备摘要
+            result.deviceSummary.push({
+                id: token.id,
+                ip: token.client_ip,
+                deviceType: deviceType,
+                createdAt: createdAt,
+                seenAt: seenAt,
+                daysSinceLastSeen: Math.floor((now - seenAt) / (24 * 60 * 60 * 1000)),
+                isRecent: isRecent,
+                userAgent: token.user_agent || '未知'
+            });
+        });
+
+        // 按最后活跃时间排序
+        result.recentDevices.sort((a, b) => b.seenAt - a.seenAt);
+        result.deviceSummary.sort((a, b) => b.seenAt - a.seenAt);
+        result.loginTimeline.sort((a, b) => b.date - a.date);
+
+        this.cache.set(cacheKey, result);
+        return result;
     }
 
     /**
@@ -759,6 +1128,9 @@ class DataAnalyzer {
             summary: this.generateSummary(),
             categoryData: this.getCategoryData(),
             badgeStats: this.getBadgeStats(),
+            badgeDetailedAnalysis: this.getBadgeDetailedAnalysis(), // 新添加的徽章详细分析
+            userPermissionsAndSettings: this.getUserPermissionsAndSettings(), // 用户权限和设置分析
+            deviceLoginHistory: this.getDeviceLoginHistory(), // 设备登录历史分析
             authTokensAnalysis: this.getAuthTokensAnalysis(),
             bookmarksAnalysis: this.getBookmarksAnalysis(),
             flagsAnalysis: this.getFlagsAnalysis(),
@@ -786,6 +1158,100 @@ class DataAnalyzer {
                 }
             }
         };
+    }
+
+    /**
+     * 获取综合活动趋势数据
+     */
+    getActivityTrendData() {
+        const cacheKey = 'activityTrendData';
+        if (this.cache.has(cacheKey)) {
+            return this.cache.get(cacheKey);
+        }
+
+        // 获取最近30天的日期
+        const dates = [];
+        const today = new Date();
+        for (let i = 29; i >= 0; i--) {
+            const date = new Date(today);
+            date.setDate(date.getDate() - i);
+            dates.push(date.toISOString().split('T')[0]);
+        }
+
+        // 统计每天的活动数据
+        const postsData = new Array(30).fill(0);
+        const likesData = new Array(30).fill(0);
+        const visitsData = new Array(30).fill(0);
+
+        // 统计发帖数据
+        if (this.data.userArchive) {
+            this.data.userArchive.forEach(post => {
+                const postDate = post.created_at?.split('T')[0];
+                const index = dates.indexOf(postDate);
+                if (index !== -1) {
+                    postsData[index]++;
+                }
+            });
+        }
+
+        // 统计点赞数据
+        if (this.data.likes) {
+            this.data.likes.forEach(like => {
+                const likeDate = like.created_at?.split('T')[0];
+                const index = dates.indexOf(likeDate);
+                if (index !== -1) {
+                    likesData[index]++;
+                }
+            });
+        }
+
+        // 统计访问数据
+        if (this.data.visits) {
+            this.data.visits.forEach(visit => {
+                const visitDate = visit.visited_at?.split('T')[0];
+                const index = dates.indexOf(visitDate);
+                if (index !== -1) {
+                    visitsData[index] = visit.posts_read || 0;
+                }
+            });
+        }
+
+        const data = {
+            labels: dates.map(d => d.substr(5)), // MM-DD格式
+            posts: postsData,
+            likes: likesData,
+            visits: visitsData
+        };
+
+        this.cache.set(cacheKey, data);
+        return data;
+    }
+
+    /**
+     * 获取分类活动图表数据
+     */
+    getCategoryChartData() {
+        const cacheKey = 'categoryChartData';
+        if (this.cache.has(cacheKey)) {
+            return this.cache.get(cacheKey);
+        }
+
+        const categoryData = this.getCategoryData();
+        if (!categoryData || categoryData.length === 0) {
+            return [];
+        }
+
+        // 取前10个最活跃的分类
+        const topCategories = categoryData
+            .sort((a, b) => b.posts - a.posts)
+            .slice(0, 10)
+            .map(cat => ({
+                name: cat.name,
+                posts: cat.posts
+            }));
+
+        this.cache.set(cacheKey, topCategories);
+        return topCategories;
     }
 }
 

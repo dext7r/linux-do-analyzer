@@ -49,16 +49,17 @@ class ChartRenderer {
      * 渲染访问活动图表
      */
     renderVisitsChart(data) {
-        const chartId = 'visitsChart';
-        this.destroyChart(chartId);
+        // 渲染到两个位置：总览页和图表页
+        const chartIds = ['visitsChart', 'visitsChartDetail'];
 
-        const ctx = document.getElementById(chartId);
-        if (!ctx) {
-            console.error('找不到图表容器:', chartId);
-            return;
-        }
+        chartIds.forEach(chartId => {
+            this.destroyChart(chartId);
+            const ctx = document.getElementById(chartId);
+            if (!ctx) {
+                return; // 如果元素不存在，跳过
+            }
 
-        const options = {
+            const options = {
             ...this.defaultOptions,
             plugins: {
                 ...this.defaultOptions.plugins,
@@ -123,11 +124,12 @@ class ChartRenderer {
             }
         };
 
-        this.charts.set(chartId, new Chart(ctx, {
-            type: 'line',
-            data: data,
-            options: options
-        }));
+            this.charts.set(chartId, new Chart(ctx, {
+                type: 'line',
+                data: data,
+                options: options
+            }));
+        });
 
         console.log('访问活动图表渲染完成');
     }
@@ -468,6 +470,95 @@ class ChartRenderer {
         }));
 
         console.log('分类活动图表渲染完成');
+    }
+
+    /**
+     * 渲染综合活动趋势图表
+     */
+    renderActivityTrendChart(data) {
+        const chartId = 'activityTrendChart';
+        this.destroyChart(chartId);
+
+        const ctx = document.getElementById(chartId);
+        if (!ctx) {
+            console.warn('找不到综合活动趋势图表容器:', chartId);
+            return;
+        }
+
+        // 准备图表数据
+        const chartData = {
+            labels: data.labels || [],
+            datasets: [
+                {
+                    label: '发帖',
+                    data: data.posts || [],
+                    borderColor: '#6366f1',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    tension: 0.4
+                },
+                {
+                    label: '点赞',
+                    data: data.likes || [],
+                    borderColor: '#ec4899',
+                    backgroundColor: 'rgba(236, 72, 153, 0.1)',
+                    tension: 0.4
+                },
+                {
+                    label: '访问',
+                    data: data.visits || [],
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    tension: 0.4
+                }
+            ]
+        };
+
+        const options = {
+            ...this.defaultOptions,
+            plugins: {
+                ...this.defaultOptions.plugins,
+                title: {
+                    display: false
+                },
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        color: '#6B7280',
+                        padding: 15,
+                        font: {
+                            size: 12
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        color: 'rgba(156, 163, 175, 0.1)'
+                    },
+                    ticks: {
+                        color: '#6B7280'
+                    }
+                },
+                y: {
+                    grid: {
+                        color: 'rgba(156, 163, 175, 0.1)'
+                    },
+                    ticks: {
+                        color: '#6B7280'
+                    }
+                }
+            }
+        };
+
+        this.charts.set(chartId, new Chart(ctx, {
+            type: 'line',
+            data: chartData,
+            options: options
+        }));
+
+        console.log('综合活动趋势图表渲染完成');
     }
 
     /**

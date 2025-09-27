@@ -192,22 +192,36 @@ class App {
     /**
      * 渲染所有图表 - 新版本支持更多图表类型
      */
-    async renderCharts(analyzer) {
+    async renderCharts(analyzer = null) {
+        // 使用传入的analyzer或当前的dataAnalyzer
+        const dataAnalyzer = analyzer || this.dataAnalyzer;
+
+        if (!dataAnalyzer) {
+            console.warn('⚠️ 没有可用的数据分析器');
+            return;
+        }
+
         const renderPromises = [
             this.renderChart('visits', () =>
-                this.chartRenderer.renderVisitsChart(analyzer.getVisitsChartData())
+                this.chartRenderer.renderVisitsChart(dataAnalyzer.getVisitsChartData())
             ),
             this.renderChart('badges', () =>
-                this.chartRenderer.renderBadgesChart(analyzer.getBadgesChartData())
+                this.chartRenderer.renderBadgesChart(dataAnalyzer.getBadgesChartData())
             ),
             this.renderChart('device', () =>
-                this.chartRenderer.renderDeviceChart(analyzer.getDeviceChartData())
+                this.chartRenderer.renderDeviceChart(dataAnalyzer.getDeviceChartData())
             ),
             this.renderChart('posts', () =>
-                this.chartRenderer.renderPostsChart(analyzer.getPostsActivityData())
+                this.chartRenderer.renderPostsChart(dataAnalyzer.getPostsActivityData())
             ),
             this.renderChart('likes', () =>
-                this.chartRenderer.renderLikesChart(analyzer.getLikesActivityData())
+                this.chartRenderer.renderLikesChart(dataAnalyzer.getLikesActivityData())
+            ),
+            this.renderChart('activityTrend', () =>
+                this.chartRenderer.renderActivityTrendChart(dataAnalyzer.getActivityTrendData())
+            ),
+            this.renderChart('category', () =>
+                this.chartRenderer.renderCategoryChart(dataAnalyzer.getCategoryChartData())
             )
         ];
 
@@ -259,21 +273,52 @@ class App {
                 throw new Error('分析数据不存在');
             }
 
+            // 确保数据结构完整
+            const parsedData = analysisData.data || analysisData;
+
             // 重建分析器
-            this.dataAnalyzer = new DataAnalyzer(analysisData);
+            this.dataAnalyzer = new DataAnalyzer(parsedData);
+
+            // 生成新的分析摘要
+            const summary = analysisData.summary || this.dataAnalyzer.generateSummary();
+
             this.currentAnalysis = {
                 id: id,
-                data: analysisData,
+                data: parsedData,
                 analyzer: this.dataAnalyzer,
-                summary: analysisData.summary
+                summary: summary
             };
 
-            // 渲染结果
-            await this.renderAnalysisResults();
+            // 准备完整的分析数据用于渲染
+            const analysisResultData = {
+                summary: summary,
+                detailedData: parsedData,
+                categoryData: this.dataAnalyzer.getCategoryData ? this.dataAnalyzer.getCategoryData() : [],
+                badgeStats: this.dataAnalyzer.getBadgeStats ? this.dataAnalyzer.getBadgeStats() : [],
+                badgeDetailedAnalysis: this.dataAnalyzer.getBadgeDetailedAnalysis ? this.dataAnalyzer.getBadgeDetailedAnalysis() : null,
+                userPermissionsAndSettings: this.dataAnalyzer.getUserPermissionsAndSettings ? this.dataAnalyzer.getUserPermissionsAndSettings() : null,
+                deviceLoginHistory: this.dataAnalyzer.getDeviceLoginHistory ? this.dataAnalyzer.getDeviceLoginHistory() : null,
+                authTokensAnalysis: this.dataAnalyzer.getAuthTokensAnalysis ? this.dataAnalyzer.getAuthTokensAnalysis() : null,
+                bookmarksAnalysis: this.dataAnalyzer.getBookmarksAnalysis ? this.dataAnalyzer.getBookmarksAnalysis() : null,
+                flagsAnalysis: this.dataAnalyzer.getFlagsAnalysis ? this.dataAnalyzer.getFlagsAnalysis() : null,
+                metadata: parsedData.metadata || analysisData.metadata || {}
+            };
+
+            // 渲染分析结果
+            this.uiManager.renderAnalysisResults(analysisResultData);
+
+            // 渲染图表
+            await this.renderCharts();
 
             this.uiManager.hideLoading();
-            this.uiManager.showToast('数据加载完成', 'success');
+            this.uiManager.showToast('历史数据加载完成', 'success');
             this.uiManager.showExportButton();
+
+            // 显示新建分析按钮，隐藏已存储数据列表和上传区域
+            $('#newAnalysisBtn').removeClass('hidden');
+            $('#storedDataSection').addClass('hidden');
+            $('#upload').addClass('hidden');
+            $('#hero').addClass('hidden');
 
             console.log('✅ 分析数据加载完成');
 

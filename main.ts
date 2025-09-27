@@ -13,7 +13,13 @@ const routes = new Map([
     ["/privacy.html", "./privacy.html"]
 ]);
 
-Deno.serve((req: Request) => {
+// 获取端口（从命令行参数或环境变量）
+const port = Deno.args[0] ? parseInt(Deno.args[0]) : parseInt(Deno.env.get("PORT") || "8888");
+
+console.log(`🚀 服务器启动在端口 ${port}`);
+console.log(`📎 访问: http://localhost:${port}`);
+
+Deno.serve({ port }, (req: Request) => {
     const url = new URL(req.url);
     const pathname = url.pathname;
 
