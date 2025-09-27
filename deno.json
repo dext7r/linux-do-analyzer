@@ -1,0 +1,27 @@
+{
+  "name": "linux-do-data-analyzer",
+  "version": "1.0.0",
+  "description": "Linux.do 论坛个人数据分析工具",
+  "author": "dext7r",
+  "license": "MIT",
+  "exports": "./src/main.ts",
+  "tasks": {
+    "start": "deno run --allow-read --allow-write --allow-net src/main.ts",
+    "dev": "deno run --allow-read --allow-write --allow-net --watch src/main.ts",
+    "analyze": "deno run --allow-read --allow-write src/analyzer.ts",
+    "serve": "deno run --allow-read --allow-net --allow-write src/server.ts"
+  },
+  "compilerOptions": {
+    "strict": true,
+    "lib": ["dom", "deno.window"]
+  },
+  "imports": {
+    "@std/csv": "jsr:@std/csv@1.0.3",
+    "@std/datetime": "jsr:@std/datetime@0.224.5",
+    "@std/http": "jsr:@std/http@1.0.2",
+    "@std/path": "jsr:@std/path@1.0.2",
+    "@std/json": "jsr:@std/json@1.0.0",
+    "chart.js": "https://cdn.skypack.dev/chart.js@4.4.0",
+    "plotly": "https://cdn.skypack.dev/plotly.js-dist@2.26.0"
+  }
+}
