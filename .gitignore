@@ -140,7 +140,49 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
 
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.tmp
+*.temp
+
+# Linux
+*~
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Application specific files
+public/
+release-assets/
+standalone/
+docs/
+cli-package/
+
+# Test data
+test-data/
+*.test.zip
+
+# Generated files
+checksums.txt
+RELEASE_NOTES.md
+analysis-report.html
+
+# CSV and JSON data files
 *.csv
 preferences.json
-.gitignore
-analysis-report.html
+
+# Build and temporary files
+build/
+tmp/
+temp/

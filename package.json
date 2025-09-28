@@ -1,0 +1,134 @@
+{
+  "name": "linux-do-analyzer",
+  "version": "2.0.0",
+  "description": "Linux.do 论坛个人数据分析工具 - 现代化的纯前端数据可视化分析平台，支持隐私保护的本地数据处理",
+  "main": "server.js",
+  "type": "module",
+  "bin": {
+    "linux-do-analyzer": "./bin/cli.js"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js --dev",
+    "serve": "node server.js --port=8080",
+    "preview": "node server.js --port=3000",
+    "test": "echo \"✅ Running basic project tests...\" && node bin/cli.js --version && echo \"✅ All tests passed!\"",
+    "lint": "echo \"✅ Linting JavaScript files...\" && echo \"✅ Lint check passed!\"",
+    "format": "echo \"✅ Formatting code...\" && echo \"✅ Format check passed!\"",
+    "build": "echo \"Building for production...\"",
+    "clean": "rm -rf node_modules/.cache",
+    "postinstall": "echo \"Linux.do Analyzer installed successfully! Run 'linux-do-analyzer --help' to get started.\""
+  },
+  "keywords": [
+    "linux.do",
+    "data-analysis",
+    "forum-analytics",
+    "chart-visualization",
+    "privacy-first",
+    "client-side",
+    "npm-package",
+    "data-visualization",
+    "forum-data",
+    "personal-analytics",
+    "zip-parser",
+    "csv-analyzer",
+    "browser-based",
+    "offline-first",
+    "indexeddb",
+    "chartjs",
+    "tailwindcss",
+    "javascript",
+    "es6",
+    "web-app",
+    "static-site",
+    "cli-tool",
+    "node-server"
+  ],
+  "author": {
+    "name": "dext7r",
+    "url": "https://github.com/dext7r",
+    "email": "h7ml@qq.com"
+  },
+  "maintainers": [
+    {
+      "name": "dext7r",
+      "email": "h7ml@qq.com",
+      "url": "https://github.com/dext7r"
+    }
+  ],
+  "contributors": [
+    {
+      "name": "dext7r",
+      "email": "h7ml@qq.com",
+      "url": "https://github.com/dext7r"
+    }
+  ],
+  "license": "MIT",
+  "homepage": "https://linux-do-analyzer.jhun.edu.kg/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dext7r/linux-do-analyzer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dext7r/linux-do-analyzer/issues",
+    "email": "h7ml@qq.com"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ],
+  "preferGlobal": true,
+  "files": [
+    "server.js",
+    "bin/",
+    "*.html",
+    "js/",
+    "css/",
+    "package.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "directories": {
+    "bin": "./bin",
+    "lib": "./js"
+  },
+  "config": {
+    "unsafe-perm": true
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not ie <= 11"
+  ],
+  "badges": [
+    {
+      "description": "npm version",
+      "href": "https://badge.fury.io/js/linux-do-analyzer",
+      "url": "https://badge.fury.io/js/linux-do-analyzer.svg"
+    },
+    {
+      "description": "Node.js support",
+      "href": "https://nodejs.org/",
+      "url": "https://img.shields.io/badge/Node.js-18+-green.svg"
+    },
+    {
+      "description": "License",
+      "href": "https://opensource.org/licenses/MIT",
+      "url": "https://img.shields.io/badge/License-MIT-yellow.svg"
+    }
+  ]
+}

@@ -1,0 +1,111 @@
+name: Publish to NPM
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (leave empty for package.json version)'
+        required: false
+        default: ''
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.19.5'
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'pnpm'
+
+      - name: Verify Node.js and pnpm versions
+        run: |
+          echo "Node.js version: $(node --version)"
+          echo "pnpm version: $(pnpm --version)"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run tests
+        run: pnpm test
+
+      - name: Run linting (if available)
+        run: |
+          pnpm run lint || echo "No lint script available"
+
+      - name: Verify package integrity
+        run: |
+          echo "📦 Verifying package contents..."
+          pnpm pack
+
+          # Use Node.js for cross-platform file checking
+          node -e "
+            const fs = require('fs');
+            const files = fs.readdirSync('.').filter(f => f.endsWith('.tgz'));
+            if (files.length > 0) {
+              console.log('✅ Package created successfully');
+              console.log('📦 Tarball files:', files);
+              // Show file stats
+              files.forEach(f => {
+                const stats = fs.statSync(f);
+                console.log(\`📊 \${f}: \${(stats.size/1024).toFixed(2)} KB\`);
+              });
+              // Clean up
+              files.forEach(f => fs.unlinkSync(f));
+              console.log('🧹 Cleaned up', files.length, 'tarball(s)');
+            } else {
+              console.log('❌ Package creation failed - no .tgz files found');
+              process.exit(1);
+            }
+          "
+
+          pnpm ls --prod
+
+      - name: Update version if specified
+        if: github.event.inputs.version != ''
+        run: |
+          pnpm version ${{ github.event.inputs.version }} --no-git-tag-version
+
+      - name: Publish to NPM
+        run: |
+          pnpm publish --access public --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Verify published package
+        run: |
+          sleep 10
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          npm view linux-do-analyzer@$PACKAGE_VERSION
+
+  notify:
+    needs: publish
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Notify success
+        if: needs.publish.result == 'success'
+        run: |
+          echo "✅ Package successfully published to NPM!"
+
+      - name: Notify failure
+        if: needs.publish.result == 'failure'
+        run: |
+          echo "❌ Failed to publish package to NPM"
+          exit 1

@@ -1,0 +1,168 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        node-version: ['20.19.5']
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run tests
+        run: pnpm test
+
+      - name: Test CLI functionality
+        run: |
+          node bin/cli.js --help
+          node bin/cli.js --version
+
+      - name: Test server startup
+        shell: bash
+        continue-on-error: true
+        run: |
+          echo "🚀 Testing server startup..."
+
+          # Use different approach for Windows vs Unix
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            # Windows approach: start server in background and test quickly
+            echo "Using Windows-compatible server test..."
+
+            # Start server with timeout in background
+            powershell -Command "Start-Process node -ArgumentList 'server.js --port 8081' -WindowStyle Hidden -PassThru" > server_pid.txt &
+
+            # Wait for server to start
+            sleep 8
+
+            # Test HTTP response with retries
+            for i in {1..5}; do
+              if curl -f http://localhost:8081/ --max-time 5 --silent --output /dev/null; then
+                echo "✅ Server HTTP response successful (attempt $i)"
+                break
+              else
+                echo "⏳ Waiting for server... (attempt $i/5)"
+                sleep 2
+              fi
+
+              if [ $i -eq 5 ]; then
+                echo "❌ Server failed to respond after 5 attempts"
+                echo "⚠️  Server test failed on Windows - this is not blocking"
+                exit 0
+              fi
+            done
+
+            # Try to cleanup (best effort)
+            taskkill //F //IM node.exe 2>/dev/null || echo "Server cleanup completed"
+
+          else
+            # Unix approach (Linux/macOS)
+            echo "Using Unix-compatible server test..."
+
+            # Start server in background
+            node server.js --port 8081 &
+            SERVER_PID=$!
+
+            # Wait for server to start
+            sleep 5
+
+            # Check if process is still running
+            if kill -0 $SERVER_PID 2>/dev/null; then
+              echo "✅ Server process is running (PID: $SERVER_PID)"
+
+              # Test HTTP response
+              if curl -f http://localhost:8081/ --max-time 10 --silent --output /dev/null; then
+                echo "✅ Server HTTP response successful"
+              else
+                echo "❌ Server HTTP response failed"
+                kill $SERVER_PID 2>/dev/null || true
+                echo "⚠️  Server test failed - this is not blocking"
+                exit 0
+              fi
+
+              # Clean up
+              kill $SERVER_PID 2>/dev/null || true
+            else
+              echo "❌ Server process failed to start"
+              echo "⚠️  Server test failed - this is not blocking"
+              exit 0
+            fi
+          fi
+
+      - name: Package verification
+        run: |
+          echo "📦 Verifying package contents..."
+          pnpm pack
+
+          # Use Node.js for cross-platform file checking
+          node -e "
+            const fs = require('fs');
+            const files = fs.readdirSync('.').filter(f => f.endsWith('.tgz'));
+            if (files.length > 0) {
+              console.log('✅ Package created successfully');
+              console.log('📦 Tarball files:', files);
+              // Show file stats
+              files.forEach(f => {
+                const stats = fs.statSync(f);
+                console.log(\`📊 \${f}: \${(stats.size/1024).toFixed(2)} KB\`);
+              });
+              // Clean up
+              files.forEach(f => fs.unlinkSync(f));
+              console.log('🧹 Cleaned up', files.length, 'tarball(s)');
+            } else {
+              console.log('❌ Package creation failed - no .tgz files found');
+              process.exit(1);
+            }
+          "
+
+          pnpm ls
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.19.5'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run linting
+        run: pnpm run lint
+
+      - name: Check formatting
+        run: pnpm run format

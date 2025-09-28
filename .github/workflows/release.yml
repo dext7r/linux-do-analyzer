@@ -1,0 +1,234 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag name for the release'
+        required: true
+        default: 'v2.0.0'
+      release_name:
+        description: 'Release name'
+        required: false
+        default: ''
+      body:
+        description: 'Release notes'
+        required: false
+        default: ''
+      draft:
+        description: 'Create a draft release'
+        required: false
+        default: false
+        type: boolean
+      prerelease:
+        description: 'Mark as pre-release'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.19.5'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Get package version
+        id: package-version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Package version: $VERSION"
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          echo "Generating changelog..."
+
+          # Get current tag
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            CURRENT_TAG="${{ github.event.inputs.tag_name }}"
+          else
+            CURRENT_TAG=${GITHUB_REF#refs/tags/}
+          fi
+
+          # Get previous tag
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 $CURRENT_TAG^)
+
+          echo "Current tag: $CURRENT_TAG"
+          echo "Previous tag: $PREVIOUS_TAG"
+
+          # Generate changelog between tags
+          CHANGELOG=$(git log --pretty=format:"* %s (%h)" $PREVIOUS_TAG..$CURRENT_TAG)
+
+          if [ -z "$CHANGELOG" ]; then
+            CHANGELOG="* Initial release"
+          fi
+
+          # Format changelog
+          FORMATTED_CHANGELOG="## 🚀 What's Changed
+
+          $CHANGELOG
+
+          ## 📦 Installation
+
+          \`\`\`bash
+          # NPM
+          npm install -g linux-do-analyzer
+
+          # PNPM
+          pnpm add -g linux-do-analyzer
+
+          # NPX (no installation required)
+          npx linux-do-analyzer
+
+          # PNPX
+          pnpx linux-do-analyzer
+          \`\`\`
+
+          ## 🌐 Online Usage
+
+          **Try it online**: [https://linux-do-analyzer.jhun.edu.kg/](https://linux-do-analyzer.jhun.edu.kg/)
+
+          ## 📋 Release Assets
+
+          - \`linux-do-analyzer-${{ steps.package-version.outputs.version }}.tgz\` - NPM package
+          - \`linux-do-analyzer-standalone.zip\` - Standalone web application
+          - \`Source code (zip)\` - Complete source code archive
+          - \`Source code (tar.gz)\` - Complete source code archive
+
+          **Full Changelog**: https://github.com/dext7r/linux-do-analyzer/compare/$PREVIOUS_TAG...$CURRENT_TAG"
+
+          # Save to file for multiline output
+          echo "$FORMATTED_CHANGELOG" > changelog.md
+          echo "changelog_file=changelog.md" >> $GITHUB_OUTPUT
+
+      - name: Prepare release assets
+        run: |
+          echo "🔧 Preparing release assets..."
+
+          # Create release directory
+          mkdir -p release-assets
+
+          # 1. Create NPM package
+          pnpm pack
+          mv linux-do-analyzer-*.tgz release-assets/linux-do-analyzer-${{ steps.package-version.outputs.version }}.tgz
+
+          # 2. Create standalone web application package
+          mkdir -p standalone
+
+          # Copy essential files for standalone deployment
+          cp index.html standalone/
+          cp about.html standalone/ 2>/dev/null || true
+          cp help.html standalone/ 2>/dev/null || true
+          cp faq.html standalone/ 2>/dev/null || true
+          cp privacy.html standalone/ 2>/dev/null || true
+          cp -r js/ standalone/
+          cp -r css/ standalone/
+          cp package.json standalone/
+          cp README.md standalone/
+
+          # Create standalone archive
+          cd standalone
+          zip -r ../release-assets/linux-do-analyzer-standalone.zip .
+          cd ..
+
+          # 3. Create documentation package
+          mkdir -p docs
+          cp README.md docs/
+          cp package.json docs/
+          cp -r .github/ docs/ 2>/dev/null || true
+          zip -r release-assets/linux-do-analyzer-docs.zip docs/
+
+          # 4. Create source code with dependencies
+          git archive --format=zip --prefix=linux-do-analyzer-${{ steps.package-version.outputs.version }}/ HEAD > release-assets/linux-do-analyzer-source.zip
+
+          # List all assets
+          echo "📦 Release assets prepared:"
+          ls -la release-assets/
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.event.inputs.tag_name || github.ref_name }}
+          release_name: ${{ github.event.inputs.release_name || format('Linux.do Analyzer v{0}', steps.package-version.outputs.version) }}
+          body_path: ${{ steps.changelog.outputs.changelog_file }}
+          draft: ${{ github.event.inputs.draft || false }}
+          prerelease: ${{ github.event.inputs.prerelease || false }}
+
+      - name: Upload NPM Package
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./release-assets/linux-do-analyzer-${{ steps.package-version.outputs.version }}.tgz
+          asset_name: linux-do-analyzer-${{ steps.package-version.outputs.version }}.tgz
+          asset_content_type: application/gzip
+
+      - name: Upload Standalone Package
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./release-assets/linux-do-analyzer-standalone.zip
+          asset_name: linux-do-analyzer-standalone.zip
+          asset_content_type: application/zip
+
+      - name: Upload Documentation Package
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./release-assets/linux-do-analyzer-docs.zip
+          asset_name: linux-do-analyzer-docs.zip
+          asset_content_type: application/zip
+
+      - name: Upload Source Code Package
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./release-assets/linux-do-analyzer-source.zip
+          asset_name: linux-do-analyzer-source.zip
+          asset_content_type: application/zip
+
+      - name: Summary
+        run: |
+          echo "## 🎉 Release Created Successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Release URL**: ${{ steps.create_release.outputs.html_url }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Version**: ${{ steps.package-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Tag**: ${{ github.event.inputs.tag_name || github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📦 Assets Uploaded:" >> $GITHUB_STEP_SUMMARY
+          echo "- linux-do-analyzer-${{ steps.package-version.outputs.version }}.tgz" >> $GITHUB_STEP_SUMMARY
+          echo "- linux-do-analyzer-standalone.zip" >> $GITHUB_STEP_SUMMARY
+          echo "- linux-do-analyzer-docs.zip" >> $GITHUB_STEP_SUMMARY
+          echo "- linux-do-analyzer-source.zip" >> $GITHUB_STEP_SUMMARY
