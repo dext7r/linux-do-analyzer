@@ -1,10 +1,11 @@
 /**
  * 图表渲染器
- * 负责使用Chart.js渲染各种数据可视化图表
+ * 负责使用Chart.js和ECharts渲染各种数据可视化图表
  */
 class ChartRenderer {
     constructor() {
         this.charts = new Map();
+        this.echartsInstances = new Map();
         this.defaultOptions = this.getDefaultOptions();
     }
 
@@ -129,6 +130,9 @@ class ChartRenderer {
                 data: data,
                 options: options
             }));
+
+            // 添加导出按钮
+            this.addExportButton(chartId, ctx.canvas);
         });
 
         console.log('访问活动图表渲染完成');
@@ -200,6 +204,9 @@ class ChartRenderer {
             options: options
         }));
 
+        // 添加导出按钮
+        this.addExportButton(chartId, ctx.canvas);
+
         console.log('徽章获得图表渲染完成');
     }
 
@@ -250,6 +257,9 @@ class ChartRenderer {
             data: data,
             options: options
         }));
+
+        // 添加导出按钮
+        this.addExportButton(chartId, ctx.canvas);
 
         console.log('设备使用分布图表渲染完成');
     }
@@ -320,6 +330,9 @@ class ChartRenderer {
             options: options
         }));
 
+        // 添加导出按钮
+        this.addExportButton(chartId, ctx.canvas);
+
         console.log('发帖活动分布图表渲染完成');
     }
 
@@ -387,6 +400,9 @@ class ChartRenderer {
             data: data,
             options: options
         }));
+
+        // 添加导出按钮
+        this.addExportButton(chartId, ctx.canvas);
 
         console.log('点赞活动趋势图表渲染完成');
     }
@@ -468,6 +484,9 @@ class ChartRenderer {
             data: data,
             options: options
         }));
+
+        // 添加导出按钮
+        this.addExportButton(chartId, ctx.canvas);
 
         console.log('分类活动图表渲染完成');
     }
@@ -558,6 +577,9 @@ class ChartRenderer {
             options: options
         }));
 
+        // 添加导出按钮
+        this.addExportButton(chartId, ctx.canvas);
+
         console.log('综合活动趋势图表渲染完成');
     }
 
@@ -568,7 +590,12 @@ class ChartRenderer {
         if (this.charts.has(chartId)) {
             this.charts.get(chartId).destroy();
             this.charts.delete(chartId);
-            console.log(`销毁图表: ${chartId}`);
+            console.log(`销毁Chart.js图表: ${chartId}`);
+        }
+        if (this.echartsInstances.has(chartId)) {
+            this.echartsInstances.get(chartId).dispose();
+            this.echartsInstances.delete(chartId);
+            console.log(`销毁ECharts图表: ${chartId}`);
         }
     }
 
@@ -578,9 +605,16 @@ class ChartRenderer {
     destroyAllCharts() {
         this.charts.forEach((chart, id) => {
             chart.destroy();
-            console.log(`销毁图表: ${id}`);
+            console.log(`销毁Chart.js图表: ${id}`);
         });
         this.charts.clear();
+        
+        this.echartsInstances.forEach((chart, id) => {
+            chart.dispose();
+            console.log(`销毁ECharts图表: ${id}`);
+        });
+        this.echartsInstances.clear();
+        
         console.log('所有图表已销毁');
     }
 
@@ -613,38 +647,147 @@ class ChartRenderer {
     }
 
     /**
-     * 导出图表为图片
+     * 导出图表为图片（支持Chart.js和ECharts）
      */
-    exportChartAsImage(chartId, filename = 'chart.png') {
-        if (!this.charts.has(chartId)) {
-            console.error('图表不存在:', chartId);
+    exportChartAsImage(chartId, filename = 'chart.png', format = 'png') {
+        // 检查Chart.js图表
+        if (this.charts.has(chartId)) {
+            const chart = this.charts.get(chartId);
+            const canvas = chart.canvas;
+            const url = canvas.toDataURL(`image/${format}`);
+            this.downloadImage(url, filename);
+            console.log(`导出Chart.js图表: ${chartId} -> ${filename}`);
             return;
         }
 
-        const chart = this.charts.get(chartId);
-        const canvas = chart.canvas;
-        const url = canvas.toDataURL('image/png');
+        // 检查ECharts图表
+        if (this.echartsInstances.has(chartId)) {
+            const chart = this.echartsInstances.get(chartId);
+            const url = chart.getDataURL({
+                type: format,
+                pixelRatio: 2,
+                backgroundColor: '#fff'
+            });
+            this.downloadImage(url, filename);
+            console.log(`导出ECharts图表: ${chartId} -> ${filename}`);
+            return;
+        }
 
+        console.error('图表不存在:', chartId);
+    }
+
+    /**
+     * 下载图片
+     */
+    downloadImage(url, filename) {
         const a = document.createElement('a');
         a.href = url;
         a.download = filename;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+    }
 
-        console.log(`导出图表: ${chartId} -> ${filename}`);
+    /**
+     * 批量导出所有图表
+     */
+    exportAllCharts(format = 'png') {
+        const timestamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, '');
+        
+        // 导出Chart.js图表
+        this.charts.forEach((chart, id) => {
+            const filename = `chart_${id}_${timestamp}.${format}`;
+            this.exportChartAsImage(id, filename, format);
+        });
+
+        // 导出ECharts图表
+        this.echartsInstances.forEach((chart, id) => {
+            const filename = `chart_${id}_${timestamp}.${format}`;
+            this.exportChartAsImage(id, filename, format);
+        });
+
+        console.log(`批量导出完成，格式: ${format}`);
+    }
+
+    /**
+     * 创建ECharts图表
+     */
+    createEChart(chartId, option) {
+        const container = document.getElementById(chartId);
+        if (!container) {
+            console.error('找不到图表容器:', chartId);
+            return null;
+        }
+
+        // 销毁已存在的图表
+        this.destroyChart(chartId);
+
+        // 创建新的ECharts实例
+        const chart = echarts.init(container);
+        chart.setOption(option);
+        
+        this.echartsInstances.set(chartId, chart);
+        
+        // 添加导出按钮
+        this.addExportButton(chartId, container);
+        
+        console.log(`ECharts图表创建完成: ${chartId}`);
+        return chart;
+    }
+
+    /**
+     * 为图表容器添加导出按钮
+     */
+    addExportButton(chartId, container) {
+        // 如果传入的是canvas元素，获取其父容器
+        if (container.tagName === 'CANVAS') {
+            container = container.parentElement;
+        }
+        
+        // 检查是否已存在导出按钮
+        const existingButton = container.querySelector('.export-btn');
+        if (existingButton) {
+            existingButton.remove();
+        }
+
+        // 创建导出按钮
+        const exportBtn = document.createElement('button');
+        exportBtn.className = 'export-btn absolute top-2 right-2 bg-blue-500 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded shadow-lg z-10';
+        exportBtn.innerHTML = '📥 导出';
+        exportBtn.title = '导出图表为PNG图片';
+        
+        exportBtn.onclick = () => {
+            const timestamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, '');
+            const filename = `${chartId}_${timestamp}.png`;
+            this.exportChartAsImage(chartId, filename);
+        };
+
+        // 确保父容器有相对定位
+        container.style.position = 'relative';
+        container.appendChild(exportBtn);
     }
 
     /**
      * 调整所有图表大小（移动端优化）
      */
     resizeAllCharts() {
+        // 调整Chart.js图表
         this.charts.forEach((chart, id) => {
             try {
                 chart.resize();
-                console.log(`调整图表大小: ${id}`);
+                console.log(`调整Chart.js图表大小: ${id}`);
             } catch (error) {
-                console.warn(`调整图表 ${id} 大小失败:`, error);
+                console.warn(`调整Chart.js图表 ${id} 大小失败:`, error);
+            }
+        });
+
+        // 调整ECharts图表
+        this.echartsInstances.forEach((chart, id) => {
+            try {
+                chart.resize();
+                console.log(`调整ECharts图表大小: ${id}`);
+            } catch (error) {
+                console.warn(`调整ECharts图表 ${id} 大小失败:`, error);
             }
         });
     }
@@ -654,13 +797,28 @@ class ChartRenderer {
      */
     getChartsStatus() {
         const status = {};
+        
+        // Chart.js图表状态
         this.charts.forEach((chart, id) => {
             status[id] = {
+                library: 'Chart.js',
                 type: chart.config.type,
                 datasets: chart.data.datasets.length,
                 dataPoints: chart.data.labels.length
             };
         });
+
+        // ECharts图表状态
+        this.echartsInstances.forEach((chart, id) => {
+            const option = chart.getOption();
+            status[id] = {
+                library: 'ECharts',
+                type: option.series?.[0]?.type || 'unknown',
+                series: option.series?.length || 0,
+                dataPoints: option.xAxis?.[0]?.data?.length || option.series?.[0]?.data?.length || 0
+            };
+        });
+        
         return status;
     }
 }

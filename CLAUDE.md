@@ -215,7 +215,109 @@ surge . your-domain.surge.sh
 # Deno Deploy
 deno task serve
 # 连接 GitHub 仓库到 Deno Deploy
+
+# Docker 部署
+docker build -t linux-do-analyzer .
+docker run -p 8080:8080 linux-do-analyzer
+
+# Docker Compose
+docker-compose up -d
+
+# 使用 Nginx 反向代理
+docker-compose --profile nginx up -d
 ```
+
+## Docker 部署
+
+### 基本 Docker 部署
+
+项目已配置 Docker 支持，可以通过以下方式快速部署：
+
+```bash
+# 构建镜像
+docker build -t linux-do-analyzer .
+
+# 运行容器
+docker run -d \
+  --name linux-do-analyzer \
+  -p 8080:8080 \
+  --restart unless-stopped \
+  linux-do-analyzer
+
+# 访问应用
+curl http://localhost:8080
+```
+
+### Docker Compose 部署
+
+使用 Docker Compose 进行更便捷的部署：
+
+```bash
+# 基本部署
+docker-compose up -d
+
+# 带 Nginx 反向代理的部署
+docker-compose --profile nginx up -d
+
+# 查看运行状态
+docker-compose ps
+
+# 查看日志
+docker-compose logs -f
+
+# 停止服务
+docker-compose down
+```
+
+### 环境变量配置
+
+Docker 容器支持以下环境变量：
+
+- `PORT`: 应用监听端口（默认: 8080）
+- `DENO_DIR`: Deno 缓存目录（默认: /deno-dir/）
+
+```bash
+# 自定义端口运行
+docker run -d \
+  --name linux-do-analyzer \
+  -p 3000:3000 \
+  -e PORT=3000 \
+  linux-do-analyzer
+```
+
+### 生产环境部署建议
+
+1. **使用 Nginx 反向代理**：
+   ```bash
+   docker-compose --profile nginx up -d
+   ```
+
+2. **配置 SSL 证书**：
+   - 将 SSL 证书放置在 `./ssl/` 目录
+   - 取消 `nginx.conf` 中 HTTPS 服务器配置的注释
+
+3. **资源限制**：
+   ```yaml
+   # docker-compose.yml 中添加
+   deploy:
+     resources:
+       limits:
+         memory: 256M
+         cpus: '0.5'
+   ```
+
+4. **健康检查**：
+   Docker 镜像包含内置健康检查，可监控应用状态
+
+5. **日志管理**：
+   ```bash
+   # 配置日志轮转
+   docker run -d \
+     --log-driver json-file \
+     --log-opt max-size=10m \
+     --log-opt max-file=3 \
+     linux-do-analyzer
+   ```
 
 ### 域名配置
 
