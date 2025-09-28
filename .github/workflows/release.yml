@@ -73,7 +73,7 @@ jobs:
           fi
 
           # Get previous tag
-          PREVIOUS_TAG=$(git describe --tags --abbrev=0 $CURRENT_TAG^)
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 $CURRENT_TAG^ 2>/dev/null || echo "HEAD~10")
 
           echo "Current tag: $CURRENT_TAG"
           echo "Previous tag: $PREVIOUS_TAG"
