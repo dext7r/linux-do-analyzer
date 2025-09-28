@@ -155,9 +155,6 @@ ehthumbs_vista.db
 
 # Linux
 *~
-
-# IDE
-.vscode/
 .idea/
 *.swp
 *.swo

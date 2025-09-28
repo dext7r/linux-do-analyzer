@@ -1,0 +1,20 @@
+{
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.expand": false,
+  "explorer.fileNesting.patterns": {
+    "*.js": "$(capture).js.map, $(capture).min.js, $(capture).d.ts",
+    "*.ts": "$(capture).js, $(capture).js.map, $(capture).min.js, $(capture).d.ts",
+    "*.html": "$(capture).*.html",
+    "package.json": "package-lock.json, pnpm-lock.yaml, yarn.lock, .npmrc, .nvmrc",
+    "deno.json": "deno.lock, import_map.json",
+    "README.md": "CHANGELOG.md, CONTRIBUTING.md, LICENSE, SECURITY.md, DEPLOY.md",
+    ".gitignore": ".gitattributes, .gitmodules",
+    "index.html": "index_backup.html, about.html, help.html, faq.html, privacy.html"
+  },
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true
+  }
+}
