@@ -32,6 +32,9 @@ class App {
             this.chartRenderer = new ChartRenderer();
             this.uiManager = new UIManager();
 
+            // 设置全局变量供其他模块使用
+            window.chartRenderer = this.chartRenderer;
+
             // 初始化数据库
             await this.dataManager.initDB();
 
@@ -226,6 +229,13 @@ class App {
         ];
 
         await Promise.allSettled(renderPromises);
+        
+        // 更新批量导出按钮状态
+        if (this.uiManager && this.uiManager.updateExportAllChartsButton) {
+            setTimeout(() => {
+                this.uiManager.updateExportAllChartsButton();
+            }, 200);
+        }
     }
 
     /**

@@ -1,47 +1,47 @@
 /**
- * 图表渲染器
- * 负责使用Chart.js和ECharts渲染各种数据可视化图表
+ * 图表渲染器 - ECharts 版本
+ * 使用 ECharts 渲染各种数据可视化图表，支持完整的导出功能
  */
 class ChartRenderer {
     constructor() {
         this.charts = new Map();
-        this.echartsInstances = new Map();
-        this.defaultOptions = this.getDefaultOptions();
+        this.defaultTheme = this.getDefaultTheme();
+        
+        // 初始化窗口大小监听
+        this.initResizeListener();
     }
 
     /**
-     * 获取默认图表配置
+     * 获取默认主题配置
      */
-    getDefaultOptions() {
+    getDefaultTheme() {
         return {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        padding: 20,
-                        usePointStyle: true,
-                        font: {
-                            size: 12
-                        }
-                    }
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                    titleColor: 'white',
-                    bodyColor: 'white',
-                    borderColor: 'rgba(102, 126, 234, 0.5)',
-                    borderWidth: 1,
-                    cornerRadius: 8,
-                    displayColors: true,
-                    mode: 'index',
-                    intersect: false
+            backgroundColor: 'transparent',
+            textStyle: {
+                color: '#374151',
+                fontFamily: 'ui-sans-serif, system-ui, -apple-system, sans-serif'
+            },
+            grid: {
+                left: '10%',
+                right: '10%',
+                top: '15%',
+                bottom: '15%',
+                containLabel: true
+            },
+            color: ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6', '#ef4444'],
+            tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                borderColor: 'rgba(102, 126, 234, 0.5)',
+                borderWidth: 1,
+                textStyle: {
+                    color: '#fff'
                 }
             },
-            interaction: {
-                mode: 'index',
-                intersect: false
+            legend: {
+                textStyle: {
+                    color: '#6b7280'
+                },
+                bottom: 0
             }
         };
     }
@@ -50,91 +50,67 @@ class ChartRenderer {
      * 渲染访问活动图表
      */
     renderVisitsChart(data) {
-        // 渲染到两个位置：总览页和图表页
-        const chartIds = ['visitsChart', 'visitsChartDetail'];
-
-        chartIds.forEach(chartId => {
-            this.destroyChart(chartId);
-            const ctx = document.getElementById(chartId);
-            if (!ctx) {
-                return; // 如果元素不存在，跳过
-            }
-
-            const options = {
-            ...this.defaultOptions,
-            plugins: {
-                ...this.defaultOptions.plugins,
-                title: {
-                    display: true,
-                    text: '最近30天访问活动趋势',
-                    font: {
-                        size: 16,
-                        weight: 'bold'
-                    },
-                    color: '#374151'
-                }
+        const chartId = 'visitsChartDetail';
+        const option = {
+            ...this.defaultTheme,
+            title: {
+                text: '每日访问活动',
+                left: 'center',
+                textStyle: { color: '#374151', fontSize: 16, fontWeight: 'bold' }
             },
-            scales: {
-                x: {
-                    display: true,
-                    title: {
-                        display: true,
-                        text: '日期',
-                        color: '#6B7280'
-                    },
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.1)'
-                    },
-                    ticks: {
-                        maxTicksLimit: 10,
-                        color: '#6B7280'
-                    }
+            xAxis: {
+                type: 'category',
+                data: data.labels,
+                axisLabel: { color: '#6b7280' },
+                axisLine: { lineStyle: { color: '#e5e7eb' } }
+            },
+            yAxis: [
+                {
+                    type: 'value',
+                    name: '阅读帖子数',
+                    nameTextStyle: { color: '#6b7280' },
+                    axisLabel: { color: '#6b7280' },
+                    axisLine: { lineStyle: { color: '#e5e7eb' } },
+                    splitLine: { lineStyle: { color: '#f3f4f6' } },
+                    position: 'left'
                 },
-                y: {
-                    type: 'linear',
-                    display: true,
-                    position: 'left',
-                    title: {
-                        display: true,
-                        text: '阅读帖子数',
-                        color: '#667eea'
-                    },
-                    grid: {
-                        color: 'rgba(102, 126, 234, 0.1)'
-                    },
-                    ticks: {
-                        color: '#667eea'
-                    }
-                },
-                y1: {
-                    type: 'linear',
-                    display: true,
-                    position: 'right',
-                    title: {
-                        display: true,
-                        text: '阅读时间(分钟)',
-                        color: '#a855f7'
-                    },
-                    grid: {
-                        drawOnChartArea: false
-                    },
-                    ticks: {
-                        color: '#a855f7'
+                {
+                    type: 'value',
+                    name: '阅读时间(分钟)',
+                    nameTextStyle: { color: '#6b7280' },
+                    axisLabel: { color: '#6b7280' },
+                    axisLine: { lineStyle: { color: '#e5e7eb' } },
+                    splitLine: { show: false },
+                    position: 'right'
+                }
+            ],
+            series: data.datasets.map((dataset, index) => ({
+                name: dataset.label,
+                data: dataset.data,
+                type: 'line',
+                smooth: true,
+                lineStyle: { width: 3 },
+                areaStyle: { opacity: 0.2 },
+                symbol: 'circle',
+                symbolSize: 6,
+                yAxisIndex: index // 使用不同的Y轴
+            })),
+            legend: {
+                ...this.defaultTheme.legend,
+                data: data.datasets.map(dataset => dataset.label)
+            },
+            toolbox: {
+                right: 20,
+                feature: {
+                    saveAsImage: {
+                        title: '保存为图片',
+                        pixelRatio: 2
                     }
                 }
             }
         };
 
-            this.charts.set(chartId, new Chart(ctx, {
-                type: 'line',
-                data: data,
-                options: options
-            }));
-
-            // 添加导出按钮
-            this.addExportButton(chartId, ctx.canvas);
-        });
-
+        this.createEChart(chartId, option);
         console.log('访问活动图表渲染完成');
     }
 
@@ -143,70 +119,47 @@ class ChartRenderer {
      */
     renderBadgesChart(data) {
         const chartId = 'badgesChart';
-        this.destroyChart(chartId);
-
-        const ctx = document.getElementById(chartId);
-        if (!ctx) {
-            console.error('找不到图表容器:', chartId);
-            return;
-        }
-
-        const options = {
-            ...this.defaultOptions,
-            plugins: {
-                ...this.defaultOptions.plugins,
-                title: {
-                    display: true,
-                    text: '每月获得徽章统计',
-                    font: {
-                        size: 16,
-                        weight: 'bold'
-                    },
-                    color: '#374151'
-                }
+        const option = {
+            ...this.defaultTheme,
+            title: {
+                text: '徽章获得统计',
+                left: 'center',
+                textStyle: { color: '#374151', fontSize: 16, fontWeight: 'bold' }
             },
-            scales: {
-                x: {
-                    display: true,
-                    title: {
-                        display: true,
-                        text: '月份',
-                        color: '#6B7280'
-                    },
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.1)'
-                    },
-                    ticks: {
-                        color: '#6B7280'
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: '徽章数量',
-                        color: '#6B7280'
-                    },
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.1)'
-                    },
-                    ticks: {
-                        color: '#6B7280',
-                        stepSize: 1
+            xAxis: {
+                type: 'category',
+                data: data.labels,
+                axisLabel: { color: '#6b7280', rotate: 45 },
+                axisLine: { lineStyle: { color: '#e5e7eb' } }
+            },
+            yAxis: {
+                type: 'value',
+                name: '徽章数量',
+                nameTextStyle: { color: '#6b7280' },
+                axisLabel: { color: '#6b7280' },
+                axisLine: { lineStyle: { color: '#e5e7eb' } },
+                splitLine: { lineStyle: { color: '#f3f4f6' } },
+                minInterval: 1
+            },
+            series: [{
+                data: data.datasets[0].data,
+                type: 'bar',
+                itemStyle: {
+                    borderRadius: [4, 4, 0, 0]
+                }
+            }],
+            toolbox: {
+                right: 20,
+                feature: {
+                    saveAsImage: {
+                        title: '保存为图片',
+                        pixelRatio: 2
                     }
                 }
             }
         };
 
-        this.charts.set(chartId, new Chart(ctx, {
-            type: 'bar',
-            data: data,
-            options: options
-        }));
-
-        // 添加导出按钮
-        this.addExportButton(chartId, ctx.canvas);
-
+        this.createEChart(chartId, option);
         console.log('徽章获得图表渲染完成');
     }
 
@@ -215,52 +168,62 @@ class ChartRenderer {
      */
     renderDeviceChart(data) {
         const chartId = 'deviceChart';
-        this.destroyChart(chartId);
-
-        const ctx = document.getElementById(chartId);
-        if (!ctx) {
-            console.error('找不到图表容器:', chartId);
-            return;
-        }
-
         const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+        
+        const seriesData = data.labels.map((label, index) => ({
+            name: label,
+            value: data.datasets[0].data[index]
+        }));
 
-        const options = {
-            ...this.defaultOptions,
-            plugins: {
-                ...this.defaultOptions.plugins,
-                title: {
-                    display: true,
-                    text: '设备使用分布',
-                    font: {
-                        size: 16,
-                        weight: 'bold'
-                    },
-                    color: '#374151'
+        const option = {
+            ...this.defaultTheme,
+            title: {
+                text: '设备使用分布',
+                left: 'center',
+                textStyle: { color: '#374151', fontSize: 16, fontWeight: 'bold' }
+            },
+            tooltip: {
+                ...this.defaultTheme.tooltip,
+                formatter: (params) => {
+                    const percentage = total > 0 ? ((params.value / total) * 100).toFixed(1) : '0';
+                    return `${params.name}: ${params.value} 次 (${percentage}%)`;
+                }
+            },
+            series: [{
+                type: 'pie',
+                radius: ['40%', '70%'],
+                center: ['50%', '60%'],
+                data: seriesData,
+                itemStyle: {
+                    borderRadius: 8,
+                    borderColor: '#fff',
+                    borderWidth: 2
                 },
-                tooltip: {
-                    ...this.defaultOptions.plugins.tooltip,
-                    callbacks: {
-                        label: function(context) {
-                            const label = context.label || '';
-                            const value = context.parsed;
-                            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0';
-                            return `${label}: ${value} 次 (${percentage}%)`;
-                        }
+                label: {
+                    show: true,
+                    formatter: '{b}: {c}',
+                    color: '#6b7280'
+                },
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.3)'
+                    }
+                }
+            }],
+            toolbox: {
+                right: 20,
+                feature: {
+                    saveAsImage: {
+                        title: '保存为图片',
+                        pixelRatio: 2
                     }
                 }
             }
         };
 
-        this.charts.set(chartId, new Chart(ctx, {
-            type: 'doughnut',
-            data: data,
-            options: options
-        }));
-
-        // 添加导出按钮
-        this.addExportButton(chartId, ctx.canvas);
-
+        this.createEChart(chartId, option);
         console.log('设备使用分布图表渲染完成');
     }
 
@@ -269,70 +232,50 @@ class ChartRenderer {
      */
     renderPostsChart(data) {
         const chartId = 'postsChart';
-        this.destroyChart(chartId);
-
-        const ctx = document.getElementById(chartId);
-        if (!ctx) {
-            console.error('找不到图表容器:', chartId);
-            return;
-        }
-
-        const options = {
-            ...this.defaultOptions,
-            plugins: {
-                ...this.defaultOptions.plugins,
-                title: {
-                    display: true,
-                    text: '24小时发帖活动分布',
-                    font: {
-                        size: 16,
-                        weight: 'bold'
-                    },
-                    color: '#374151'
-                }
+        const option = {
+            ...this.defaultTheme,
+            title: {
+                text: '24小时发帖活动分布',
+                left: 'center',
+                textStyle: { color: '#374151', fontSize: 16, fontWeight: 'bold' }
             },
-            scales: {
-                x: {
-                    display: true,
-                    title: {
-                        display: true,
-                        text: '时间(小时)',
-                        color: '#6B7280'
-                    },
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.1)'
-                    },
-                    ticks: {
-                        color: '#6B7280'
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: '发帖数量',
-                        color: '#6B7280'
-                    },
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.1)'
-                    },
-                    ticks: {
-                        color: '#6B7280',
-                        stepSize: 1
+            xAxis: {
+                type: 'category',
+                data: data.labels,
+                name: '时间(小时)',
+                nameLocation: 'middle',
+                nameGap: 30,
+                nameTextStyle: { color: '#6b7280' },
+                axisLabel: { color: '#6b7280' },
+                axisLine: { lineStyle: { color: '#e5e7eb' } }
+            },
+            yAxis: {
+                type: 'value',
+                name: '发帖数量',
+                nameTextStyle: { color: '#6b7280' },
+                axisLabel: { color: '#6b7280' },
+                axisLine: { lineStyle: { color: '#e5e7eb' } },
+                splitLine: { lineStyle: { color: '#f3f4f6' } }
+            },
+            series: [{
+                data: data.datasets[0].data,
+                type: 'bar',
+                itemStyle: {
+                    borderRadius: [4, 4, 0, 0]
+                }
+            }],
+            toolbox: {
+                right: 20,
+                feature: {
+                    saveAsImage: {
+                        title: '保存为图片',
+                        pixelRatio: 2
                     }
                 }
             }
         };
 
-        this.charts.set(chartId, new Chart(ctx, {
-            type: 'bar',
-            data: data,
-            options: options
-        }));
-
-        // 添加导出按钮
-        this.addExportButton(chartId, ctx.canvas);
-
+        this.createEChart(chartId, option);
         console.log('发帖活动分布图表渲染完成');
     }
 
@@ -341,69 +284,51 @@ class ChartRenderer {
      */
     renderLikesChart(data) {
         const chartId = 'likesChart';
-        this.destroyChart(chartId);
-
-        const ctx = document.getElementById(chartId);
-        if (!ctx) {
-            console.error('找不到图表容器:', chartId);
-            return;
-        }
-
-        const options = {
-            ...this.defaultOptions,
-            plugins: {
-                ...this.defaultOptions.plugins,
-                title: {
-                    display: true,
-                    text: '每月点赞活动趋势',
-                    font: {
-                        size: 16,
-                        weight: 'bold'
-                    },
-                    color: '#374151'
-                }
+        const option = {
+            ...this.defaultTheme,
+            title: {
+                text: '点赞活动趋势',
+                left: 'center',
+                textStyle: { color: '#374151', fontSize: 16, fontWeight: 'bold' }
             },
-            scales: {
-                x: {
-                    display: true,
-                    title: {
-                        display: true,
-                        text: '月份',
-                        color: '#6B7280'
-                    },
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.1)'
-                    },
-                    ticks: {
-                        color: '#6B7280'
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: '点赞数量',
-                        color: '#6B7280'
-                    },
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.1)'
-                    },
-                    ticks: {
-                        color: '#6B7280'
+            xAxis: {
+                type: 'category',
+                data: data.labels,
+                name: '月份',
+                nameLocation: 'middle',
+                nameGap: 30,
+                nameTextStyle: { color: '#6b7280' },
+                axisLabel: { color: '#6b7280' },
+                axisLine: { lineStyle: { color: '#e5e7eb' } }
+            },
+            yAxis: {
+                type: 'value',
+                name: '点赞数量',
+                nameTextStyle: { color: '#6b7280' },
+                axisLabel: { color: '#6b7280' },
+                axisLine: { lineStyle: { color: '#e5e7eb' } },
+                splitLine: { lineStyle: { color: '#f3f4f6' } }
+            },
+            series: [{
+                data: data.datasets[0].data,
+                type: 'line',
+                smooth: true,
+                lineStyle: { width: 3 },
+                symbol: 'circle',
+                symbolSize: 8
+            }],
+            toolbox: {
+                right: 20,
+                feature: {
+                    saveAsImage: {
+                        title: '保存为图片',
+                        pixelRatio: 2
                     }
                 }
             }
         };
 
-        this.charts.set(chartId, new Chart(ctx, {
-            type: 'line',
-            data: data,
-            options: options
-        }));
-
-        // 添加导出按钮
-        this.addExportButton(chartId, ctx.canvas);
-
+        this.createEChart(chartId, option);
         console.log('点赞活动趋势图表渲染完成');
     }
 
@@ -412,82 +337,52 @@ class ChartRenderer {
      */
     renderCategoryChart(categoryData) {
         const chartId = 'categoryChart';
-        this.destroyChart(chartId);
-
-        const ctx = document.getElementById(chartId);
-        if (!ctx) {
-            console.warn('找不到分类图表容器:', chartId);
-            return;
-        }
-
-        if (!categoryData || categoryData.length === 0) {
-            console.warn('分类数据为空');
-            return;
-        }
-
-        const data = {
-            labels: categoryData.map(cat => cat.name),
-            datasets: [{
-                label: '发帖数',
-                data: categoryData.map(cat => cat.posts),
-                backgroundColor: 'rgba(102, 126, 234, 0.8)',
-                borderColor: 'rgb(102, 126, 234)',
-                borderWidth: 1
-            }]
-        };
-
-        const options = {
-            ...this.defaultOptions,
-            indexAxis: 'y',
-            plugins: {
-                ...this.defaultOptions.plugins,
-                title: {
-                    display: true,
-                    text: '热门分类发帖统计',
-                    font: {
-                        size: 16,
-                        weight: 'bold'
-                    },
-                    color: '#374151'
-                }
+        const option = {
+            ...this.defaultTheme,
+            title: {
+                text: '分类活动分布',
+                left: 'center',
+                textStyle: { color: '#374151', fontSize: 16, fontWeight: 'bold' }
             },
-            scales: {
-                x: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: '发帖数量',
-                        color: '#6B7280'
-                    },
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.1)'
-                    },
-                    ticks: {
-                        color: '#6B7280'
+            xAxis: {
+                type: 'category',
+                data: categoryData.labels,
+                axisLabel: { 
+                    color: '#6b7280',
+                    rotate: 45,
+                    formatter: function(value) {
+                        return value.length > 10 ? value.substring(0, 10) + '...' : value;
                     }
                 },
-                y: {
-                    title: {
-                        display: true,
-                        text: '分类',
-                        color: '#6B7280'
-                    },
-                    ticks: {
-                        color: '#6B7280'
+                axisLine: { lineStyle: { color: '#e5e7eb' } }
+            },
+            yAxis: {
+                type: 'value',
+                name: '活动数量',
+                nameTextStyle: { color: '#6b7280' },
+                axisLabel: { color: '#6b7280' },
+                axisLine: { lineStyle: { color: '#e5e7eb' } },
+                splitLine: { lineStyle: { color: '#f3f4f6' } }
+            },
+            series: [{
+                data: categoryData.datasets[0].data,
+                type: 'bar',
+                itemStyle: {
+                    borderRadius: [4, 4, 0, 0]
+                }
+            }],
+            toolbox: {
+                right: 20,
+                feature: {
+                    saveAsImage: {
+                        title: '保存为图片',
+                        pixelRatio: 2
                     }
                 }
             }
         };
 
-        this.charts.set(chartId, new Chart(ctx, {
-            type: 'bar',
-            data: data,
-            options: options
-        }));
-
-        // 添加导出按钮
-        this.addExportButton(chartId, ctx.canvas);
-
+        this.createEChart(chartId, option);
         console.log('分类活动图表渲染完成');
     }
 
@@ -496,91 +391,104 @@ class ChartRenderer {
      */
     renderActivityTrendChart(data) {
         const chartId = 'activityTrendChart';
-        this.destroyChart(chartId);
-
-        const ctx = document.getElementById(chartId);
-        if (!ctx) {
-            console.warn('找不到综合活动趋势图表容器:', chartId);
-            return;
-        }
-
-        // 准备图表数据
-        const chartData = {
-            labels: data.labels || [],
-            datasets: [
-                {
-                    label: '发帖',
-                    data: data.posts || [],
-                    borderColor: '#6366f1',
-                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                    tension: 0.4
-                },
-                {
-                    label: '点赞',
-                    data: data.likes || [],
-                    borderColor: '#ec4899',
-                    backgroundColor: 'rgba(236, 72, 153, 0.1)',
-                    tension: 0.4
-                },
-                {
-                    label: '访问',
-                    data: data.visits || [],
-                    borderColor: '#10b981',
-                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                    tension: 0.4
-                }
-            ]
-        };
-
-        const options = {
-            ...this.defaultOptions,
-            plugins: {
-                ...this.defaultOptions.plugins,
-                title: {
-                    display: false
-                },
-                legend: {
-                    display: true,
-                    position: 'top',
-                    labels: {
-                        color: '#6B7280',
-                        padding: 15,
-                        font: {
-                            size: 12
-                        }
-                    }
-                }
+        const option = {
+            ...this.defaultTheme,
+            title: {
+                text: '综合活动趋势',
+                left: 'center',
+                textStyle: { color: '#374151', fontSize: 16, fontWeight: 'bold' }
             },
-            scales: {
-                x: {
-                    grid: {
-                        color: 'rgba(156, 163, 175, 0.1)'
-                    },
-                    ticks: {
-                        color: '#6B7280'
-                    }
-                },
-                y: {
-                    grid: {
-                        color: 'rgba(156, 163, 175, 0.1)'
-                    },
-                    ticks: {
-                        color: '#6B7280'
+            xAxis: {
+                type: 'category',
+                data: data.labels,
+                axisLabel: { color: '#6b7280' },
+                axisLine: { lineStyle: { color: '#e5e7eb' } }
+            },
+            yAxis: {
+                type: 'value',
+                name: '活动数量',
+                nameTextStyle: { color: '#6b7280' },
+                axisLabel: { color: '#6b7280' },
+                axisLine: { lineStyle: { color: '#e5e7eb' } },
+                splitLine: { lineStyle: { color: '#f3f4f6' } }
+            },
+            series: data.datasets.map((dataset, index) => ({
+                name: dataset.label,
+                data: dataset.data,
+                type: 'line',
+                smooth: true,
+                lineStyle: { width: 3 },
+                symbol: 'circle',
+                symbolSize: 6
+            })),
+            legend: {
+                ...this.defaultTheme.legend,
+                data: data.datasets.map(dataset => dataset.label)
+            },
+            toolbox: {
+                right: 20,
+                feature: {
+                    saveAsImage: {
+                        title: '保存为图片',
+                        pixelRatio: 2
                     }
                 }
             }
         };
 
-        this.charts.set(chartId, new Chart(ctx, {
-            type: 'line',
-            data: chartData,
-            options: options
-        }));
-
-        // 添加导出按钮
-        this.addExportButton(chartId, ctx.canvas);
-
+        this.createEChart(chartId, option);
         console.log('综合活动趋势图表渲染完成');
+    }
+
+    /**
+     * 创建ECharts图表
+     */
+    createEChart(chartId, option) {
+        // 检查ECharts是否已加载
+        if (typeof echarts === 'undefined') {
+            console.error('ECharts库未加载');
+            return null;
+        }
+
+        const container = document.getElementById(chartId);
+        if (!container) {
+            console.error('找不到图表容器:', chartId);
+            return null;
+        }
+
+        // 确保容器可见且有尺寸
+        const parentElement = container.parentElement;
+        if (parentElement) {
+            parentElement.style.minHeight = '300px';
+        }
+
+        // 销毁已存在的图表
+        this.destroyChart(chartId);
+
+        // 延迟初始化，确保容器已完全渲染
+        setTimeout(() => {
+            try {
+                // 再次检查容器尺寸
+                const rect = container.getBoundingClientRect();
+                if (rect.width === 0 || rect.height === 0) {
+                    console.warn(`图表容器尺寸为0: ${chartId}, width: ${rect.width}, height: ${rect.height}`);
+                    container.style.width = '100%';
+                    container.style.height = '300px';
+                }
+
+                // 创建新的ECharts实例
+                const chart = echarts.init(container);
+                chart.setOption(option);
+                
+                this.charts.set(chartId, chart);
+                
+                console.log(`ECharts图表创建完成: ${chartId}`);
+            } catch (error) {
+                console.error(`ECharts图表创建失败: ${chartId}`, error);
+            }
+        }, 200);
+        
+        return null;
     }
 
     /**
@@ -588,13 +496,8 @@ class ChartRenderer {
      */
     destroyChart(chartId) {
         if (this.charts.has(chartId)) {
-            this.charts.get(chartId).destroy();
+            this.charts.get(chartId).dispose();
             this.charts.delete(chartId);
-            console.log(`销毁Chart.js图表: ${chartId}`);
-        }
-        if (this.echartsInstances.has(chartId)) {
-            this.echartsInstances.get(chartId).dispose();
-            this.echartsInstances.delete(chartId);
             console.log(`销毁ECharts图表: ${chartId}`);
         }
     }
@@ -604,65 +507,20 @@ class ChartRenderer {
      */
     destroyAllCharts() {
         this.charts.forEach((chart, id) => {
-            chart.destroy();
-            console.log(`销毁Chart.js图表: ${id}`);
-        });
-        this.charts.clear();
-        
-        this.echartsInstances.forEach((chart, id) => {
             chart.dispose();
             console.log(`销毁ECharts图表: ${id}`);
         });
-        this.echartsInstances.clear();
+        this.charts.clear();
         
         console.log('所有图表已销毁');
     }
 
     /**
-     * 更新图表数据
-     */
-    updateChart(chartId, newData) {
-        if (this.charts.has(chartId)) {
-            const chart = this.charts.get(chartId);
-            chart.data = newData;
-            chart.update('active');
-            console.log(`更新图表: ${chartId}`);
-        } else {
-            console.warn(`图表不存在: ${chartId}`);
-        }
-    }
-
-    /**
-     * 获取图表实例
-     */
-    getChart(chartId) {
-        return this.charts.get(chartId);
-    }
-
-    /**
-     * 检查图表是否存在
-     */
-    hasChart(chartId) {
-        return this.charts.has(chartId);
-    }
-
-    /**
-     * 导出图表为图片（支持Chart.js和ECharts）
+     * 导出图表为图片
      */
     exportChartAsImage(chartId, filename = 'chart.png', format = 'png') {
-        // 检查Chart.js图表
         if (this.charts.has(chartId)) {
             const chart = this.charts.get(chartId);
-            const canvas = chart.canvas;
-            const url = canvas.toDataURL(`image/${format}`);
-            this.downloadImage(url, filename);
-            console.log(`导出Chart.js图表: ${chartId} -> ${filename}`);
-            return;
-        }
-
-        // 检查ECharts图表
-        if (this.echartsInstances.has(chartId)) {
-            const chart = this.echartsInstances.get(chartId);
             const url = chart.getDataURL({
                 type: format,
                 pixelRatio: 2,
@@ -694,14 +552,8 @@ class ChartRenderer {
     exportAllCharts(format = 'png') {
         const timestamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, '');
         
-        // 导出Chart.js图表
-        this.charts.forEach((chart, id) => {
-            const filename = `chart_${id}_${timestamp}.${format}`;
-            this.exportChartAsImage(id, filename, format);
-        });
-
         // 导出ECharts图表
-        this.echartsInstances.forEach((chart, id) => {
+        this.charts.forEach((chart, id) => {
             const filename = `chart_${id}_${timestamp}.${format}`;
             this.exportChartAsImage(id, filename, format);
         });
@@ -710,79 +562,11 @@ class ChartRenderer {
     }
 
     /**
-     * 创建ECharts图表
-     */
-    createEChart(chartId, option) {
-        const container = document.getElementById(chartId);
-        if (!container) {
-            console.error('找不到图表容器:', chartId);
-            return null;
-        }
-
-        // 销毁已存在的图表
-        this.destroyChart(chartId);
-
-        // 创建新的ECharts实例
-        const chart = echarts.init(container);
-        chart.setOption(option);
-        
-        this.echartsInstances.set(chartId, chart);
-        
-        // 添加导出按钮
-        this.addExportButton(chartId, container);
-        
-        console.log(`ECharts图表创建完成: ${chartId}`);
-        return chart;
-    }
-
-    /**
-     * 为图表容器添加导出按钮
-     */
-    addExportButton(chartId, container) {
-        // 如果传入的是canvas元素，获取其父容器
-        if (container.tagName === 'CANVAS') {
-            container = container.parentElement;
-        }
-        
-        // 检查是否已存在导出按钮
-        const existingButton = container.querySelector('.export-btn');
-        if (existingButton) {
-            existingButton.remove();
-        }
-
-        // 创建导出按钮
-        const exportBtn = document.createElement('button');
-        exportBtn.className = 'export-btn absolute top-2 right-2 bg-blue-500 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded shadow-lg z-10';
-        exportBtn.innerHTML = '📥 导出';
-        exportBtn.title = '导出图表为PNG图片';
-        
-        exportBtn.onclick = () => {
-            const timestamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, '');
-            const filename = `${chartId}_${timestamp}.png`;
-            this.exportChartAsImage(chartId, filename);
-        };
-
-        // 确保父容器有相对定位
-        container.style.position = 'relative';
-        container.appendChild(exportBtn);
-    }
-
-    /**
      * 调整所有图表大小（移动端优化）
      */
     resizeAllCharts() {
-        // 调整Chart.js图表
-        this.charts.forEach((chart, id) => {
-            try {
-                chart.resize();
-                console.log(`调整Chart.js图表大小: ${id}`);
-            } catch (error) {
-                console.warn(`调整Chart.js图表 ${id} 大小失败:`, error);
-            }
-        });
-
         // 调整ECharts图表
-        this.echartsInstances.forEach((chart, id) => {
+        this.charts.forEach((chart, id) => {
             try {
                 chart.resize();
                 console.log(`调整ECharts图表大小: ${id}`);
@@ -793,23 +577,26 @@ class ChartRenderer {
     }
 
     /**
+     * 初始化窗口大小监听
+     */
+    initResizeListener() {
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                this.resizeAllCharts();
+            }, 100);
+        });
+    }
+
+    /**
      * 获取所有图表状态
      */
     getChartsStatus() {
         const status = {};
         
-        // Chart.js图表状态
-        this.charts.forEach((chart, id) => {
-            status[id] = {
-                library: 'Chart.js',
-                type: chart.config.type,
-                datasets: chart.data.datasets.length,
-                dataPoints: chart.data.labels.length
-            };
-        });
-
         // ECharts图表状态
-        this.echartsInstances.forEach((chart, id) => {
+        this.charts.forEach((chart, id) => {
             const option = chart.getOption();
             status[id] = {
                 library: 'ECharts',

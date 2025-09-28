@@ -9,7 +9,8 @@
     "deno.json": "deno.lock, import_map.json",
     "README.md": "CHANGELOG.md, CONTRIBUTING.md, LICENSE, SECURITY.md, DEPLOY.md",
     ".gitignore": ".gitattributes, .gitmodules",
-    "index.html": "index_backup.html, about.html, help.html, faq.html, privacy.html"
+    "index.html": "index_backup.html, about.html, help.html, faq.html, privacy.html",
+    "Dockerfile": ".dockerignore, docker-compose.yml, docker-compose.*.yml, nginx.conf, DOCKER.md"
   },
   "files.exclude": {
     "**/node_modules": true,

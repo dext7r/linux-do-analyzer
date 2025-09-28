@@ -201,7 +201,7 @@ npx serve -p 8080
 
 - **📱 响应式设计** - 完美适配桌面端、平板和移动设备
 - **🌈 渐变背景** - 科技感十足的深色主题和动态背景效果
-- **🎮 交互式图表** - 基于 Chart.js 的高质量数据可视化
+- **🎮 交互式图表** - 基于 ECharts 的高质量数据可视化
 - **🎯 卡片式布局** - 清晰的信息层级和优雅的视觉呈现
 - **✨ 动画效果** - 流畅的页面加载和交互动画
 
@@ -223,7 +223,7 @@ npx serve -p 8080
 <summary><strong>📚 前端技术栈</strong></summary>
 
 - **🎨 TailwindCSS** - 现代化 CSS 框架，快速构建响应式界面
-- **📊 Chart.js** - 强大的图表可视化库
+- **📊 ECharts** - 专业的企业级图表可视化库
 - **🗂️ JSZip** - 客户端 ZIP 文件解析和处理
 - **💫 jQuery** - DOM 操作和事件处理
 - **🎯 FontAwesome** - 丰富的图标库
@@ -484,7 +484,7 @@ deno task check    # 类型检查
 | `data-manager.js` | 数据存储管理 | IndexedDB 操作、数据持久化 |
 | `zip-parser.js` | 文件解析器 | ZIP 解压、CSV/JSON 解析 |
 | `data-analyzer.js` | 数据分析引擎 | 统计计算、趋势分析、模式识别 |
-| `chart-renderer.js` | 图表渲染器 | Chart.js 集成、可视化生成 |
+| `chart-renderer.js` | 图表渲染器 | ECharts 集成、可视化生成 |
 | `ui-manager.js` | 界面管理器 | DOM 操作、用户交互、状态管理 |
 
 </details>
@@ -567,7 +567,7 @@ deno task check    # 类型检查
 
 感谢以下开源项目和技术栈的支持：
 
-- **📊 [Chart.js](https://www.chartjs.org/)** - 强大的图表可视化库
+- **📊 [ECharts](https://echarts.apache.org/)** - 专业的企业级图表可视化库
 - **🎨 [TailwindCSS](https://tailwindcss.com/)** - 现代化 CSS 框架
 - **🗂️ [JSZip](https://stuk.github.io/jszip/)** - JavaScript ZIP 文件处理库
 - **💫 [jQuery](https://jquery.com/)** - 简化 DOM 操作的 JavaScript 库

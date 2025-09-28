@@ -61,7 +61,7 @@ deno task bundle
    - 缓存计算结果以提高性能
 
 5. **ChartRenderer** (`js/chart-renderer.js`) - 可视化层
-   - 使用 Chart.js 创建交互式图表
+   - 使用 ECharts 创建交互式图表
    - 支持多种图表类型（折线图、柱状图、饼图、环形图）
    - 处理响应式设计和主题适配
 

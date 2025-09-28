@@ -104,6 +104,11 @@ class UIManager {
       this.hideHelpModal();
     });
 
+    // 批量导出所有图表按钮
+    $('#exportAllChartsBtn').on('click', () => {
+      this.handleExportAllCharts();
+    });
+
     // 点击模态框外部关闭
     $('#helpModal').on('click', (e) => {
       if (e.target.id === 'helpModal') {
@@ -2916,6 +2921,11 @@ class UIManager {
     // 显示分析结果区域
     this.showAnalysisResults();
     this.showExportButton();
+    
+    // 更新批量导出按钮状态
+    setTimeout(() => {
+      this.updateExportAllChartsButton();
+    }, 100);
   }
 
   /**
@@ -3682,6 +3692,61 @@ class UIManager {
     if (bytes < 1024) return bytes + ' B';
     if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+
+  /**
+   * 处理批量导出所有图表
+   */
+  handleExportAllCharts() {
+    try {
+      // 检查图表渲染器是否存在
+      if (!window.chartRenderer) {
+        this.showToast('图表渲染器未初始化，请先分析数据', 'error');
+        return;
+      }
+
+      // 检查是否有图表
+      const chartStatus = window.chartRenderer.getChartsStatus();
+      const chartCount = Object.keys(chartStatus).length;
+      
+      if (chartCount === 0) {
+        this.showToast('没有可导出的图表，请先分析数据', 'warning');
+        return;
+      }
+
+      // 显示导出进度
+      this.showToast(`正在导出 ${chartCount} 个图表...`, 'info', 3000);
+
+      // 执行批量导出
+      window.chartRenderer.exportAllCharts('png');
+
+      // 显示成功消息
+      setTimeout(() => {
+        this.showToast(`成功导出 ${chartCount} 个图表到下载文件夹`, 'success');
+      }, 1000);
+
+    } catch (error) {
+      console.error('批量导出图表失败:', error);
+      this.showToast('导出失败，请重试', 'error');
+    }
+  }
+
+  /**
+   * 更新批量导出按钮状态
+   */
+  updateExportAllChartsButton() {
+    const button = $('#exportAllChartsBtn');
+    if (button.length === 0) return;
+
+    const hasCharts = window.chartRenderer && Object.keys(window.chartRenderer.getChartsStatus()).length > 0;
+    
+    if (hasCharts) {
+      button.removeClass('opacity-50 cursor-not-allowed').prop('disabled', false);
+      button.find('span').text('批量导出所有图表');
+    } else {
+      button.addClass('opacity-50 cursor-not-allowed').prop('disabled', true);
+      button.find('span').text('暂无图表可导出');
+    }
   }
 }
 

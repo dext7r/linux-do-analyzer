@@ -1,0 +1,48 @@
+# Git
+.git
+.gitignore
+
+# 临时文件和缓存
+.temp/
+dist/
+.DS_Store
+*.tmp
+*.log
+
+# Node.js (如果存在)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 测试数据
+test-data.zip
+*.zip
+
+# 编辑器和IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 操作系统
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# 文档和说明
+README.md
+CHANGELOG.md
+CONTRIBUTING.md
+SECURITY.md
+LICENSE
+
+# 其他
+*.backup
+index_backup.html
