@@ -285,6 +285,259 @@
             </div>
         </header>
 
+        <!-- NPM 包安装和使用方法 -->
+        <section class="mb-16 scroll-reveal">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-6 gradient-text">
+                    <i class="fas fa-download text-green-600 mr-4 animate-float"></i>
+                    NPM 包安装和使用
+                </h2>
+                <p class="text-xl max-w-2xl mx-auto" style="color: var(--text-secondary);">
+                    除了在线使用，您还可以通过多种方式安装和运行本工具
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- 全局安装方法 -->
+                <div class="group animate-fade-in-left">
+                    <div class="relative p-8 rounded-3xl transition-all duration-500 hover:shadow-2xl hover:-translate-y-4 card-hover" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                        <!-- 图标区域 -->
+                        <div class="text-center mb-8">
+                            <div class="w-20 h-20 mx-auto bg-gradient-to-br from-green-500 to-emerald-600 rounded-3xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-500 shadow-xl">
+                                <i class="fas fa-globe text-white text-3xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-4" style="color: var(--text-color);">全局安装使用</h3>
+                        </div>
+
+                        <div class="space-y-6">
+                            <!-- NPM 安装 -->
+                            <div class="p-4 rounded-lg" style="background: var(--surface-secondary);">
+                                <h4 class="font-semibold mb-3 flex items-center" style="color: var(--text-color);">
+                                    <i class="fab fa-npm text-red-500 mr-2"></i>
+                                    使用 NPM 安装
+                                </h4>
+                                <div class="bg-gray-900 rounded-lg p-4 mb-3">
+                                    <code class="text-green-400 font-mono text-sm">npm install -g linux-do-analyzer</code>
+                                </div>
+                                <div class="bg-gray-900 rounded-lg p-4">
+                                    <code class="text-blue-400 font-mono text-sm">linux-do-analyzer</code>
+                                </div>
+                            </div>
+
+                            <!-- PNPM 安装 -->
+                            <div class="p-4 rounded-lg" style="background: var(--surface-secondary);">
+                                <h4 class="font-semibold mb-3 flex items-center" style="color: var(--text-color);">
+                                    <i class="fas fa-box text-orange-500 mr-2"></i>
+                                    使用 PNPM 安装
+                                </h4>
+                                <div class="bg-gray-900 rounded-lg p-4 mb-3">
+                                    <code class="text-green-400 font-mono text-sm">pnpm add -g linux-do-analyzer</code>
+                                </div>
+                                <div class="bg-gray-900 rounded-lg p-4">
+                                    <code class="text-blue-400 font-mono text-sm">linux-do-analyzer --port 3000</code>
+                                </div>
+                            </div>
+
+                            <!-- 启动选项 -->
+                            <div class="p-4 rounded-lg border-l-4 border-green-500" style="background: var(--surface-secondary);">
+                                <h4 class="font-semibold mb-2" style="color: var(--text-color);">
+                                    <i class="fas fa-cog text-green-500 mr-2"></i>
+                                    启动选项
+                                </h4>
+                                <ul class="text-sm space-y-1">
+                                    <li style="color: var(--text-secondary);">• <code class="bg-gray-200 px-1 rounded">--port 端口号</code> 指定服务器端口</li>
+                                    <li style="color: var(--text-secondary);">• <code class="bg-gray-200 px-1 rounded">--dev</code> 开发模式（文件监听）</li>
+                                    <li style="color: var(--text-secondary);">• <code class="bg-gray-200 px-1 rounded">--help</code> 显示帮助信息</li>
+                                    <li style="color: var(--text-secondary);">• <code class="bg-gray-200 px-1 rounded">--version</code> 显示版本信息</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- 装饰性元素 -->
+                        <div class="absolute top-4 right-4 w-3 h-3 bg-green-300 rounded-full animate-float opacity-50"></div>
+                        <div class="absolute bottom-4 left-4 w-2 h-2 bg-emerald-300 rounded-full animate-float opacity-60" style="animation-delay: 1s;"></div>
+                    </div>
+                </div>
+
+                <!-- 临时运行方法 -->
+                <div class="group animate-fade-in-right">
+                    <div class="relative p-8 rounded-3xl transition-all duration-500 hover:shadow-2xl hover:-translate-y-4 card-hover" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                        <!-- 图标区域 -->
+                        <div class="text-center mb-8">
+                            <div class="w-20 h-20 mx-auto bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-500 shadow-xl">
+                                <i class="fas fa-bolt text-white text-3xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-4" style="color: var(--text-color);">临时运行使用</h3>
+                        </div>
+
+                        <div class="space-y-6">
+                            <!-- NPX 使用 -->
+                            <div class="p-4 rounded-lg" style="background: var(--surface-secondary);">
+                                <h4 class="font-semibold mb-3 flex items-center" style="color: var(--text-color);">
+                                    <i class="fab fa-npm text-red-500 mr-2"></i>
+                                    使用 NPX（推荐）
+                                </h4>
+                                <div class="bg-gray-900 rounded-lg p-4 mb-2">
+                                    <code class="text-green-400 font-mono text-sm">npx linux-do-analyzer</code>
+                                </div>
+                                <p class="text-xs" style="color: var(--text-secondary);">
+                                    无需安装，直接运行最新版本
+                                </p>
+                            </div>
+
+                            <!-- PNPX 使用 -->
+                            <div class="p-4 rounded-lg" style="background: var(--surface-secondary);">
+                                <h4 class="font-semibold mb-3 flex items-center" style="color: var(--text-color);">
+                                    <i class="fas fa-box text-orange-500 mr-2"></i>
+                                    使用 PNPX
+                                </h4>
+                                <div class="bg-gray-900 rounded-lg p-4 mb-2">
+                                    <code class="text-green-400 font-mono text-sm">pnpx linux-do-analyzer</code>
+                                </div>
+                                <p class="text-xs" style="color: var(--text-secondary);">
+                                    PNPM 的运行器，更快的下载速度
+                                </p>
+                            </div>
+
+                            <!-- 带参数运行 -->
+                            <div class="p-4 rounded-lg" style="background: var(--surface-secondary);">
+                                <h4 class="font-semibold mb-3 flex items-center" style="color: var(--text-color);">
+                                    <i class="fas fa-terminal text-blue-500 mr-2"></i>
+                                    带参数运行示例
+                                </h4>
+                                <div class="space-y-2">
+                                    <div class="bg-gray-900 rounded-lg p-3">
+                                        <code class="text-green-400 font-mono text-xs">npx linux-do-analyzer --port 8080</code>
+                                    </div>
+                                    <div class="bg-gray-900 rounded-lg p-3">
+                                        <code class="text-green-400 font-mono text-xs">pnpx linux-do-analyzer --dev</code>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 优势说明 -->
+                            <div class="p-4 rounded-lg border-l-4 border-blue-500" style="background: var(--surface-secondary);">
+                                <h4 class="font-semibold mb-2" style="color: var(--text-color);">
+                                    <i class="fas fa-star text-blue-500 mr-2"></i>
+                                    临时运行优势
+                                </h4>
+                                <ul class="text-sm space-y-1">
+                                    <li style="color: var(--text-secondary);">• 无需全局安装，节省磁盘空间</li>
+                                    <li style="color: var(--text-secondary);">• 始终使用最新版本</li>
+                                    <li style="color: var(--text-secondary);">• 适合偶尔使用的场景</li>
+                                    <li style="color: var(--text-secondary);">• 避免版本冲突问题</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- 装饰性元素 -->
+                        <div class="absolute top-4 right-4 w-3 h-3 bg-blue-300 rounded-full animate-float opacity-50"></div>
+                        <div class="absolute bottom-4 left-4 w-2 h-2 bg-purple-300 rounded-full animate-float opacity-60" style="animation-delay: 1.5s;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 使用场景对比 -->
+            <div class="mt-12">
+                <div class="p-8 rounded-3xl card-hover" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                    <h3 class="text-2xl font-bold mb-6 text-center" style="color: var(--text-color);">
+                        <i class="fas fa-balance-scale text-indigo-500 mr-3"></i>
+                        使用方式对比
+                    </h3>
+
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <!-- 在线使用 -->
+                        <div class="text-center p-6 rounded-2xl" style="background: var(--surface-secondary);">
+                            <div class="w-16 h-16 mx-auto bg-gradient-to-br from-green-400 to-blue-500 rounded-2xl flex items-center justify-center mb-4">
+                                <i class="fas fa-globe text-white text-2xl"></i>
+                            </div>
+                            <h4 class="font-bold mb-3" style="color: var(--text-color);">在线使用</h4>
+                            <ul class="text-sm space-y-1 text-left">
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-green-500 mr-2"></i>
+                                    <span style="color: var(--text-secondary);">即开即用，无需安装</span>
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-green-500 mr-2"></i>
+                                    <span style="color: var(--text-secondary);">自动更新</span>
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-times text-red-500 mr-2"></i>
+                                    <span style="color: var(--text-secondary);">需要网络连接</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- 全局安装 -->
+                        <div class="text-center p-6 rounded-2xl" style="background: var(--surface-secondary);">
+                            <div class="w-16 h-16 mx-auto bg-gradient-to-br from-purple-400 to-pink-500 rounded-2xl flex items-center justify-center mb-4">
+                                <i class="fas fa-download text-white text-2xl"></i>
+                            </div>
+                            <h4 class="font-bold mb-3" style="color: var(--text-color);">全局安装</h4>
+                            <ul class="text-sm space-y-1 text-left">
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-green-500 mr-2"></i>
+                                    <span style="color: var(--text-secondary);">离线可用</span>
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-green-500 mr-2"></i>
+                                    <span style="color: var(--text-secondary);">启动快速</span>
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-times text-red-500 mr-2"></i>
+                                    <span style="color: var(--text-secondary);">占用磁盘空间</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- 临时运行 -->
+                        <div class="text-center p-6 rounded-2xl" style="background: var(--surface-secondary);">
+                            <div class="w-16 h-16 mx-auto bg-gradient-to-br from-orange-400 to-red-500 rounded-2xl flex items-center justify-center mb-4">
+                                <i class="fas fa-bolt text-white text-2xl"></i>
+                            </div>
+                            <h4 class="font-bold mb-3" style="color: var(--text-color);">临时运行</h4>
+                            <ul class="text-sm space-y-1 text-left">
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-green-500 mr-2"></i>
+                                    <span style="color: var(--text-secondary);">无需安装</span>
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-green-500 mr-2"></i>
+                                    <span style="color: var(--text-secondary);">始终最新版</span>
+                                </li>
+                                <li class="flex items-center">
+                                    <i class="fas fa-times text-red-500 mr-2"></i>
+                                    <span style="color: var(--text-secondary);">首次启动较慢</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 推荐使用场景 -->
+                    <div class="mt-8 p-6 rounded-2xl border-l-4 border-indigo-500" style="background: var(--surface-secondary);">
+                        <h4 class="font-bold mb-4 flex items-center" style="color: var(--text-color);">
+                            <i class="fas fa-lightbulb text-yellow-500 mr-3"></i>
+                            推荐使用场景
+                        </h4>
+                        <div class="grid md:grid-cols-3 gap-4 text-sm">
+                            <div>
+                                <strong style="color: var(--text-color);">在线使用：</strong>
+                                <span style="color: var(--text-secondary);">偶尔使用、快速体验</span>
+                            </div>
+                            <div>
+                                <strong style="color: var(--text-color);">全局安装：</strong>
+                                <span style="color: var(--text-secondary);">频繁使用、离线环境</span>
+                            </div>
+                            <div>
+                                <strong style="color: var(--text-color);">临时运行：</strong>
+                                <span style="color: var(--text-secondary);">测试最新版、CI/CD</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- 快速开始 - 现代化设计 -->
         <section class="mb-16 scroll-reveal">
             <div class="text-center mb-12">
