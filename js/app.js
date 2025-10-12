@@ -135,7 +135,8 @@ class App {
                 id: savedId,
                 data: parsedData,
                 analyzer: this.dataAnalyzer,
-                summary: summary
+                summary: summary,
+                platform: parsedData.platform || parsedData.metadata?.platform || null
             };
 
             await this.renderAnalysisResults();
@@ -177,6 +178,17 @@ class App {
         try {
             // 获取完整分析数据
             const fullAnalysis = analyzer.exportAnalysis();
+
+            if (!fullAnalysis.metadata) {
+                fullAnalysis.metadata = {};
+            }
+
+            if (!fullAnalysis.metadata.platform) {
+                fullAnalysis.metadata.platform = this.currentAnalysis.platform
+                    || this.currentAnalysis.data.platform
+                    || this.currentAnalysis.data.metadata?.platform
+                    || null;
+            }
 
             // 使用新的UI管理器渲染完整结果
             this.uiManager.renderAnalysisResults(fullAnalysis);
@@ -296,7 +308,12 @@ class App {
                 id: id,
                 data: parsedData,
                 analyzer: this.dataAnalyzer,
-                summary: summary
+                summary: summary,
+                platform: parsedData.platform
+                    || parsedData.metadata?.platform
+                    || analysisData.platform
+                    || analysisData.metadata?.platform
+                    || null
             };
 
             // 准备完整的分析数据用于渲染
@@ -311,7 +328,16 @@ class App {
                 authTokensAnalysis: this.dataAnalyzer.getAuthTokensAnalysis ? this.dataAnalyzer.getAuthTokensAnalysis() : null,
                 bookmarksAnalysis: this.dataAnalyzer.getBookmarksAnalysis ? this.dataAnalyzer.getBookmarksAnalysis() : null,
                 flagsAnalysis: this.dataAnalyzer.getFlagsAnalysis ? this.dataAnalyzer.getFlagsAnalysis() : null,
-                metadata: parsedData.metadata || analysisData.metadata || {}
+                hundredDayBadge: this.dataAnalyzer.getHundredDayBadgeAnalysis ? this.dataAnalyzer.getHundredDayBadgeAnalysis() : null,
+                metadata: {
+                    ...(analysisData.metadata || {}),
+                    ...(parsedData.metadata || {}),
+                    platform: parsedData.platform
+                        || parsedData.metadata?.platform
+                        || analysisData.platform
+                        || analysisData.metadata?.platform
+                        || null
+                }
             };
 
             // 渲染分析结果
@@ -409,14 +435,29 @@ class App {
         try {
             console.log('📤 导出分析数据');
 
+            const platformInfo = this.currentAnalysis.platform
+                || this.currentAnalysis.data.platform
+                || this.currentAnalysis.data.metadata?.platform
+                || {
+                    id: 'linux-do',
+                    displayName: 'Linux.do 社区',
+                    domain: 'linux.do',
+                    baseUrl: 'https://linux.do'
+                };
+
             const exportData = {
                 metadata: {
                     exportedAt: new Date().toISOString(),
-                    version: '1.0',
-                    source: 'Linux.do Data Analyzer'
+                    version: '1.1',
+                    source: 'Linux.do Analyzer',
+                    platform: platformInfo,
+                    baseUrl: platformInfo.baseUrl
                 },
                 summary: this.currentAnalysis.summary,
-                userData: this.currentAnalysis.data.userData,
+                userData: this.currentAnalysis.summary?.user
+                    || this.currentAnalysis.data.user
+                    || this.currentAnalysis.data.userData
+                    || {},
                 analysis: this.dataAnalyzer.exportAnalysis()
             };
 
@@ -427,7 +468,14 @@ class App {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `linux-do-analysis-${this.currentAnalysis.data.userData?.username || 'unknown'}-${Date.now()}.json`;
+            const username = exportData.summary?.user?.username
+                || exportData.userData?.username
+                || this.currentAnalysis.data.user?.username
+                || 'unknown';
+            const platformSlug = platformInfo?.id
+                || platformInfo?.domain
+                || 'forum';
+            a.download = `${platformSlug}-analysis-${username}-${Date.now()}.json`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);

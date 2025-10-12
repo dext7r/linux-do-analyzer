@@ -50,8 +50,38 @@ class DataAnalyzer {
             dataCompleteness: this.getDataCompleteness()
         };
 
+        summary.platform = this.getPlatformInfo();
+
         this.cache.set(cacheKey, summary);
         return summary;
+    }
+
+    /**
+     * 获取平台信息
+     */
+    getPlatformInfo() {
+        const cacheKey = 'platformInfo';
+        if (this.cache.has(cacheKey)) {
+            return this.cache.get(cacheKey);
+        }
+
+        const platform = this.data.platform || this.data.metadata?.platform || {};
+        const result = {
+            id: platform.id || 'linux-do',
+            displayName: platform.displayName || 'Linux.do 社区',
+            domain: platform.domain || 'linux.do',
+            baseUrl: platform.baseUrl || 'https://linux.do',
+            accentColor: platform.accentColor || '#2563eb',
+            detectedHosts: Array.isArray(platform.detectedHosts)
+                ? platform.detectedHosts.map(item => ({
+                    host: item.host,
+                    count: item.count
+                }))
+                : []
+        };
+
+        this.cache.set(cacheKey, result);
+        return result;
     }
 
     /**
@@ -1124,6 +1154,38 @@ class DataAnalyzer {
      * 导出完整分析结果
      */
     exportAnalysis() {
+        const platformInfo = this.getPlatformInfo();
+        const baseMetadata = this.data.metadata || {};
+
+        const hundredDayAnalysis = this.getHundredDayBadgeAnalysis();
+        const aggregatedWarnings = Array.isArray(baseMetadata.warnings) ? [...baseMetadata.warnings] : [];
+        if (hundredDayAnalysis?.warnings?.length) {
+            aggregatedWarnings.push(...hundredDayAnalysis.warnings);
+        }
+
+        const metadata = {
+            ...baseMetadata,
+            platform: platformInfo,
+            analyzedAt: new Date().toISOString(),
+            dataPoints: {
+                ...(baseMetadata.dataPoints || {}),
+                posts: this.data.userArchive?.length || 0,
+                visits: this.data.visits?.length || 0,
+                likes: this.data.likes?.length || 0,
+                userBadges: this.data.userBadges?.length || 0,
+                authTokens: this.data.authTokens?.length || 0,
+                authTokenLogs: this.data.authTokenLogs?.length || 0,
+                bookmarks: this.data.bookmarks?.length || 0,
+                flags: this.data.flags?.length || 0,
+                queuedPosts: this.data.queuedPosts?.length || 0,
+                categoryPreferences: this.data.categoryPreferences?.length || 0
+            }
+        };
+
+        if (aggregatedWarnings.length > 0) {
+            metadata.warnings = Array.from(new Set(aggregatedWarnings));
+        }
+
         return {
             summary: this.generateSummary(),
             categoryData: this.getCategoryData(),
@@ -1142,22 +1204,210 @@ class DataAnalyzer {
                 posts: this.getPostsActivityData(),
                 likes: this.getLikesActivityData()
             },
-            metadata: {
-                analyzedAt: new Date().toISOString(),
-                dataPoints: {
-                    posts: this.data.userArchive?.length || 0,
-                    visits: this.data.visits?.length || 0,
-                    likes: this.data.likes?.length || 0,
-                    userBadges: this.data.userBadges?.length || 0,
-                    authTokens: this.data.authTokens?.length || 0,
-                    authTokenLogs: this.data.authTokenLogs?.length || 0,
-                    bookmarks: this.data.bookmarks?.length || 0,
-                    flags: this.data.flags?.length || 0,
-                    queuedPosts: this.data.queuedPosts?.length || 0,
-                    categoryPreferences: this.data.categoryPreferences?.length || 0
+            metadata,
+            hundredDayBadge: hundredDayAnalysis
+        };
+    }
+
+    /**
+     * 百尺竿头（连续100天登录）徽章分析
+     */
+    getHundredDayBadgeAnalysis() {
+        const cacheKey = 'hundredDayBadgeAnalysis';
+        if (this.cache.has(cacheKey)) {
+            return this.cache.get(cacheKey);
+        }
+
+        const targetStreak = 100;
+        const badges = this.data.badges || [];
+        const userBadges = this.data.userBadges || [];
+        const visits = this.data.visits || [];
+        const warnings = [];
+
+        const badgeCandidates = badges.filter(badge => badge && typeof badge.name === 'string' && badge.name.includes('百尺'));
+        const badgeDefinition = badgeCandidates.length > 0 ? badgeCandidates[0] : null;
+
+        let userBadgeEntry = null;
+        if (badgeDefinition) {
+            userBadgeEntry = userBadges.find(entry => entry.badge_id === badgeDefinition.id) || null;
+        } else {
+            userBadgeEntry = userBadges.find(entry => {
+                const badge = badges.find(b => b.id === entry.badge_id);
+                return badge && typeof badge.name === 'string' && badge.name.includes('百尺');
+            }) || null;
+        }
+
+        const hasBadge = Boolean(userBadgeEntry);
+        const badgeName = badgeDefinition?.name || '百尺竿头';
+
+        const dateSet = new Set();
+        visits.forEach((visit, index) => {
+            const normalized = this.normalizeVisitDate(visit?.visited_at);
+            if (normalized) {
+                dateSet.add(normalized);
+            } else {
+                warnings.push(`visits.csv 第${index + 1}行缺少有效日期`);
+            }
+        });
+
+        const sortedDateStrings = Array.from(dateSet).sort();
+
+        const segments = [];
+        const missingRanges = [];
+
+        let prevDate = null;
+        let currentSegment = null;
+
+        sortedDateStrings.forEach(dateStr => {
+            const dateObj = this.parseDate(dateStr);
+            if (!dateObj) {
+                warnings.push(`无法解析访问日期 "${dateStr}"`);
+                return;
+            }
+
+            if (!currentSegment) {
+                currentSegment = {
+                    start: dateObj,
+                    end: dateObj,
+                    length: 1
+                };
+            } else {
+                const diff = this.diffInDays(prevDate, dateObj);
+                if (diff === 1) {
+                    currentSegment.end = dateObj;
+                    currentSegment.length += 1;
+                } else {
+                    segments.push(currentSegment);
+
+                    if (diff > 1) {
+                        const gapStart = this.addDays(prevDate, 1);
+                        const gapEnd = this.addDays(dateObj, -1);
+                        missingRanges.push({
+                            start: this.formatDate(gapStart),
+                            end: this.formatDate(gapEnd),
+                            length: diff - 1
+                        });
+                    }
+
+                    currentSegment = {
+                        start: dateObj,
+                        end: dateObj,
+                        length: 1
+                    };
                 }
             }
+
+            prevDate = dateObj;
+        });
+
+        if (currentSegment) {
+            segments.push(currentSegment);
+        }
+
+        let longestSegment = null;
+        segments.forEach(segment => {
+            if (!longestSegment || segment.length > longestSegment.length) {
+                longestSegment = segment;
+            }
+        });
+
+        const lastSegment = segments.length > 0 ? segments[segments.length - 1] : null;
+        const currentStreakLength = lastSegment ? lastSegment.length : 0;
+        const remainingDays = hasBadge ? 0 : Math.max(0, targetStreak - currentStreakLength);
+        const projectedCompletionDate = (!hasBadge && lastSegment && remainingDays > 0)
+            ? this.formatDate(this.addDays(lastSegment.end, remainingDays))
+            : null;
+
+        const analysis = {
+            badge: {
+                id: badgeDefinition?.id || null,
+                name: badgeName,
+                slug: badgeDefinition?.slug || null,
+                granted: hasBadge,
+                grantedAt: userBadgeEntry?.granted_at || null
+            },
+            requirements: {
+                targetStreak
+            },
+            stats: {
+                totalVisitDays: sortedDateStrings.length,
+                lastVisitDate: lastSegment ? this.formatDate(lastSegment.end) : null,
+                currentStreak: lastSegment ? {
+                    length: lastSegment.length,
+                    start: this.formatDate(lastSegment.start),
+                    end: this.formatDate(lastSegment.end)
+                } : {
+                    length: 0,
+                    start: null,
+                    end: null
+                },
+                longestStreak: longestSegment ? {
+                    length: longestSegment.length,
+                    start: this.formatDate(longestSegment.start),
+                    end: this.formatDate(longestSegment.end)
+                } : {
+                    length: 0,
+                    start: null,
+                    end: null
+                }
+            },
+            progress: {
+                remainingDays,
+                projectedCompletionDate,
+                onTrack: !hasBadge && currentStreakLength > 0
+            },
+            interruptions: {
+                total: missingRanges.length,
+                details: missingRanges.slice(-5)
+            }
         };
+
+        if (warnings.length > 0) {
+            analysis.warnings = Array.from(new Set(warnings));
+        }
+
+        this.cache.set(cacheKey, analysis);
+        return analysis;
+    }
+
+    normalizeVisitDate(value) {
+        if (!value && value !== 0) return '';
+        const str = String(value).trim();
+        if (str === '') return '';
+        if (str.length >= 10) {
+            return str.slice(0, 10);
+        }
+        return str;
+    }
+
+    parseDate(value) {
+        if (!value) return null;
+        const base = this.normalizeVisitDate(value);
+        if (!base) return null;
+        const parsed = new Date(`${base}T00:00:00Z`);
+        if (Number.isNaN(parsed.getTime())) {
+            return null;
+        }
+        return parsed;
+    }
+
+    addDays(date, days) {
+        if (!date) return null;
+        const result = new Date(date.getTime());
+        result.setUTCDate(result.getUTCDate() + days);
+        return result;
+    }
+
+    diffInDays(startDate, endDate) {
+        if (!startDate || !endDate) return null;
+        const msPerDay = 24 * 60 * 60 * 1000;
+        const diff = (endDate - startDate) / msPerDay;
+        return Math.round(diff);
+    }
+
+    formatDate(date) {
+        if (!date) return null;
+        return date.toISOString().split('T')[0];
     }
 
     /**
@@ -1211,7 +1461,7 @@ class DataAnalyzer {
                 const visitDate = visit.visited_at?.split('T')[0];
                 const index = dates.indexOf(visitDate);
                 if (index !== -1) {
-                    visitsData[index] = visit.posts_read || 0;
+                    visitsData[index] += visit.posts_read || 0;
                 }
             });
         }

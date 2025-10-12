@@ -27,6 +27,70 @@ class UIManager {
       totalItems: 0,
       searchQuery: ''
     };
+
+    this.defaultPlatform = {
+      id: 'linux-do',
+      displayName: 'Linux.do 社区',
+      domain: 'linux.do',
+      baseUrl: 'https://linux.do',
+      accentColor: '#2563eb',
+      detectedHosts: []
+    };
+
+    this.platform = { ...this.defaultPlatform };
+  }
+
+  setPlatform(platform) {
+    if (!platform) {
+      this.platform = { ...this.defaultPlatform };
+      return;
+    }
+
+    const domain = platform.domain || (platform.baseUrl ? platform.baseUrl.replace(/^https?:\/\//, '') : this.defaultPlatform.domain);
+    const baseUrl = platform.baseUrl || (domain ? `https://${domain}` : this.defaultPlatform.baseUrl);
+
+    this.platform = {
+      id: platform.id || domain?.replace(/\./g, '-') || this.defaultPlatform.id,
+      displayName: platform.displayName || platform.name || this.defaultPlatform.displayName,
+      domain: domain || this.defaultPlatform.domain,
+      baseUrl,
+      accentColor: platform.accentColor || this.defaultPlatform.accentColor,
+      detectedHosts: Array.isArray(platform.detectedHosts) ? platform.detectedHosts : []
+    };
+  }
+
+  getPlatformBaseUrl() {
+    return this.platform?.baseUrl || '';
+  }
+
+  buildTopicUrl(topicId, postNumber = null) {
+    if (!topicId) return '#';
+    const base = this.getPlatformBaseUrl();
+    if (!base) return '#';
+    return postNumber ? `${base}/t/topic/${topicId}/${postNumber}` : `${base}/t/topic/${topicId}`;
+  }
+
+  buildPostUrl(postId, topicId = null, postNumber = null) {
+    const base = this.getPlatformBaseUrl();
+    if (postId && base) {
+      return `${base}/p/${postId}`;
+    }
+    if (topicId) {
+      return this.buildTopicUrl(topicId, postNumber);
+    }
+    return '#';
+  }
+
+  buildBadgeUrl(badgeId) {
+    const base = this.getPlatformBaseUrl();
+    if (!badgeId || !base) return '#';
+    return `${base}/badges/${badgeId}`;
+  }
+
+  buildUserUrl(userId) {
+    const base = this.getPlatformBaseUrl();
+    if (!userId || !base) return '#';
+    return `${base}/u/user/${userId}`;
   }
 
   /**
@@ -1067,6 +1131,121 @@ class UIManager {
         `).join('');
 
     cardsContainer.html(cardHTML);
+  }
+
+  renderHundredDayBadge(analysis) {
+    const container = $('#hundredDayContent');
+    if (!container.length) {
+      return;
+    }
+
+    const formatDate = (value) => {
+      if (!value) return '—';
+      try {
+        const date = new Date(value);
+        if (!Number.isNaN(date.getTime())) {
+          return date.toISOString().split('T')[0];
+        }
+      } catch (_) {
+        // ignore
+      }
+      return value;
+    };
+
+    if (!analysis || (analysis.stats?.totalVisitDays || 0) === 0) {
+      container.html(`
+        <div class="bg-white/10 border border-white/20 rounded-2xl p-5 text-sm text-white/70">
+          暂无访问记录，无法计算连续登录情况。
+        </div>
+      `);
+      return;
+    }
+
+    const badgeGranted = analysis.badge?.granted;
+    const remainingDays = analysis.progress?.remainingDays ?? 0;
+    const currentStreak = analysis.stats?.currentStreak?.length ?? 0;
+    const longestStreak = analysis.stats?.longestStreak?.length ?? 0;
+    const projectedDate = analysis.progress?.projectedCompletionDate;
+    const interruptions = analysis.interruptions?.details || [];
+    const totalInterruptions = analysis.interruptions?.total || 0;
+
+    const statusBlock = badgeGranted
+      ? `
+        <div class="bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 border border-emerald-400/40 rounded-2xl p-5 text-emerald-100">
+          <div class="flex items-center mb-2 text-emerald-200">
+            <i class="fas fa-award mr-3"></i>
+            <span class="font-semibold text-lg">恭喜！您已获得百尺竿头徽章</span>
+          </div>
+          <p class="text-sm">授予时间：<span class="font-semibold">${formatDate(analysis.badge?.grantedAt)}</span></p>
+        </div>
+      `
+      : `
+        <div class="bg-gradient-to-r from-indigo-500/20 to-purple-600/20 border border-indigo-400/40 rounded-2xl p-5 text-indigo-100">
+          <div class="flex items-center mb-2 text-indigo-200">
+            <i class="fas fa-shoe-prints mr-3"></i>
+            <span class="font-semibold text-lg">继续努力，百尺竿头近在眼前</span>
+          </div>
+          <p class="text-sm">当前连续登录 <span class="font-semibold">${currentStreak}</span> 天，距离徽章还差 <span class="font-semibold">${remainingDays}</span> 天。</p>
+          ${projectedDate ? `<p class="text-xs text-indigo-100/80 mt-1">按当前节奏，预计可在 <span class="font-semibold">${formatDate(projectedDate)}</span> 达成。</p>` : ''}
+        </div>
+      `;
+
+    const streakBlock = `
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
+        <div class="bg-white/10 border border-white/10 rounded-2xl p-4">
+          <div class="text-white/60 text-sm mb-1">当前连续</div>
+          <div class="text-3xl font-bold text-white">${currentStreak}</div>
+          <div class="text-xs text-white/60 mt-1">${formatDate(analysis.stats?.currentStreak?.start)} 至 ${formatDate(analysis.stats?.currentStreak?.end)}</div>
+        </div>
+        <div class="bg-white/10 border border-white/10 rounded-2xl p-4">
+          <div class="text-white/60 text-sm mb-1">历史最长</div>
+          <div class="text-3xl font-bold text-white">${longestStreak}</div>
+          <div class="text-xs text-white/60 mt-1">${formatDate(analysis.stats?.longestStreak?.start)} 至 ${formatDate(analysis.stats?.longestStreak?.end)}</div>
+        </div>
+        <div class="bg-white/10 border border-white/10 rounded-2xl p-4">
+          <div class="text-white/60 text-sm mb-1">累计签到天数</div>
+          <div class="text-3xl font-bold text-white">${analysis.stats?.totalVisitDays || 0}</div>
+          <div class="text-xs text-white/60 mt-1">最后记录：${formatDate(analysis.stats?.lastVisitDate)}</div>
+        </div>
+      </div>
+    `;
+
+    const interruptionItems = interruptions.length > 0
+      ? interruptions.map(item => {
+          const isSingleDay = item.start === item.end;
+          const rangeText = isSingleDay ? item.start : `${item.start} ~ ${item.end}`;
+          return `<li class="flex items-center text-xs"><span class="w-2 h-2 bg-amber-400 rounded-full mr-2"></span>${rangeText} <span class="text-amber-200/70 ml-2">缺失 ${item.length} 天</span></li>`;
+        }).join('')
+      : '<li class="text-xs text-emerald-200">暂无中断记录，继续保持！</li>';
+
+    const interruptionBlock = `
+      <div class="mt-6">
+        <div class="flex items-center justify-between mb-2">
+          <div class="text-sm font-semibold text-white flex items-center"><i class="fas fa-history text-amber-300 mr-2"></i>历史中断</div>
+          <div class="text-xs text-white/50">共 ${totalInterruptions} 次</div>
+        </div>
+        <ul class="space-y-1 text-white/70">
+          ${interruptionItems}
+          ${totalInterruptions > interruptions.length ? `<li class="text-xs text-white/40">... 其余 ${totalInterruptions - interruptions.length} 次请查看详细访问记录</li>` : ''}
+        </ul>
+      </div>
+    `;
+
+    const warningsBlock = analysis?.warnings?.length ? `
+      <div class="mt-6 bg-amber-500/10 border border-amber-300/40 rounded-2xl p-4 text-xs text-amber-100">
+        <div class="font-semibold text-amber-200 mb-2 flex items-center"><i class="fas fa-exclamation-triangle mr-2"></i>解析提示</div>
+        <ul class="space-y-1">
+          ${analysis.warnings.map(msg => `<li class="flex items-start"><span class="w-2 h-2 bg-amber-300 rounded-full mr-2 mt-1"></span><span>${msg}</span></li>`).join('')}
+        </ul>
+      </div>
+    ` : '';
+
+    container.html(`
+      ${statusBlock}
+      ${streakBlock}
+      ${interruptionBlock}
+      ${warningsBlock}
+    `);
   }
 
   /**
@@ -2477,9 +2656,7 @@ class UIManager {
 
     // 处理特殊情况：likes表的topic_id字段，添加链接图标
     if (tabName === 'likes' && type === 'number' && row && row.topic_id && value === row.topic_id) {
-      const url = row.post_number ?
-        `https://linux.do/t/topic/${row.topic_id}/${row.post_number}` :
-        `https://linux.do/t/topic/${row.topic_id}`;
+      const url = this.buildTopicUrl(row.topic_id, row.post_number);
       return `
                 <div class="flex items-center gap-2">
                     <span>${value}</span>
@@ -2506,33 +2683,40 @@ class UIManager {
           return value;
         }
       case 'boolean':
+        if (value === null || value === undefined) {
+          return '<span class="text-gray-400">-</span>';
+        }
         return value ? '<span class="text-green-600">是</span>' : '<span class="text-gray-400">否</span>';
       case 'number':
-        return (typeof value === 'number' && !isNaN(value)) ? value.toLocaleString() : (value || 0);
+        if (value === null || value === undefined || value === '') {
+          return '<span class="text-gray-400">-</span>';
+        }
+        if (typeof value === 'number' && !Number.isNaN(value)) {
+          return value.toLocaleString();
+        }
+        const parsedNumber = Number(value);
+        return Number.isNaN(parsedNumber) ? value : parsedNumber.toLocaleString();
       case 'topic_title':
         // 特殊处理主题标题，添加链接图标
         if (tabName === 'userArchive' && row && row.url) {
-          const urlMatch = row.url.match(/\/t\/topic\/(\d+)/);
-          if (urlMatch) {
-            const topicId = urlMatch[1];
-            return `
-              <div class="flex items-center gap-2">
-                <span>${value}</span>
-                <a href="https://linux.do/t/topic/${topicId}" target="_blank"
-                   class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
-                   title="在新标签页打开">
-                    <i class="fas fa-external-link-alt text-xs"></i>
-                </a>
-              </div>
-            `;
-          }
-        }
-        // 兼容旧格式
-        else if (tabName === 'userArchive' && row && row.topic_id) {
           return `
             <div class="flex items-center gap-2">
               <span>${value}</span>
-              <a href="https://linux.do/t/topic/${row.topic_id}" target="_blank"
+              <a href="${row.url}" target="_blank"
+                 class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+                 title="在新标签页打开">
+                  <i class="fas fa-external-link-alt text-xs"></i>
+              </a>
+            </div>
+          `;
+        }
+        // 兼容旧格式
+        else if (tabName === 'userArchive' && row && row.topic_id) {
+          const topicLink = this.buildTopicUrl(row.topic_id);
+          return `
+            <div class="flex items-center gap-2">
+              <span>${value}</span>
+              <a href="${topicLink}" target="_blank"
                  class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
                  title="在新标签页打开">
                   <i class="fas fa-external-link-alt text-xs"></i>
@@ -2557,7 +2741,6 @@ class UIManager {
    * 生成操作按钮
    */
   generateActionButtons(row, tabName) {
-    // Enhanced debug logging
     console.log('%c🔗 Action Buttons Debug', 'background: #4CAF50; color: white; padding: 2px 8px; border-radius: 3px;', {
       tabName: tabName,
       url: row?.url,
@@ -2568,140 +2751,147 @@ class UIManager {
     const buttons = [];
 
     switch (tabName) {
-      case 'userArchive':
-        // 从URL中提取topic_id和post_number
-        // URL格式: https://linux.do/t/topic/640656/12
-        if (row.url) {
+      case 'userArchive': {
+        let topicId = null;
+        let postNumber = null;
+
+        if (row?.url) {
           const urlMatch = row.url.match(/\/t\/topic\/(\d+)(?:\/(\d+))?/);
           if (urlMatch) {
-            const topicId = urlMatch[1];
-            const postNumber = urlMatch[2];
-
-            console.log('Extracted from URL:', { topicId, postNumber });
-
-            // 总是添加主题链接
-            buttons.push(`
-              <a href="https://linux.do/t/topic/${topicId}" target="_blank"
-                 class="inline-flex items-center px-3 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition-colors duration-200"
-                 title="打开主题: ${row.topic_title || ''}">
-                  <i class="fas fa-external-link-alt"></i>
-              </a>
-            `);
-
-            // 如果有post_number，添加具体帖子链接
-            if (postNumber) {
-              buttons.push(`
-                <a href="${row.url}" target="_blank"
-                   class="inline-flex items-center px-3 py-1 text-xs font-medium text-white bg-green-600 rounded hover:bg-green-700 transition-colors duration-200"
-                   title="打开具体帖子">
-                    <i class="fas fa-link"></i>
-                </a>
-              `);
-            }
+            topicId = urlMatch[1];
+            postNumber = urlMatch[2] || null;
           }
         }
-        // 兼容旧数据格式（如果有topic_id字段）
-        else if (row.topic_id) {
-          console.log('Using topic_id field:', row.topic_id);
+
+        if (!topicId && row?.topic_id) {
+          topicId = row.topic_id;
+        }
+
+        if (topicId) {
+          const topicUrl = this.buildTopicUrl(topicId);
           buttons.push(`
-            <a href="https://linux.do/t/topic/${row.topic_id}" target="_blank"
+            <a href="${topicUrl}" target="_blank"
                class="inline-flex items-center px-3 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition-colors duration-200"
                title="在新标签页打开主题">
                 <i class="fas fa-external-link-alt"></i>
             </a>
           `);
 
-          if (row.post_id && row.post_number) {
+          if (postNumber) {
+            const postUrl = this.buildTopicUrl(topicId, postNumber);
             buttons.push(`
-              <a href="https://linux.do/t/topic/${row.topic_id}/${row.post_number}" target="_blank"
+              <a href="${postUrl}" target="_blank"
                  class="inline-flex items-center px-3 py-1 text-xs font-medium text-white bg-green-600 rounded hover:bg-green-700 transition-colors duration-200"
-                 title="在新标签页打开帖子">
+                 title="打开具体帖子">
+                  <i class="fas fa-link"></i>
+              </a>
+            `);
+          } else if (row?.url) {
+            buttons.push(`
+              <a href="${row.url}" target="_blank"
+                 class="inline-flex items-center px-3 py-1 text-xs font-medium text-white bg-green-600 rounded hover:bg-green-700 transition-colors duration-200"
+                 title="打开具体帖子">
                   <i class="fas fa-link"></i>
               </a>
             `);
           }
+        } else if (row?.url) {
+          buttons.push(`
+            <a href="${row.url}" target="_blank"
+               class="inline-flex items-center px-3 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition-colors duration-200"
+               title="在新标签页打开">
+                <i class="fas fa-external-link-alt"></i>
+            </a>
+          `);
         }
         break;
+      }
 
-      case 'likes':
-        // 点赞的帖子链接 - 总是显示
-        if (row.topic_id && row.post_number) {
+      case 'likes': {
+        if (row?.topic_id) {
+          const likeUrl = this.buildTopicUrl(row.topic_id, row.post_number);
           buttons.push(`
-                        <a href="https://linux.do/t/topic/${row.topic_id}/${row.post_number}" target="_blank"
-                           class="inline-flex items-center px-3 py-1 text-xs font-medium text-white bg-red-600 rounded hover:bg-red-700 transition-colors duration-200"
-                           title="在新标签页打开帖子">
-                            <i class="fas fa-external-link-alt"></i>
-                        </a>
-                    `);
-        } else if (row.topic_id) {
-          buttons.push(`
-                        <a href="https://linux.do/t/topic/${row.topic_id}" target="_blank"
-                           class="inline-flex items-center px-3 py-1 text-xs font-medium text-white bg-red-600 rounded hover:bg-red-700 transition-colors duration-200"
-                           title="在新标签页打开主题">
-                            <i class="fas fa-external-link-alt"></i>
-                        </a>
-                    `);
+            <a href="${likeUrl}" target="_blank"
+               class="inline-flex items-center px-3 py-1 text-xs font-medium text-white bg-red-600 rounded hover:bg-red-700 transition-colors duration-200"
+               title="在新标签页打开帖子">
+                <i class="fas fa-external-link-alt"></i>
+            </a>
+          `);
         }
         break;
+      }
 
-      case 'flags':
-        // 举报的帖子链接
-        if (row.post_id && row.topic_id) {
+      case 'flags': {
+        if (row?.post_id || row?.topic_id) {
+          const flagUrl = this.buildPostUrl(row.post_id, row.topic_id, row.post_number);
           buttons.push(`
-                        <a href="https://linux.do/p/${row.post_id}" target="_blank"
-                           class="inline-flex items-center px-2 py-1 text-xs font-medium text-orange-600 bg-orange-100 rounded-md hover:bg-orange-200 transition-colors duration-200">
-                            <i class="fas fa-flag mr-1"></i>
-                            查看帖子
-                        </a>
-                    `);
+            <a href="${flagUrl}" target="_blank"
+               class="inline-flex items-center px-2 py-1 text-xs font-medium text-orange-600 bg-orange-100 rounded-md hover:bg-orange-200 transition-colors duration-200">
+                <i class="fas fa-flag mr-1"></i>
+                查看帖子
+            </a>
+          `);
         }
         break;
+      }
 
-      case 'userBadges':
-        // 徽章信息链接
-        if (row.badge_id) {
+      case 'userBadges': {
+        if (row?.badge_id) {
+          const badgeUrl = this.buildBadgeUrl(row.badge_id);
           buttons.push(`
-                        <a href="https://linux.do/badges/${row.badge_id}" target="_blank"
-                           class="inline-flex items-center px-2 py-1 text-xs font-medium text-yellow-600 bg-yellow-100 rounded-md hover:bg-yellow-200 transition-colors duration-200">
-                            <i class="fas fa-medal mr-1"></i>
-                            查看徽章
-                        </a>
-                    `);
+            <a href="${badgeUrl}" target="_blank"
+               class="inline-flex items-center px-2 py-1 text-xs font-medium text-yellow-600 bg-yellow-100 rounded-md hover:bg-yellow-200 transition-colors duration-200">
+                <i class="fas fa-medal mr-1"></i>
+                查看徽章
+            </a>
+          `);
         }
         break;
+      }
 
-      case 'bookmarks':
-        // 书签链接
-        if (row.bookmarkable_type === 'Post' && row.bookmarkable_id) {
+      case 'bookmarks': {
+        if (row?.link) {
           buttons.push(`
-                        <a href="https://linux.do/p/${row.bookmarkable_id}" target="_blank"
-                           class="inline-flex items-center px-2 py-1 text-xs font-medium text-purple-600 bg-purple-100 rounded-md hover:bg-purple-200 transition-colors duration-200">
-                            <i class="fas fa-bookmark mr-1"></i>
-                            查看帖子
-                        </a>
-                    `);
-        } else if (row.bookmarkable_type === 'Topic' && row.bookmarkable_id) {
+            <a href="${row.link}" target="_blank"
+               class="inline-flex items-center px-2 py-1 text-xs font-medium text-purple-600 bg-purple-100 rounded-md hover:bg-purple-200 transition-colors duration-200">
+                <i class="fas fa-bookmark mr-1"></i>
+                查看书签
+            </a>
+          `);
+        } else if (row?.bookmarkable_type === 'Post' && row?.bookmarkable_id) {
+          const bookmarkPostUrl = this.buildPostUrl(row.bookmarkable_id);
           buttons.push(`
-                        <a href="https://linux.do/t/topic/${row.bookmarkable_id}" target="_blank"
-                           class="inline-flex items-center px-2 py-1 text-xs font-medium text-purple-600 bg-purple-100 rounded-md hover:bg-purple-200 transition-colors duration-200">
-                            <i class="fas fa-external-link-alt mr-1"></i>
-                            查看主题
-                        </a>
-                    `);
+            <a href="${bookmarkPostUrl}" target="_blank"
+               class="inline-flex items-center px-2 py-1 text-xs font-medium text-purple-600 bg-purple-100 rounded-md hover:bg-purple-200 transition-colors duration-200">
+                <i class="fas fa-bookmark mr-1"></i>
+                查看帖子
+            </a>
+          `);
+        } else if (row?.bookmarkable_type === 'Topic' && row?.bookmarkable_id) {
+          const bookmarkTopicUrl = this.buildTopicUrl(row.bookmarkable_id);
+          buttons.push(`
+            <a href="${bookmarkTopicUrl}" target="_blank"
+               class="inline-flex items-center px-2 py-1 text-xs font-medium text-purple-600 bg-purple-100 rounded-md hover:bg-purple-200 transition-colors duration-200">
+                <i class="fas fa-external-link-alt mr-1"></i>
+                查看主题
+            </a>
+          `);
         }
         break;
+      }
 
-      default:
-        // 通用的用户主页链接（如果有用户ID）
-        if (row.user_id) {
+      default: {
+        if (row?.user_id) {
+          const userUrl = this.buildUserUrl(row.user_id);
           buttons.push(`
-                        <a href="https://linux.do/u/user/${row.user_id}" target="_blank"
-                           class="inline-flex items-center px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors duration-200">
-                            <i class="fas fa-user mr-1"></i>
-                            查看用户
-                        </a>
-                    `);
+            <a href="${userUrl}" target="_blank"
+               class="inline-flex items-center px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors duration-200">
+                <i class="fas fa-user mr-1"></i>
+                查看用户
+            </a>
+          `);
         }
+      }
     }
 
     const result = buttons.length > 0 ?
@@ -2711,6 +2901,7 @@ class UIManager {
     console.log(`Returning ${buttons.length} buttons for ${tabName}:`, result);
     return result;
   }
+
 
   /**
    * 更新产品预览区域
@@ -2728,6 +2919,12 @@ class UIManager {
     try {
       const summary = analysisData.summary || {};
       const user = summary.user || {};
+      const platformInfo = this.platform || this.defaultPlatform;
+      const platformName = platformInfo.displayName || platformInfo.name || platformInfo.domain || 'Linux.do 社区';
+      const platformLink = platformInfo.baseUrl || '';
+      const platformLabel = platformLink
+        ? `<a href="${platformLink}" target="_blank" class="hover:text-indigo-600 transition-colors">${platformName}</a>`
+        : `<span class="text-gray-700">${platformName}</span>`;
 
       // 使用现有的用户信息格式化逻辑
       const formatValue = (value, type = 'text') => {
@@ -2756,7 +2953,10 @@ class UIManager {
                         <div class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
                             <i class="fas fa-chart-bar text-white text-sm"></i>
                         </div>
-                        <div class="text-sm font-semibold text-gray-700"><a href="index.html" class="hover:text-indigo-600 transition-colors">Linux.do Analyzer</a></div>
+                        <div class="text-sm font-semibold text-gray-700">
+                            ${platformLabel}
+                            <span class="text-xs text-gray-500 ml-2">数据分析</span>
+                        </div>
                     </div>
                     <div class="flex items-center space-x-2">
                         <div class="w-4 h-4 bg-blue-500 rounded-full animate-pulse"></div>
@@ -2860,6 +3060,12 @@ class UIManager {
   renderAnalysisResults(analysisData) {
     console.log('🎨 渲染完整分析结果');
 
+    const platformSource = analysisData.summary?.platform
+      || analysisData.metadata?.platform
+      || analysisData.platform
+      || null;
+    this.setPlatform(platformSource);
+
     // 保存当前数据
     this.currentTabData = analysisData.detailedData;
 
@@ -2873,15 +3079,31 @@ class UIManager {
       this.renderUserInfo(analysisData.summary.user);
     }
 
-    // 渲染数据完整性评估
-    if (this.renderEnhancedDataCompleteness) {
-      this.renderEnhancedDataCompleteness(analysisData);
-    } else {
-      this.renderDataCompleteness(analysisData.summary.dataCompleteness);
+    // 数据完整性评估模块已移除
+    const completenessContainer = $('#dataCompletenessContent');
+    if (completenessContainer.length) {
+      completenessContainer.parent().remove();
+    }
+
+    const combinedWarnings = [];
+    if (Array.isArray(analysisData.metadata?.warnings)) {
+      combinedWarnings.push(...analysisData.metadata.warnings);
+    }
+    if (Array.isArray(analysisData.hundredDayBadge?.warnings)) {
+      combinedWarnings.push(...analysisData.hundredDayBadge.warnings);
+    }
+
+    const uniqueWarnings = [...new Set(combinedWarnings)];
+    if (uniqueWarnings.length > 0) {
+      this.showToast(uniqueWarnings[0], 'warning');
+      if (uniqueWarnings.length > 1) {
+        this.showToast(`还有 ${uniqueWarnings.length - 1} 条解析提示，可在导出数据中查看详情`, 'warning');
+      }
     }
 
     // 渲染摘要卡片
     this.renderSummaryCards(analysisData.summary);
+    this.renderHundredDayBadge(analysisData.hundredDayBadge);
 
     // 渲染分类数据
     this.renderCategoryData(analysisData.categoryData);
@@ -3009,6 +3231,8 @@ class UIManager {
         const badges = analysis.summary?.totalBadges || 0;
         const visits = analysis.summary?.totalVisits || 0;
         const likes = analysis.summary?.totalLikes || 0;
+        const platformInfo = analysis.platform || analysis.metadata?.platform || analysis.summary?.platform || {};
+        const platformLabel = platformInfo.displayName || platformInfo.name || platformInfo.domain || 'Linux.do 社区';
 
         return `
                     <div class="stored-data-item bg-white/90 rounded-xl p-4 border border-gray-200
@@ -3018,6 +3242,10 @@ class UIManager {
                         <div class="flex items-center justify-between">
                             <div class="flex-1">
                                 <h4 class="font-semibold text-gray-800 text-lg">${username}</h4>
+                                <p class="text-xs text-blue-600 mt-1 flex items-center gap-1">
+                                    <i class="fas fa-globe-asia"></i>
+                                    <span>${platformLabel}</span>
+                                </p>
                                 <div class="grid grid-cols-2 gap-2 mt-2">
                                     <p class="text-sm text-gray-600">
                                         <i class="fas fa-comment text-blue-500 mr-1"></i>

@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js --dev",
+    "dev": "nodemon --watch server.js --watch js --watch css --ext js,css,html --exec \"node server.js --dev\"",
     "serve": "node server.js --port=8080",
     "preview": "node server.js --port=3000",
     "test": "echo \"✅ Running basic project tests...\" && node bin/cli.js --version && echo \"✅ All tests passed!\"",
@@ -100,6 +100,9 @@
   "directories": {
     "bin": "./bin",
     "lib": "./js"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
   },
   "config": {
     "unsafe-perm": true
