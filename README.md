@@ -145,7 +145,7 @@ cd linux-do-analyzer
 # 安装依赖
 npm install
 
-# 启动开发服务器
+# 启动开发服务器（基于 nodemon 自动重载）
 npm run dev
 
 # 启动生产服务器
